@@ -769,7 +769,38 @@ export const quotationService = {
       try {
         const res = await fetch('/api/quotations');
         if (res.ok) {
-          return await res.json();
+          const raw = await res.json();
+          if (Array.isArray(raw)) {
+            return raw.map((q: any) => {
+              const qId = Number(q.quotationId ?? q.id ?? 0);
+              const sub = Number(q.subtotal ?? 0);
+              const p3 = Number(q.payMethod3 ?? q.p3Cash ?? sub);
+              const p2 = Number(q.payMethod2 ?? q.p2ThreeMonths ?? Math.round(p3 * 1.04 * 100) / 100);
+              const p1 = Number(q.payMethod1 ?? q.p1TwelveMonths ?? Math.round(p3 * 1.15 * 100) / 100);
+              return {
+                quotationId: qId,
+                customerId: Number(q.customerId ?? 0),
+                customerName: q.customerName || 'Commercial Client',
+                remarks: q.remarks || '',
+                payMethod1: p1,
+                payMethod2: p2,
+                payMethod3: p3,
+                quotationDate: q.quotationDate || new Date().toISOString(),
+                quotationStatus: q.quotationStatus || 'Draft',
+                computerName: q.computerName || 'POS-TERMINAL-01',
+                encoder: q.encoder || 'Sales Associate',
+                items: Array.isArray(q.items) ? q.items.map((it: any, idx: number) => ({
+                  id: it.id ?? idx + 1,
+                  quotationId: it.quotationId ?? qId,
+                  stockName: it.stockName || '',
+                  stockDetails: it.stockDetails || '',
+                  quantity: Number(it.quantity ?? 1),
+                  stockPrice: Number(it.stockPrice ?? 0),
+                  subTotal: Number(it.subTotal ?? (Number(it.stockPrice ?? 0) * Number(it.quantity ?? 1)))
+                })) : []
+              };
+            });
+          }
         }
       } catch (err) {
         console.warn('Live API /api/quotations failed, using local storage fallback', err);
@@ -800,7 +831,32 @@ export const quotationService = {
           body: JSON.stringify(data),
         });
         if (res.ok) {
-          const newQuote: QuotationHeader = await res.json();
+          const raw: any = await res.json();
+          const qId = Number(raw.quotationId ?? raw.id ?? (5000 + quotations.length + 1));
+          const sub = Number(raw.subtotal ?? 0);
+          const p3 = Number(raw.payMethod3 ?? raw.p3Cash ?? sub);
+          const newQuote: QuotationHeader = {
+            quotationId: qId,
+            customerId: Number(raw.customerId ?? data.customerId),
+            customerName: raw.customerName || 'Commercial Client',
+            remarks: raw.remarks || data.remarks || '',
+            payMethod1: Number(raw.payMethod1 ?? raw.p1TwelveMonths ?? Math.round(p3 * 1.15 * 100) / 100),
+            payMethod2: Number(raw.payMethod2 ?? raw.p2ThreeMonths ?? Math.round(p3 * 1.04 * 100) / 100),
+            payMethod3: p3,
+            quotationDate: raw.quotationDate || new Date().toISOString(),
+            quotationStatus: raw.quotationStatus || 'Active',
+            computerName: raw.computerName || 'POS-TERMINAL-01',
+            encoder: raw.encoder || data.encoder || 'Sales Associate',
+            items: Array.isArray(raw.items) ? raw.items : data.items.map((item, idx) => ({
+              id: idx + 1,
+              quotationId: qId,
+              stockName: item.stockName,
+              stockDetails: item.stockDetails,
+              quantity: item.quantity,
+              stockPrice: item.stockPrice,
+              subTotal: item.stockPrice * item.quantity
+            }))
+          };
           notifyDataUpdated();
           return newQuote;
         }

@@ -60,8 +60,13 @@ quotationRouter.get('/', async (_req, res) => {
       const fullName = `${row.FirstName || ''} ${row.LastName || ''}`.trim() || 'Commercial Client';
       const subtotal = items.reduce((acc, it) => acc + it.subTotal, 0);
 
+      const p3 = Number(row.PayMethod3) || subtotal;
+      const p2 = Number(row.PayMethod2) || Math.round(subtotal * 1.04 * 100) / 100;
+      const p1 = Number(row.PayMethod1) || Math.round(subtotal * 1.15 * 100) / 100;
+
       return {
         id: row.QuotationId,
+        quotationId: row.QuotationId,
         customerId: row.CustomerId,
         customerName: fullName,
         customerCompany: row.Company || undefined,
@@ -73,9 +78,12 @@ quotationRouter.get('/', async (_req, res) => {
         encoder: row.Encoder || 'Sales Associate',
         computerName: row.ComputerName || 'POS-TERMINAL-01',
         subtotal,
-        p3Cash: Number(row.PayMethod3) || subtotal,
-        p2ThreeMonths: Number(row.PayMethod2) || Math.round(subtotal * 1.04 * 100) / 100,
-        p1TwelveMonths: Number(row.PayMethod1) || Math.round(subtotal * 1.15 * 100) / 100,
+        payMethod1: p1,
+        payMethod2: p2,
+        payMethod3: p3,
+        p3Cash: p3,
+        p2ThreeMonths: p2,
+        p1TwelveMonths: p1,
         items,
       };
     });
@@ -159,6 +167,7 @@ quotationRouter.post('/', async (req, res) => {
 
     res.status(201).json({
       id: newQuoteId,
+      quotationId: newQuoteId,
       customerId,
       remarks,
       quotationDate: new Date().toISOString(),
@@ -166,6 +175,9 @@ quotationRouter.post('/', async (req, res) => {
       encoder,
       computerName,
       subtotal,
+      payMethod1: p1,
+      payMethod2: p2,
+      payMethod3: p3,
       p3Cash: p3,
       p2ThreeMonths: p2,
       p1TwelveMonths: p1,

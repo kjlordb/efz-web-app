@@ -45,15 +45,6 @@ export const QuotationPage: React.FC = () => {
     }
   }, [currentUser]);
 
-  useEffect(() => {
-    loadInitial();
-    const handleUpdate = () => {
-      loadInitial();
-    };
-    window.addEventListener(DATA_UPDATED_EVENT, handleUpdate);
-    return () => window.removeEventListener(DATA_UPDATED_EVENT, handleUpdate);
-  }, []);
-
   // New item inputs
   const [newItemCat, setNewItemCat] = useState(CATEGORIES[0]);
   const [newItemSpecs, setNewItemSpecs] = useState('');
@@ -65,23 +56,37 @@ export const QuotationPage: React.FC = () => {
   const [isAddCustModalOpen, setIsAddCustModalOpen] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadInitial();
-  }, []);
+  const [isLoading, setIsLoading] = useState(true);
 
   const loadInitial = async () => {
-    const [qList, cList, sList] = await Promise.all([
-      quotationService.getQuotations(),
-      customerService.getCustomers(),
-      inventoryService.getStockItems({ status: 'stored' })
-    ]);
-    setQuotations(qList);
-    setCustomers(cList);
-    setStockItems(sList);
-    if (cList.length > 0 && selectedCustomerId === '') {
-      setSelectedCustomerId(cList[0].id);
+    try {
+      setIsLoading(true);
+      const [qList, cList, sList] = await Promise.all([
+        quotationService.getQuotations(),
+        customerService.getCustomers(),
+        inventoryService.getStockItems({ status: 'stored' })
+      ]);
+      setQuotations(Array.isArray(qList) ? qList : []);
+      setCustomers(Array.isArray(cList) ? cList : []);
+      setStockItems(Array.isArray(sList) ? sList : []);
+      if (Array.isArray(cList) && cList.length > 0 && selectedCustomerId === '') {
+        setSelectedCustomerId(cList[0].id);
+      }
+    } catch (err: any) {
+      console.error('Failed to load quotation initial data:', err);
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadInitial();
+    const handleUpdate = () => {
+      loadInitial();
+    };
+    window.addEventListener(DATA_UPDATED_EVENT, handleUpdate);
+    return () => window.removeEventListener(DATA_UPDATED_EVENT, handleUpdate);
+  }, []);
 
   const selectedCustomer = customers.find((c) => c.id === selectedCustomerId);
 
@@ -414,45 +419,65 @@ export const QuotationPage: React.FC = () => {
           </div>
 
           <div className="flex-1 overflow-y-auto space-y-3 pr-1">
-            {quotations.map((q) => (
-              <div
-                key={q.quotationId}
-                className="p-3.5 rounded-xl border border-white/[0.08] hover:border-teal-500/40 bg-slate-950/40 hover:bg-slate-900/80 transition-all space-y-2"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-xs font-bold text-teal-300">
-                    Quote #{q.quotationId}
-                  </span>
-                  <span className="text-[10px] bg-slate-800 text-slate-300 border border-white/[0.06] px-1.5 py-0.5 rounded font-medium">
-                    {new Date(q.quotationDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                  </span>
-                </div>
+            {isLoading ? (
+              <div className="p-8 text-center text-xs text-slate-400 space-y-2">
+                <div className="w-6 h-6 border-2 border-teal-400 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                <p>Loading database quotations...</p>
+              </div>
+            ) : quotations.map((q, idx) => {
+              const quoteNum = q.quotationId ?? (q as any).id ?? (idx + 1);
+              let formattedDate = 'Recent';
+              try {
+                if (q.quotationDate) {
+                  const d = new Date(q.quotationDate);
+                  if (!isNaN(d.getTime())) {
+                    formattedDate = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                  }
+                }
+              } catch {}
 
-                <div className="text-xs font-bold text-white">
-                  {q.customerName}
-                </div>
+              const amount = Number(q.payMethod3 ?? (q as any).p3Cash ?? 0);
 
-                <div className="text-[11px] text-slate-400 line-clamp-1">
-                  {q.remarks}
-                </div>
-
-                <div className="flex items-center justify-between pt-2 border-t border-white/[0.06] text-xs">
-                  <div className="font-mono font-bold text-white">
-                    ₱{q.payMethod3.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+              return (
+                <div
+                  key={quoteNum}
+                  className="p-3.5 rounded-xl border border-white/[0.08] hover:border-teal-500/40 bg-slate-950/40 hover:bg-slate-900/80 transition-all space-y-2"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-xs font-bold text-teal-300">
+                      Quote #{quoteNum}
+                    </span>
+                    <span className="text-[10px] bg-slate-800 text-slate-300 border border-white/[0.06] px-1.5 py-0.5 rounded font-medium">
+                      {formattedDate}
+                    </span>
                   </div>
 
-                  <button
-                    onClick={() => setPrintQuote(q)}
-                    className="text-xs text-teal-300 hover:text-teal-200 font-semibold flex items-center gap-1 transition-colors"
-                  >
-                    <Eye className="w-3.5 h-3.5" />
-                    <span>View / Print</span>
-                  </button>
-                </div>
-              </div>
-            ))}
+                  <div className="text-xs font-bold text-white">
+                    {q.customerName || 'Commercial Client'}
+                  </div>
 
-            {quotations.length === 0 && (
+                  <div className="text-[11px] text-slate-400 line-clamp-1">
+                    {q.remarks || 'Formal price quotation'}
+                  </div>
+
+                  <div className="flex items-center justify-between pt-2 border-t border-white/[0.06] text-xs">
+                    <div className="font-mono font-bold text-white">
+                      ₱{amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </div>
+
+                    <button
+                      onClick={() => setPrintQuote(q)}
+                      className="text-xs text-teal-300 hover:text-teal-200 font-semibold flex items-center gap-1 transition-colors"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                      <span>View / Print</span>
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+
+            {!isLoading && quotations.length === 0 && (
               <div className="p-8 text-center text-xs text-slate-500">
                 No quotations recorded yet.
               </div>

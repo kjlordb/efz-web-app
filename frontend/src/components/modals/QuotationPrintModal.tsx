@@ -49,13 +49,27 @@ export const QuotationPrintModal: React.FC<QuotationPrintModalProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onClose]);
 
-  const formattedDate = new Date(quote.quotationDate).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
+  let formattedDate = 'Recent';
+  try {
+    if (quote.quotationDate) {
+      const d = new Date(quote.quotationDate);
+      if (!isNaN(d.getTime())) {
+        formattedDate = d.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+      }
+    }
+  } catch {}
 
-  const rawQuoteNo = `QTN-2026-${String(quote.quotationId).padStart(5, '0')}`;
+  const quoteId = quote.quotationId ?? (quote as any).id ?? 0;
+  const rawQuoteNo = `QTN-2026-${String(quoteId).padStart(5, '0')}`;
+
+  const p3 = Number(quote.payMethod3 ?? (quote as any).p3Cash ?? 0);
+  const p2 = Number(quote.payMethod2 ?? (quote as any).p2ThreeMonths ?? Math.round(p3 * 1.04 * 100) / 100);
+  const p1 = Number(quote.payMethod1 ?? (quote as any).p1TwelveMonths ?? Math.round(p3 * 1.15 * 100) / 100);
+  const items = Array.isArray(quote.items) ? quote.items : [];
 
   const clientName = customer?.fullName || quote.customerName || 'Prospective Corporate Client';
   const clientCompany = customer?.company;
@@ -272,7 +286,7 @@ export const QuotationPrintModal: React.FC<QuotationPrintModalProps> = ({
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">
-                {quote.items.map((item, idx) => (
+                {items.map((item, idx) => (
                   <tr key={idx} className="even:bg-slate-50/60 hover:bg-slate-50 transition-colors">
                     <td className="py-3 px-3 text-center font-mono text-slate-400 text-[11px]">
                       {String(idx + 1).padStart(2, '0')}
@@ -285,10 +299,10 @@ export const QuotationPrintModal: React.FC<QuotationPrintModalProps> = ({
                       {item.quantity}
                     </td>
                     <td className="py-3 px-3 text-right font-mono font-medium text-slate-700">
-                      ₱{item.stockPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                      ₱{(Number(item.stockPrice) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                     </td>
                     <td className="py-3 px-3 text-right font-mono font-bold text-slate-900">
-                      ₱{item.subTotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                      ₱{(Number(item.subTotal) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                     </td>
                   </tr>
                 ))}
@@ -319,7 +333,7 @@ export const QuotationPrintModal: React.FC<QuotationPrintModalProps> = ({
                     Option A: Cash Discount Net (P3)
                   </div>
                   <div className="text-xl font-black text-slate-950 font-mono mt-1">
-                    ₱{quote.payMethod3.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                    ₱{p3.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
                 </div>
                 <div className="text-[10px] text-emerald-700 font-medium mt-2 pt-2 border-t border-slate-100">
@@ -334,7 +348,7 @@ export const QuotationPrintModal: React.FC<QuotationPrintModalProps> = ({
                     Option B: 3-Mo / Card Rate (P2)
                   </div>
                   <div className="text-xl font-black text-teal-950 font-mono mt-1">
-                    ₱{quote.payMethod2.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                    ₱{p2.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
                 </div>
                 <div className="text-[10px] text-slate-500 font-medium mt-2 pt-2 border-t border-slate-100">
@@ -349,11 +363,11 @@ export const QuotationPrintModal: React.FC<QuotationPrintModalProps> = ({
                     Option C: 12-Mo Commercial Financing (P1)
                   </div>
                   <div className="text-xl font-black text-slate-900 font-mono mt-1">
-                    ₱{quote.payMethod1.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                    ₱{p1.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
                 </div>
                 <div className="text-[10px] text-slate-500 font-medium mt-2 pt-2 border-t border-slate-100">
-                  Amortized: ~₱{(quote.payMethod1 / 12).toLocaleString('en-US', { maximumFractionDigits: 2 })} / mo
+                  Amortized: ~₱{(p1 / 12).toLocaleString('en-US', { maximumFractionDigits: 2 })} / mo
                 </div>
               </div>
             </div>
