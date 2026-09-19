@@ -8,6 +8,7 @@ import {
   Menu
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { getDbHealth, DbHealthStatus } from '../../services/api';
 
 interface NavbarProps {
   onSearchGlobal?: (query: string) => void;
@@ -18,9 +19,15 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({ onOpenBackupModal, onToggleMobileNav }) => {
   const { currentUser, logout, switchRole } = useAuth();
   const [time, setTime] = useState<string>('');
+  const [dbHealth, setDbHealth] = useState<DbHealthStatus | null>(null);
   const currentRole = currentUser?.role || 'cashier';
 
   useEffect(() => {
+    getDbHealth().then(setDbHealth);
+    const healthInterval = setInterval(() => {
+      getDbHealth().then(setDbHealth);
+    }, 15000);
+
     const update = () => {
       const now = new Date();
       setTime(
@@ -34,7 +41,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBackupModal, onToggleMobil
     };
     update();
     const interval = setInterval(update, 1000);
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      clearInterval(healthInterval);
+    };
   }, []);
 
   return (
@@ -61,6 +71,24 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBackupModal, onToggleMobil
         <div className="flex items-center gap-1.5 pl-2 sm:pl-3 border-l border-[rgba(148,163,184,0.10)] text-[11px] sm:text-xs text-[#A9B6C8]">
           <span className="w-1.5 h-1.5 rounded-full bg-[#20C997] inline-block animate-pulse"></span>
           <span className="font-mono text-[#A9B6C8] font-medium">{currentUser?.workstation || 'POS-01'}</span>
+        </div>
+
+        {/* SQL Server Database Telemetry Badge */}
+        <div 
+          className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[rgba(18,28,45,0.7)] border border-[rgba(148,163,184,0.14)] text-[11px] font-mono cursor-default select-none"
+          title={dbHealth?.connected 
+            ? `SQL Server: ${dbHealth.server}\nDatabase: ${dbHealth.database}\nLatency: ${dbHealth.latencyMs}ms\nStock Items: ${dbHealth.counts?.stockItems.toLocaleString()}\nOrders: ${dbHealth.counts?.orderItems.toLocaleString()}\nCustomers: ${dbHealth.counts?.customers.toLocaleString()}`
+            : 'SQL Server offline or disconnected (Local fallback cache active)'}
+        >
+          <span className={`w-2 h-2 rounded-full inline-block ${dbHealth?.connected ? 'bg-[#20C997] shadow-[0_0_8px_#20C997]' : 'bg-[#F2B84B]'}`}></span>
+          <span className="text-[#A9B6C8] font-semibold">
+            {dbHealth?.connected ? 'SQL Server' : 'Local Cache'}
+          </span>
+          {dbHealth?.connected && (
+            <span className="text-[#19C3D1] font-bold text-[10px]">
+              {dbHealth.latencyMs}ms
+            </span>
+          )}
         </div>
       </div>
 

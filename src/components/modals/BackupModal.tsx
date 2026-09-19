@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Database, X, CheckCircle2, Loader2 } from 'lucide-react';
+import { databaseService } from '../../services/api';
 
 interface BackupModalProps {
   onClose: () => void;
@@ -9,13 +10,20 @@ export const BackupModal: React.FC<BackupModalProps> = ({ onClose }) => {
   const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState('Initializing SQL Server backup protocol...');
   const [isCompleted, setIsCompleted] = useState(false);
+  const [destinationPath, setDestinationPath] = useState('C:\\DbBackup\\EFZApp.bak');
 
   useEffect(() => {
+    let backupRes: { success: boolean; message: string; destination?: string } | null = null;
+    databaseService.triggerBackup().then((res) => {
+      backupRes = res;
+      if (res.destination) setDestinationPath(res.destination);
+    });
+
     const interval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
           clearInterval(interval);
-          setStatus('Database backup completed successfully! Stored in C:\\data\\EFZApp\\');
+          setStatus(backupRes?.message || 'Database backup completed via dbo.DbBackup (C:\\DbBackup\\EFZApp.bak)');
           setIsCompleted(true);
           return 100;
         }

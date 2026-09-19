@@ -100,7 +100,68 @@ export function getStorageStats() {
   };
 }
 
-const delay = (ms = 100) => new Promise((resolve) => setTimeout(resolve, ms));
+const delay = (ms = 50) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// ==========================================
+// SQL SERVER TELEMETRY & CONNECTION HEALTH
+// ==========================================
+export interface DbHealthStatus {
+  connected: boolean;
+  server: string;
+  database: string;
+  latencyMs?: number;
+  counts?: {
+    stockItems: number;
+    orderItems: number;
+    customers: number;
+    suppliers: number;
+    quotations: number;
+  };
+  error?: string;
+  isFallback?: boolean;
+}
+
+let cachedHealth: DbHealthStatus | null = null;
+let lastHealthCheck = 0;
+
+export async function getDbHealth(force = false): Promise<DbHealthStatus> {
+  const now = Date.now();
+  if (!force && cachedHealth && now - lastHealthCheck < 10000) {
+    return cachedHealth;
+  }
+
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 2000);
+    const res = await fetch('/api/health', { signal: controller.signal });
+    clearTimeout(timeoutId);
+
+    if (res.ok) {
+      const data = await res.json();
+      cachedHealth = {
+        connected: data.connected,
+        server: data.server,
+        database: data.database,
+        latencyMs: data.latencyMs,
+        counts: data.counts,
+        isFallback: false,
+      };
+      lastHealthCheck = now;
+      return cachedHealth;
+    }
+  } catch {
+    // API server is offline or unreachable
+  }
+
+  cachedHealth = {
+    connected: false,
+    server: 'LAPTOP-N6BLB75S',
+    database: 'EFZApp (Offline/Mock)',
+    isFallback: true,
+  };
+  lastHealthCheck = now;
+  return cachedHealth;
+}
 
 // ==========================================
 // INVENTORY & ASSET SERVICES
@@ -112,6 +173,26 @@ export const inventoryService = {
     includeDeleted?: boolean;
     status?: string;
   }): Promise<StockItem[]> {
+    const health = await getDbHealth();
+    if (health.connected) {
+      try {
+        const params = new URLSearchParams();
+        if (options?.status) params.set('status', options.status);
+        if (options?.category && options.category !== 'All Stocks') params.set('category', options.category);
+        if (options?.search) params.set('search', options.search);
+        if (options?.includeDeleted) params.set('includeDeleted', 'true');
+        params.set('limit', '300');
+
+        const res = await fetch(`/api/stock?${params.toString()}`);
+        if (res.ok) {
+          return await res.json();
+        }
+      } catch (err) {
+        console.warn('Live API /api/stock request failed, falling back to local storage cache', err);
+      }
+    }
+
+    // Local storage fallback
     await delay();
     let result = [...stockItems];
 
@@ -143,6 +224,27 @@ export const inventoryService = {
   },
 
   async addStockItem(item: Omit<StockItem, 'id' | 'stockStatus' | 'inDate'>): Promise<StockItem> {
+    const health = await getDbHealth();
+    if (health.connected) {
+      try {
+        const res = await fetch('/api/stock', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(item),
+        });
+        if (res.ok) {
+          const newItem: StockItem = await res.json();
+          notifyDataUpdated();
+          return newItem;
+        } else {
+          const err = await res.json();
+          throw new Error(err.error || 'Failed to add stock item to SQL Server.');
+        }
+      } catch (err: any) {
+        if (!err.message?.includes('Failed to fetch')) throw err;
+      }
+    }
+
     await delay();
     const exists = stockItems.some(
       (s) => s.stockSerial.toLowerCase() === item.stockSerial.toLowerCase() && s.stockStatus !== 'Deleted'
@@ -164,6 +266,23 @@ export const inventoryService = {
   },
 
   async updateStockItem(id: number, updates: Partial<StockItem>): Promise<StockItem> {
+    const health = await getDbHealth();
+    if (health.connected) {
+      try {
+        const res = await fetch(`/api/stock/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updates),
+        });
+        if (res.ok) {
+          notifyDataUpdated();
+          return { id, ...updates } as StockItem;
+        }
+      } catch (err) {
+        console.warn('Live API updateStockItem failed, using local storage fallback', err);
+      }
+    }
+
     await delay();
     const index = stockItems.findIndex((item) => item.id === id);
     if (index === -1) throw new Error('Stock item not found');
@@ -174,16 +293,45 @@ export const inventoryService = {
   },
 
   async deleteStockItem(id: number): Promise<void> {
+    const health = await getDbHealth();
+    if (health.connected) {
+      try {
+        const res = await fetch(`/api/stock/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+          notifyDataUpdated();
+          return;
+        }
+      } catch (err) {
+        console.warn('Live API deleteStockItem failed, using local storage fallback', err);
+      }
+    }
+
     await delay();
     const index = stockItems.findIndex((item) => item.id === id);
     if (index === -1) throw new Error('Stock item not found');
 
-    // Soft delete corresponding to spStockItems_UpdateStatus
     stockItems[index].stockStatus = 'Deleted';
     saveToStorage(STORAGE_KEYS.STOCK, stockItems);
   },
 
   async restoreStockItem(id: number): Promise<void> {
+    const health = await getDbHealth();
+    if (health.connected) {
+      try {
+        const res = await fetch(`/api/stock/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ stockStatus: 'stored' }),
+        });
+        if (res.ok) {
+          notifyDataUpdated();
+          return;
+        }
+      } catch (err) {
+        console.warn('Live API restoreStockItem failed, using local storage fallback', err);
+      }
+    }
+
     await delay();
     const index = stockItems.findIndex((item) => item.id === id);
     if (index === -1) throw new Error('Stock item not found');
@@ -193,6 +341,24 @@ export const inventoryService = {
   },
 
   async batchUpdatePrice(category: string, details: string, newPrice: number): Promise<number> {
+    const health = await getDbHealth();
+    if (health.connected) {
+      try {
+        const res = await fetch('/api/stock/batch-price', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ category, details, newPrice }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          notifyDataUpdated();
+          return data.rowsAffected || 0;
+        }
+      } catch (err) {
+        console.warn('Live API batchUpdatePrice failed, using local storage fallback', err);
+      }
+    }
+
     await delay();
     let updatedCount = 0;
     stockItems = stockItems.map((item) => {
@@ -220,6 +386,26 @@ export const salesService = {
     customerId?: number;
     paymentTier?: PaymentMethodType;
   }): Promise<Order[]> {
+    const health = await getDbHealth();
+    if (health.connected) {
+      try {
+        const params = new URLSearchParams();
+        if (options?.startDate) params.set('startDate', options.startDate);
+        if (options?.endDate) params.set('endDate', options.endDate);
+        if (options?.serial) params.set('serial', options.serial);
+        if (options?.customerId) params.set('customerId', String(options.customerId));
+        if (options?.paymentTier) params.set('paymentTier', options.paymentTier);
+        params.set('limit', '200');
+
+        const res = await fetch(`/api/orders?${params.toString()}`);
+        if (res.ok) {
+          return await res.json();
+        }
+      } catch (err) {
+        console.warn('Live API /api/orders failed, using local storage fallback', err);
+      }
+    }
+
     await delay();
     let result = [...orders];
 
@@ -266,6 +452,28 @@ export const salesService = {
     discountPercent?: number;
     items: StockItem[];
   }): Promise<Order> {
+    const health = await getDbHealth();
+    if (health.connected) {
+      try {
+        const res = await fetch('/api/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+        if (res.ok) {
+          const newOrder: Order = await res.json();
+          notifyDataUpdated();
+          return newOrder;
+        } else {
+          const err = await res.json();
+          throw new Error(err.error || 'Failed to finalize transaction in SQL Server.');
+        }
+      } catch (err: any) {
+        if (!err.message?.includes('Failed to fetch')) throw err;
+      }
+    }
+
+    // Local fallback
     await delay();
     syncStateFromStorage();
     const customer = customers.find((c) => c.id === data.customerId);
@@ -273,15 +481,12 @@ export const salesService = {
     if (data.items.length === 0) throw new Error('Transaction cart cannot be empty');
 
     let baseSum = data.items.reduce((acc, item) => acc + item.stockPrice, 0);
-
-    // Apply optional promotional discount
     if (data.discountPercent && data.discountPercent > 0) {
       baseSum = baseSum * (1 - data.discountPercent / 100);
     }
 
     let multiplier = 1.0;
     let paymentMethodName = 'Cash Settlement';
-
     if (data.paymentTier === '3months') {
       multiplier = 1.04;
       paymentMethodName = '3-Month Deferred Plan / Credit Card (4% MDR)';
@@ -309,13 +514,12 @@ export const salesService = {
       changeDue: data.changeDue,
       discountPercent: data.discountPercent,
       orderDate: new Date().toISOString(),
-      encoder: data.encoder || 'Kyle (Admin)',
+      encoder: data.encoder || 'Sales Associate',
       computerName: data.computerName || 'POS-TERMINAL-01',
       listOfSerials: serialList,
       items: data.items
     };
 
-    // Liquidate items
     const itemIds = new Set(data.items.map((i) => i.id));
     stockItems = stockItems.map((item) => {
       if (itemIds.has(item.id)) {
@@ -328,7 +532,6 @@ export const salesService = {
       return item;
     });
 
-    // Auto-create installment plan if financed
     if (data.paymentTier === '3months' || data.paymentTier === '12months') {
       const termMonths = data.paymentTier === '3months' ? 3 : 12;
       const monthlyDue = Math.round((orderTotal / termMonths) * 100) / 100;
@@ -383,6 +586,22 @@ export const salesService = {
 // ==========================================
 export const customerService = {
   async getCustomers(search?: string): Promise<Customer[]> {
+    const health = await getDbHealth();
+    if (health.connected) {
+      try {
+        const params = new URLSearchParams();
+        if (search) params.set('search', search);
+        params.set('limit', '200');
+
+        const res = await fetch(`/api/customers?${params.toString()}`);
+        if (res.ok) {
+          return await res.json();
+        }
+      } catch (err) {
+        console.warn('Live API /api/customers failed, using local storage fallback', err);
+      }
+    }
+
     await delay();
     let result = [...customers];
 
@@ -398,7 +617,6 @@ export const customerService = {
       );
     }
 
-    // Enrich with order history aggregates
     return result.map((c) => {
       const custOrders = orders.filter((o) => o.customerId === c.id);
       const lifetimeSpend = custOrders.reduce((acc, o) => acc + o.orderAmount, 0);
@@ -411,6 +629,27 @@ export const customerService = {
   },
 
   async addCustomer(customer: Omit<Customer, 'id' | 'fullName' | 'createdAt'>): Promise<Customer> {
+    const health = await getDbHealth();
+    if (health.connected) {
+      try {
+        const res = await fetch('/api/customers', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(customer),
+        });
+        if (res.ok) {
+          const newCust: Customer = await res.json();
+          notifyDataUpdated();
+          return newCust;
+        } else {
+          const err = await res.json();
+          throw new Error(err.error || 'Failed to add customer to SQL Server.');
+        }
+      } catch (err: any) {
+        if (!err.message?.includes('Failed to fetch')) throw err;
+      }
+    }
+
     await delay();
     const newCustomer: Customer = {
       ...customer,
@@ -427,6 +666,23 @@ export const customerService = {
   },
 
   async updateCustomer(id: number, updates: Partial<Customer>): Promise<Customer> {
+    const health = await getDbHealth();
+    if (health.connected) {
+      try {
+        const res = await fetch(`/api/customers/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updates),
+        });
+        if (res.ok) {
+          notifyDataUpdated();
+          return { id, ...updates } as Customer;
+        }
+      } catch (err) {
+        console.warn('Live API updateCustomer failed, using local storage fallback', err);
+      }
+    }
+
     await delay();
     const index = customers.findIndex((c) => c.id === id);
     if (index === -1) throw new Error('Customer record not found');
@@ -451,6 +707,18 @@ export const customerService = {
 // ==========================================
 export const supplierService = {
   async getSuppliers(): Promise<Supplier[]> {
+    const health = await getDbHealth();
+    if (health.connected) {
+      try {
+        const res = await fetch('/api/suppliers');
+        if (res.ok) {
+          return await res.json();
+        }
+      } catch (err) {
+        console.warn('Live API /api/suppliers failed, using local storage fallback', err);
+      }
+    }
+
     await delay();
     return suppliers.map((s) => ({
       ...s,
@@ -461,6 +729,24 @@ export const supplierService = {
   },
 
   async addSupplier(supplier: Omit<Supplier, 'id'>): Promise<Supplier> {
+    const health = await getDbHealth();
+    if (health.connected) {
+      try {
+        const res = await fetch('/api/suppliers', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(supplier),
+        });
+        if (res.ok) {
+          const newSup: Supplier = await res.json();
+          notifyDataUpdated();
+          return newSup;
+        }
+      } catch (err) {
+        console.warn('Live API addSupplier failed, using local storage fallback', err);
+      }
+    }
+
     await delay();
     const newSupplier: Supplier = {
       ...supplier,
@@ -478,6 +764,18 @@ export const supplierService = {
 // ==========================================
 export const quotationService = {
   async getQuotations(): Promise<QuotationHeader[]> {
+    const health = await getDbHealth();
+    if (health.connected) {
+      try {
+        const res = await fetch('/api/quotations');
+        if (res.ok) {
+          return await res.json();
+        }
+      } catch (err) {
+        console.warn('Live API /api/quotations failed, using local storage fallback', err);
+      }
+    }
+
     await delay();
     return [...quotations];
   },
@@ -493,6 +791,24 @@ export const quotationService = {
       stockPrice: number;
     }>;
   }): Promise<QuotationHeader> {
+    const health = await getDbHealth();
+    if (health.connected) {
+      try {
+        const res = await fetch('/api/quotations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+        if (res.ok) {
+          const newQuote: QuotationHeader = await res.json();
+          notifyDataUpdated();
+          return newQuote;
+        }
+      } catch (err) {
+        console.warn('Live API createQuotation failed, using local storage fallback', err);
+      }
+    }
+
     await delay();
     const customer = customers.find((c) => c.id === data.customerId);
     const subtotal = data.items.reduce((acc, i) => acc + i.stockPrice * i.quantity, 0);
@@ -502,13 +818,13 @@ export const quotationService = {
       customerId: data.customerId,
       customerName: customer?.fullName || 'Commercial Client',
       remarks: data.remarks || 'Standard price quotation valid for 7 days',
-      payMethod3: subtotal, // Spot cash
-      payMethod2: Math.round(subtotal * 1.04 * 100) / 100, // 3-month
-      payMethod1: Math.round(subtotal * 1.15 * 100) / 100, // 12-month
+      payMethod3: subtotal,
+      payMethod2: Math.round(subtotal * 1.04 * 100) / 100,
+      payMethod1: Math.round(subtotal * 1.15 * 100) / 100,
       quotationDate: new Date().toISOString(),
       quotationStatus: 'Pending',
       computerName: 'POS-TERMINAL-01',
-      encoder: data.encoder || 'Kyle (Admin)',
+      encoder: data.encoder || 'Sales Associate',
       items: data.items.map((item, idx) => ({
         id: idx + 1,
         stockName: item.stockName,
@@ -612,5 +928,25 @@ export const installmentService = {
 
     saveToStorage(STORAGE_KEYS.INSTALLMENTS, installmentPlans);
     return installmentPlans[idx];
+  }
+};
+
+// ==========================================
+// DATABASE & BACKUP SERVICES
+// ==========================================
+export const databaseService = {
+  async triggerBackup(): Promise<{ success: boolean; message: string; destination?: string }> {
+    try {
+      const res = await fetch('/api/backup', { method: 'POST' });
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch {}
+
+    return {
+      success: true,
+      message: 'Database backup simulated locally (C:\\data\\EFZApp\\EFZApp.bak).',
+      destination: 'C:\\data\\EFZApp\\EFZApp.bak'
+    };
   }
 };

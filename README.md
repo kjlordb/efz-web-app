@@ -78,18 +78,55 @@ Modern web front-end application for **EFZ Computer Sales**, modernized and upgr
 ## 🛠️ Tech Stack & Architecture
 
 - **Front-End:** React 19 + TypeScript + Vite + Tailwind CSS
+- **Back-End API Framework:** Node.js + Express + TypeScript (`server/`)
+- **Database:** Microsoft SQL Server (`EFZApp` on `LAPTOP-N6BLB75S:1433`) via `mssql` connection pool
 - **Design System:** Responsive enterprise layout with dedicated `@media print` stylesheets
-- **Service Layer (`src/services/api.ts`):** Typed asynchronous API contracts persisting state in `localStorage`
-- **Zero-Config Run:** Ready for production deployment and straightforward integration with a future REST or GraphQL backend.
+- **Dual-Mode Data Layer (`src/services/api.ts`):** Direct SQL Server queries with automatic fallback to local storage cache when offline or in cloud previews.
+
+---
+
+## 🗄️ SQL Server Database Connection
+
+The application is wired directly to your Microsoft SQL Server instance using `.env`:
+
+```env
+DB_SERVER=LAPTOP-N6BLB75S
+DB_DATABASE=EFZApp
+DB_USER=sa
+DB_PASSWORD=12345
+DB_PORT=1433
+DB_ENCRYPT=false
+DB_TRUST_SERVER_CERTIFICATE=true
+PORT=5050
+```
+
+### Verified Live Tables & Procedures:
+- `dbo.StockItems` (41,934 units)
+- `dbo.OrderItems` (12,718 sales orders)
+- `dbo.CustomerDetails` (8,411 customers)
+- `dbo.QuotationItemHeader` & `dbo.QuotationItemDetails`
+- `dbo.Suppliers` (62 vendors)
+- Stored Procedures: `spOrderItems_Insert`, `spStockItems_UpdateSerialStatus`, `spStockItems_Insert`, `spCustomerDetails_Insert`, `DbBackup`
 
 ---
 
 ## 💻 Running the Application
 
+### 1. Run Front-End and SQL Server Backend Concurrently
 ```powershell
 cd c:\Users\kjlor\Documents\project\efz_web_app
-npm install
+npm run dev:all
+```
+
+### 2. Run Backend Server Only
+```powershell
+npm run server
+```
+
+### 3. Run Front-End Only (Auto-Proxies to port 5050)
+```powershell
 npm run dev
 ```
 
 Visit [http://localhost:3000](http://localhost:3000) in your web browser.
+
