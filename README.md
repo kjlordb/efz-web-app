@@ -75,19 +75,42 @@ Modern web front-end application for **EFZ Computer Sales**, modernized and upgr
 
 ---
 
-## 🛠️ Tech Stack & Architecture
+## 🛠️ Segregated Monorepo Architecture
 
-- **Front-End:** React 19 + TypeScript + Vite + Tailwind CSS
-- **Back-End API Framework:** Node.js + Express + TypeScript (`server/`)
-- **Database:** Microsoft SQL Server (`EFZApp` on `LAPTOP-N6BLB75S:1433`) via `mssql` connection pool
-- **Design System:** Responsive enterprise layout with dedicated `@media print` stylesheets
-- **Dual-Mode Data Layer (`src/services/api.ts`):** Direct SQL Server queries with automatic fallback to local storage cache when offline or in cloud previews.
+The project is decoupled into clean, dedicated `frontend/` and `backend/` directories with a root npm workspace orchestrator:
+
+```text
+efz_web_app/
+├── frontend/               # Isolated React 19 + TypeScript + Vite + Tailwind CSS
+│   ├── public/             # SVGs, 3D assets, video banners
+│   ├── src/                # POS, Admin, Inventory, Customer, Quotation modules
+│   ├── index.html          # Frontend HTML entry
+│   ├── package.json        # Frontend dependencies & scripts
+│   ├── postcss.config.js   # PostCSS configuration
+│   ├── tailwind.config.js  # EFZ Midnight + Electric Teal + Champagne Gold theme
+│   ├── tsconfig.json       # React / DOM TypeScript configuration
+│   ├── tsconfig.node.json  # Vite TypeScript configuration
+│   └── vite.config.ts      # Vite config with /api proxy to localhost:5050
+├── backend/                # Isolated Node.js + Express + MSSQL API service
+│   ├── src/
+│   │   ├── routes/         # Modular routes (stock, customers, orders, etc.)
+│   │   ├── db.ts           # SQL Server connection pool & query helpers
+│   │   └── index.ts        # Express entry point & server bootstrap
+│   ├── .env                # Local SQL Server connection credentials
+│   ├── .env.example        # Sanitized template for environment variables
+│   ├── package.json        # Express, MSSQL, CORS dependencies & scripts
+│   └── tsconfig.json       # NodeNext TypeScript configuration
+├── .gitignore              # Unified ignore rules (node_modules, .env, dist)
+├── package.json            # Root Monorepo Orchestrator (npm workspaces & scripts)
+├── README.md               # Project documentation & run guide
+└── vercel.json             # Vercel deployment config (outputDirectory: "frontend/dist")
+```
 
 ---
 
 ## 🗄️ SQL Server Database Connection
 
-The application is wired directly to your Microsoft SQL Server instance using `.env`:
+The backend connects directly to your Microsoft SQL Server instance using `backend/.env`:
 
 ```env
 DB_SERVER=LAPTOP-N6BLB75S
@@ -112,21 +135,36 @@ PORT=5050
 
 ## 💻 Running the Application
 
-### 1. Run Front-End and SQL Server Backend Concurrently
+### From Project Root (Convenience Orchestrator)
+
 ```powershell
-cd c:\Users\kjlor\Documents\project\efz_web_app
+# 1. Run Front-End and SQL Server Backend Concurrently
 npm run dev:all
-```
 
-### 2. Run Backend Server Only
-```powershell
+# 2. Run Backend API Server Only (Port 5050)
 npm run server
+
+# 3. Run Front-End Only (Port 3000, proxies /api to port 5050)
+npm run dev
+
+# 4. Build Front-End for Production
+npm run build
 ```
 
-### 3. Run Front-End Only (Auto-Proxies to port 5050)
+### From Subdirectories Directly
+
 ```powershell
+# Frontend
+cd frontend
+npm install
+npm run dev
+
+# Backend
+cd backend
+npm install
 npm run dev
 ```
 
 Visit [http://localhost:3000](http://localhost:3000) in your web browser.
+API Health endpoint: [http://localhost:5050/api/health](http://localhost:5050/api/health).
 
