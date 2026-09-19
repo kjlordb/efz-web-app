@@ -200,6 +200,39 @@
     border: 1px solid var(--border-default);
     box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.85);
   }
+
+  /* Safe area helpers for modern mobile viewports (iOS/Android home indicators) */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .pt-safe {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+  .touch-target {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .touch-target-lg {
+    min-height: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Touch-optimized smooth scrolling container */
+.smooth-touch-scroll {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
 }
 
 /* Custom scrollbars matching glass aesthetic */

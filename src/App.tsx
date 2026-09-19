@@ -22,6 +22,7 @@ const MainLayout: React.FC = () => {
   const { isAuthenticated, currentUser, canAccess } = useAuth();
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
   const [isBackupOpen, setIsBackupOpen] = useState(false);
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
   // Workflow bridge: Initiate RMA directly from Sales Ledger
   const [rmaPrefill, setRmaPrefill] = useState<{
@@ -47,6 +48,7 @@ const MainLayout: React.FC = () => {
       setActiveTab('dashboard');
       setRmaPrefill(null);
       setIsBackupOpen(false);
+      setIsMobileNavOpen(false);
     }
   }, [isAuthenticated]);
 
@@ -76,21 +78,26 @@ const MainLayout: React.FC = () => {
         <div className="absolute -bottom-40 left-1/3 w-[550px] h-[400px] bg-radial from-teal-500/[0.05] via-transparent to-transparent rounded-full blur-3xl pointer-events-none" />
       </div>
 
-      {/* Sidebar Navigation (Layer 1 Glass) */}
+      {/* Sidebar Navigation (Layer 1 Glass - Responsive Drawer on Mobile, Persistent on Desktop) */}
       <Sidebar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onOpenBackupModal={() => setIsBackupOpen(true)}
+        isMobileOpen={isMobileNavOpen}
+        onCloseMobile={() => setIsMobileNavOpen(false)}
       />
 
       {/* Main Content Area (Layer 1/2) */}
       <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden relative z-10">
         {/* Top Navbar (Layer 1 Floating Glass) */}
-        <Navbar onOpenBackupModal={() => setIsBackupOpen(true)} />
+        <Navbar
+          onOpenBackupModal={() => setIsBackupOpen(true)}
+          onToggleMobileNav={() => setIsMobileNavOpen(!isMobileNavOpen)}
+        />
 
-        {/* Scrollable Viewport */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-7">
-          <div className="max-w-7xl mx-auto space-y-6 pb-8">
+        {/* Scrollable Viewport with safe-area spacing */}
+        <main className="flex-1 overflow-y-auto p-3 sm:p-5 lg:p-6 xl:p-8 smooth-touch-scroll pb-24 lg:pb-8">
+          <div className="max-w-[1750px] mx-auto space-y-4 sm:space-y-6">
             {!canAccess(activeTab) ? (
               <AccessRestricted
                 attemptedTab={activeTab}

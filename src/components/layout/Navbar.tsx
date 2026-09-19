@@ -2,18 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { 
   Monitor, 
   Clock, 
-  Database,
-  LogOut,
-  ChevronDown
+  Database, 
+  LogOut, 
+  ChevronDown,
+  Menu
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 interface NavbarProps {
   onSearchGlobal?: (query: string) => void;
   onOpenBackupModal?: () => void;
+  onToggleMobileNav?: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onOpenBackupModal }) => {
+export const Navbar: React.FC<NavbarProps> = ({ onOpenBackupModal, onToggleMobileNav }) => {
   const { currentUser, logout, switchRole } = useAuth();
   const [time, setTime] = useState<string>('');
   const currentRole = currentUser?.role || 'cashier';
@@ -36,9 +38,19 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBackupModal }) => {
   }, []);
 
   return (
-    <header className="no-print h-14 bg-[#080E1A]/90 backdrop-blur-md border-b border-[rgba(148,163,184,0.10)] px-5 flex items-center justify-between sticky top-0 z-20 select-none">
-      {/* Brand & Station Telemetry */}
-      <div className="flex items-center gap-3">
+    <header className="no-print h-14 bg-[#080E1A]/95 backdrop-blur-md border-b border-[rgba(148,163,184,0.10)] px-3 sm:px-5 flex items-center justify-between sticky top-0 z-20 select-none">
+      {/* Brand & Mobile Hamburger */}
+      <div className="flex items-center gap-2 sm:gap-3">
+        <button
+          type="button"
+          onClick={onToggleMobileNav}
+          className="lg:hidden p-2 rounded-xl text-[#A9B6C8] hover:text-[#F4F7FB] hover:bg-white/[0.06] active:bg-white/[0.1] transition-colors cursor-pointer touch-target"
+          aria-label="Open navigation menu"
+          title="Open Menu"
+        >
+          <Menu className="w-5 h-5 text-[#19C3D1]" />
+        </button>
+
         <div className="flex items-center gap-2">
           <span className="font-black text-[#19C3D1] text-base tracking-tight">EFZ</span>
           <span className="hidden sm:inline font-bold text-[#F4F7FB] text-xs tracking-wide">
@@ -46,26 +58,26 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBackupModal }) => {
           </span>
         </div>
 
-        <div className="flex items-center gap-1.5 pl-3 border-l border-[rgba(148,163,184,0.10)] text-xs text-[#A9B6C8]">
+        <div className="flex items-center gap-1.5 pl-2 sm:pl-3 border-l border-[rgba(148,163,184,0.10)] text-[11px] sm:text-xs text-[#A9B6C8]">
           <span className="w-1.5 h-1.5 rounded-full bg-[#20C997] inline-block animate-pulse"></span>
           <span className="font-mono text-[#A9B6C8] font-medium">{currentUser?.workstation || 'POS-01'}</span>
         </div>
       </div>
 
       {/* Right Controls */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3">
         {/* Role Switcher */}
         <div className="flex items-center">
           <select
             value={currentRole}
             onChange={(e) => switchRole(e.target.value as any)}
-            className="bg-[#0B1120] text-[#F4F7FB] text-xs py-1 px-2.5 rounded-lg border border-[rgba(148,163,184,0.14)] outline-none cursor-pointer hover:border-[#19C3D1]/40 transition-colors"
+            className="bg-[#0B1120] text-[#F4F7FB] text-[11px] sm:text-xs py-1 px-2 sm:px-2.5 rounded-lg border border-[rgba(148,163,184,0.14)] outline-none cursor-pointer hover:border-[#19C3D1]/40 transition-colors max-w-[110px] sm:max-w-none"
             title="Switch operating role"
           >
-            <option value="cashier" className="bg-[#0B1120] text-[#F4F7FB]">Cashier (POS)</option>
-            <option value="inventory" className="bg-[#0B1120] text-[#F4F7FB]">Warehouse (Inventory)</option>
-            <option value="technician" className="bg-[#0B1120] text-[#F4F7FB]">Technician (RMA)</option>
-            <option value="admin" className="bg-[#0B1120] text-[#F4F7FB]">Store Manager (Admin)</option>
+            <option value="cashier" className="bg-[#0B1120] text-[#F4F7FB]">Cashier</option>
+            <option value="inventory" className="bg-[#0B1120] text-[#F4F7FB]">Warehouse</option>
+            <option value="technician" className="bg-[#0B1120] text-[#F4F7FB]">Technician</option>
+            <option value="admin" className="bg-[#0B1120] text-[#F4F7FB]">Admin</option>
           </select>
         </div>
 

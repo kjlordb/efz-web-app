@@ -16,7 +16,11 @@ import {
   Percent,
   Coins,
   Sparkles,
-  Zap
+  Zap,
+  ChevronDown,
+  ChevronUp,
+  ArrowRight,
+  X
 } from 'lucide-react';
 import { inventoryService, salesService, customerService, DATA_UPDATED_EVENT } from '../services/api';
 import { Customer, Order, PaymentMethodType, StockItem } from '../types';
@@ -98,6 +102,8 @@ export const POSPage: React.FC = () => {
   const selectedCustomer = customers.find((c) => c.id === selectedCustomerId);
 
   const [isChangingCustomer, setIsChangingCustomer] = useState(false);
+  const [isMobileCustomerExpanded, setIsMobileCustomerExpanded] = useState(false);
+  const [isMobileCartOpen, setIsMobileCartOpen] = useState(false);
 
   // Cart calculations with discount
   const rawSubtotal = cart.reduce((acc, item) => acc + item.stockPrice, 0);
@@ -210,6 +216,7 @@ export const POSPage: React.FC = () => {
 
       setCompletedOrder(newOrder);
       setIsInvoiceOpen(true);
+      setIsMobileCartOpen(false);
       setSuccessMsg(`Sales Invoice #${newOrder.id} successfully finalized! Units liquidated from inventory.`);
       
       // Clear cart
@@ -238,6 +245,306 @@ export const POSPage: React.FC = () => {
 
   const categories = Array.from(new Set(stockItems.map((i) => i.stockName)));
 
+  const renderCartContent = (isDrawer = false) => (
+    <div className="flex flex-col h-full overflow-hidden">
+      {/* Cart Header */}
+      <div className="p-3 sm:p-3.5 border-b border-[rgba(148,163,184,0.12)] bg-[#070B14]/80 flex items-center justify-between shrink-0">
+        <div className="flex items-center gap-2">
+          <ShoppingCart className="w-4 h-4 text-[#19C3D1]" />
+          <span className="text-xs font-bold uppercase tracking-wider text-[#F4F7FB]">
+            Active Sales Order
+          </span>
+          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[rgba(25,195,209,0.10)] text-[#19C3D1] border border-[rgba(25,195,209,0.20)]">
+            {cart.length} {cart.length === 1 ? 'unit' : 'units'}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          {cart.length > 0 && (
+            <button
+              type="button"
+              onClick={handleReset}
+              className="text-xs text-[#F05D6C] hover:opacity-80 font-semibold flex items-center gap-1 transition-colors cursor-pointer px-2 py-1 rounded-lg hover:bg-red-500/10"
+            >
+              <RotateCcw className="w-3 h-3" />
+              <span>Void Order</span>
+            </button>
+          )}
+          {isDrawer && (
+            <button
+              type="button"
+              onClick={() => setIsMobileCartOpen(false)}
+              className="p-1.5 rounded-lg text-[#A9B6C8] hover:text-[#F4F7FB] hover:bg-white/[0.08] transition-colors cursor-pointer touch-target"
+              aria-label="Close cart sheet"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Cart Items List */}
+      <div className="flex-1 overflow-y-auto p-2.5 sm:p-3 space-y-1.5 smooth-touch-scroll">
+        {cart.length > 0 ? (
+          cart.map((item, idx) => (
+            <div
+              key={`${item.id}-${idx}`}
+              className="flex items-center justify-between gap-3 p-2.5 sm:p-3 rounded-xl bg-[#070B14]/40 hover:bg-[#121C2D]/50 border border-[rgba(148,163,184,0.08)] transition-colors"
+            >
+              <div className="min-w-0 flex-1">
+                <div className="font-semibold text-xs text-[#F4F7FB] truncate">
+                  {item.stockDetails}
+                </div>
+                <div className="flex items-center gap-2 mt-0.5 text-[10px] text-[#A9B6C8] flex-wrap">
+                  <span className="font-mono text-[#19C3D1] font-bold bg-[#070B14] px-1.5 py-0.5 rounded border border-[rgba(148,163,184,0.10)]">
+                    {item.stockSerial}
+                  </span>
+                  <span>{item.stockName}</span>
+                  <span>•</span>
+                  <span>{item.warranty}d warranty</span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
+                <span className="font-bold text-xs sm:text-sm text-[#F4F7FB] font-mono">
+                  ₱{item.stockPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveFromCart(idx)}
+                  className="text-[#6F7E92] hover:text-[#F05D6C] p-2 sm:p-1.5 rounded-lg hover:bg-red-500/10 transition-colors cursor-pointer touch-target"
+                  title="Remove unit"
+                  aria-label="Remove unit from cart"
+                >
+                  <Trash2 className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
+                </button>
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="h-full min-h-[180px] flex flex-col items-center justify-center text-center p-8 text-[#A9B6C8] space-y-3">
+            <div className="w-12 h-12 rounded-2xl bg-[#070B14]/60 border border-[rgba(148,163,184,0.10)] flex items-center justify-center text-[#6F7E92]">
+              <ShoppingCart className="w-6 h-6 stroke-[1.5]" />
+            </div>
+            <div>
+              <div className="font-bold text-sm text-[#F4F7FB]">Your Sales Order is Empty</div>
+              <p className="text-xs max-w-xs text-[#A9B6C8] mt-1">
+                Scan barcode serials or pick hardware assets from the catalog to begin checkout.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                if (isDrawer) setIsMobileCartOpen(false);
+                barcodeRef.current?.focus();
+              }}
+              className="text-xs font-semibold px-3 py-1.5 rounded-xl bg-[rgba(25,195,209,0.12)] hover:bg-[rgba(25,195,209,0.20)] text-[#19C3D1] border border-[rgba(25,195,209,0.25)] transition-all cursor-pointer"
+            >
+              Focus Scanner (F2)
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* STEP 5: Progressive Payment & Tendering Section */}
+      <div className={`p-3 sm:p-3.5 bg-[#070B14]/90 border-t border-[rgba(148,163,184,0.12)] space-y-2.5 sm:space-y-3 shrink-0 ${isDrawer ? 'pb-safe' : ''}`}>
+        {/* Payment Method Selector */}
+        <div>
+          <div className="text-[10px] font-bold uppercase tracking-wider text-[#A9B6C8] mb-1.5 flex items-center justify-between">
+            <span>Payment Settlement Schedule</span>
+            <span className="text-[10px] text-[#6F7E92] font-normal">Select terms</span>
+          </div>
+          <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
+            {/* Cash */}
+            <button
+              type="button"
+              onClick={() => setPaymentTier('Cash')}
+              className={`p-2 rounded-xl border text-left transition-all cursor-pointer ${
+                paymentTier === 'Cash'
+                  ? 'bg-[rgba(25,195,209,0.10)] text-[#19C3D1] border-[rgba(25,195,209,0.40)] shadow-glass-xs'
+                  : 'bg-[rgba(18,28,45,0.55)] text-[#A9B6C8] border-[rgba(148,163,184,0.12)] hover:border-[rgba(25,195,209,0.25)]'
+              }`}
+            >
+              <div className="text-[9px] font-bold uppercase tracking-wider opacity-80">
+                Spot Cash
+              </div>
+              <div className="font-bold text-xs mt-0.5 font-mono text-[#F4F7FB] truncate">
+                ₱{p3Cash.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+              </div>
+              <div className="text-[9px] text-[#6F7E92] mt-0.5 hidden sm:block">Base Net Cash</div>
+            </button>
+
+            {/* 3 Months Card */}
+            <button
+              type="button"
+              onClick={() => setPaymentTier('3months')}
+              className={`p-2 rounded-xl border text-left transition-all cursor-pointer ${
+                paymentTier === '3months'
+                  ? 'bg-[rgba(25,195,209,0.10)] text-[#19C3D1] border-[rgba(25,195,209,0.40)] shadow-glass-xs'
+                  : 'bg-[rgba(18,28,45,0.55)] text-[#A9B6C8] border-[rgba(148,163,184,0.12)] hover:border-[rgba(25,195,209,0.25)]'
+              }`}
+            >
+              <div className="text-[9px] font-bold uppercase tracking-wider opacity-80">
+                3-Mo Card
+              </div>
+              <div className="font-bold text-xs mt-0.5 font-mono text-[#F4F7FB] truncate">
+                ₱{p2ThreeMonths.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+              </div>
+              <div className="text-[9px] text-[#6F7E92] mt-0.5 hidden sm:block">+4% MDR</div>
+            </button>
+
+            {/* 12 Months Financing */}
+            <button
+              type="button"
+              onClick={() => setPaymentTier('12months')}
+              className={`p-2 rounded-xl border text-left transition-all cursor-pointer ${
+                paymentTier === '12months'
+                  ? 'bg-[rgba(25,195,209,0.10)] text-[#19C3D1] border-[rgba(25,195,209,0.40)] shadow-glass-xs'
+                  : 'bg-[rgba(18,28,45,0.55)] text-[#A9B6C8] border-[rgba(148,163,184,0.12)] hover:border-[rgba(25,195,209,0.25)]'
+              }`}
+            >
+              <div className="text-[9px] font-bold uppercase tracking-wider opacity-80">
+                12-Mo Financing
+              </div>
+              <div className="font-bold text-xs mt-0.5 font-mono text-[#F4F7FB] truncate">
+                ₱{p1TwelveMonths.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+              </div>
+              <div className="text-[9px] text-[#6F7E92] mt-0.5 hidden sm:block">+15% APR</div>
+            </button>
+          </div>
+        </div>
+
+        {/* Progressive Disclosure: Cash Tendered vs. Amortization */}
+        {paymentTier === 'Cash' ? (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs bg-[#0B1120]/60 p-2 sm:p-2.5 rounded-xl border border-[rgba(148,163,184,0.10)]">
+            <div>
+              <label className="text-[9px] font-bold uppercase tracking-wider text-[#A9B6C8] block mb-1">
+                Discount (%)
+              </label>
+              <div className="relative">
+                <Percent className="w-3 h-3 absolute left-2.5 top-2.5 text-[#6F7E92]" />
+                <input
+                  type="number"
+                  min={0}
+                  max={100}
+                  value={discountPercent || ''}
+                  onChange={(e) => setDiscountPercent(Number(e.target.value))}
+                  placeholder="0"
+                  className="w-full text-xs font-mono glass-input rounded-xl px-2 py-1.5 pl-7 font-bold text-[#F1C968] placeholder:text-[#6F7E92]"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="text-[9px] font-bold uppercase tracking-wider text-[#A9B6C8] block mb-1">
+                Amount Tendered (₱)
+              </label>
+              <div className="relative">
+                <Coins className="w-3 h-3 absolute left-2.5 top-2.5 text-[#6F7E92]" />
+                <input
+                  type="number"
+                  value={amountTendered}
+                  onChange={(e) => setAmountTendered(e.target.value === '' ? '' : Number(e.target.value))}
+                  placeholder={currentPayable.toString()}
+                  className="w-full text-xs font-mono glass-input rounded-xl px-2 py-1.5 pl-7 font-bold text-[#19C3D1] placeholder:text-[#6F7E92]"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="text-[9px] font-bold uppercase tracking-wider text-[#A9B6C8] block mb-1">
+                Change Due
+              </label>
+              <div className="text-xs font-mono font-bold text-[#20C997] bg-[#20C997]/10 px-3 py-1.5 rounded-xl border border-[#20C997]/20 flex items-center h-[34px]">
+                ₱{changeDue.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs bg-[#0B1120]/60 p-2 sm:p-2.5 rounded-xl border border-[rgba(148,163,184,0.10)]">
+            <div>
+              <label className="text-[9px] font-bold uppercase tracking-wider text-[#A9B6C8] block mb-1">
+                Monthly Amortization ({paymentTier === '3months' ? '3 Months' : '12 Months'})
+              </label>
+              <div className="text-xs font-mono font-bold text-[#19C3D1] bg-[rgba(25,195,209,0.10)] px-3 py-1.5 rounded-xl border border-[rgba(25,195,209,0.20)] flex items-center h-[34px]">
+                ₱{(currentPayable / (paymentTier === '3months' ? 3 : 12)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} / mo
+              </div>
+            </div>
+
+            <div>
+              <label className="text-[9px] font-bold uppercase tracking-wider text-[#A9B6C8] block mb-1">
+                Promotional Discount (%)
+              </label>
+              <div className="relative">
+                <Percent className="w-3 h-3 absolute left-2.5 top-2.5 text-[#6F7E92]" />
+                <input
+                  type="number"
+                  min={0}
+                  max={100}
+                  value={discountPercent || ''}
+                  onChange={(e) => setDiscountPercent(Number(e.target.value))}
+                  placeholder="0"
+                  className="w-full text-xs font-mono glass-input rounded-xl px-2 py-1.5 pl-7 font-bold text-[#F1C968] placeholder:text-[#6F7E92]"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Cashier & Remarks */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+          <div>
+            <label className="text-[9px] font-bold uppercase tracking-wider text-[#A9B6C8] block mb-1">
+              Cashier Operator
+            </label>
+            <input
+              type="text"
+              value={preparedBy}
+              onChange={(e) => setPreparedBy(e.target.value)}
+              className="w-full text-xs glass-input rounded-xl px-2.5 py-1.5 text-[#F4F7FB]"
+            />
+          </div>
+
+          <div>
+            <label className="text-[9px] font-bold uppercase tracking-wider text-[#A9B6C8] block mb-1">
+              Invoice Memo / Terms
+            </label>
+            <input
+              type="text"
+              value={remarks}
+              onChange={(e) => setRemarks(e.target.value)}
+              placeholder="e.g., Verified serial, seal intact"
+              className="w-full text-xs glass-input rounded-xl px-2.5 py-1.5 text-[#F4F7FB] placeholder:text-[#6F7E92]"
+            />
+          </div>
+        </div>
+
+        {/* STEP 6: Total Due & Finalize CTA */}
+        <div className="flex items-center justify-between pt-2 border-t border-[rgba(148,163,184,0.12)] gap-3">
+          <div className="min-w-0">
+            <div className="text-[9px] uppercase font-bold text-[#A9B6C8] truncate">
+              Total Due ({paymentTier})
+            </div>
+            {/* Final Amount Due in Champagne Gold Light #F1C968 */}
+            <div className="text-xl sm:text-2xl font-black text-[#F1C968] font-mono tracking-tight truncate">
+              ₱{currentPayable.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </div>
+          </div>
+
+          <button
+            type="button"
+            disabled={cart.length === 0}
+            onClick={handleCheckout}
+            className="btn-finalize-sale touch-target-lg flex items-center justify-center gap-2 disabled:opacity-30 disabled:cursor-not-allowed font-black text-xs px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl cursor-pointer shrink-0"
+          >
+            <Printer className="w-4 h-4 text-white shrink-0" />
+            <span className="whitespace-nowrap">Finalize & Print</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="space-y-4">
       {/* Notifications */}
@@ -247,7 +554,7 @@ export const POSPage: React.FC = () => {
             <AlertTriangle className="w-4 h-4 text-[#F05D6C] shrink-0" />
             <span className="font-semibold">{errorMsg}</span>
           </div>
-          <button onClick={() => setErrorMsg(null)} className="text-[#F05D6C] hover:opacity-80 text-sm cursor-pointer">×</button>
+          <button onClick={() => setErrorMsg(null)} className="text-[#F05D6C] hover:opacity-80 text-sm cursor-pointer p-1">×</button>
         </div>
       )}
 
@@ -257,13 +564,78 @@ export const POSPage: React.FC = () => {
             <CheckCircle2 className="w-4 h-4 text-[#20C997] shrink-0" />
             <span className="font-semibold">{successMsg}</span>
           </div>
-          <button onClick={() => setSuccessMsg(null)} className="text-[#20C997] hover:opacity-80 text-sm cursor-pointer">×</button>
+          <button onClick={() => setSuccessMsg(null)} className="text-[#20C997] hover:opacity-80 text-sm cursor-pointer p-1">×</button>
         </div>
       )}
 
-      {/* STEP 1: Customer Profile Bar */}
-      <div className="customer-panel p-3.5 shadow-glass-xs">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      {/* STEP 1: Customer Profile Bar with Progressive Disclosure */}
+      <div className="customer-panel p-3 sm:p-3.5 shadow-glass-xs">
+        {/* Mobile View (< sm) */}
+        <div className="sm:hidden">
+          <div 
+            onClick={() => setIsMobileCustomerExpanded(!isMobileCustomerExpanded)}
+            className="flex items-center justify-between gap-2.5 cursor-pointer select-none"
+          >
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-9 h-9 rounded-xl bg-[rgba(25,195,209,0.10)] border border-[rgba(25,195,209,0.22)] flex items-center justify-center shrink-0 text-[#19C3D1]">
+                <User className="w-4 h-4" />
+              </div>
+              <div className="min-w-0">
+                <div className="text-xs font-bold text-[#F4F7FB] truncate">
+                  {selectedCustomer ? selectedCustomer.fullName : 'No Client Selected'}
+                </div>
+                <div className="text-[10px] text-[#A9B6C8] truncate">
+                  {selectedCustomer ? (selectedCustomer.company || selectedCustomer.contactNumber) : 'Tap to select client'}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1 shrink-0 text-[#19C3D1] text-xs font-semibold px-2 py-1 rounded-lg bg-white/[0.04]">
+              <span>{isMobileCustomerExpanded ? 'Less' : 'Details'}</span>
+              {isMobileCustomerExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+            </div>
+          </div>
+
+          {/* Expandable Mobile Client Details */}
+          {isMobileCustomerExpanded && (
+            <div className="mt-3 pt-3 border-t border-[rgba(148,163,184,0.10)] space-y-2.5 animate-fadeIn">
+              {selectedCustomer ? (
+                <div className="text-[11px] text-[#6F7E92] space-y-1 bg-[#070B14]/50 p-2.5 rounded-xl border border-[rgba(148,163,184,0.08)]">
+                  <div><span className="text-[#A9B6C8]">Company:</span> {selectedCustomer.company || 'Direct Retail'}</div>
+                  <div><span className="text-[#A9B6C8]">Phone:</span> <span className="font-mono text-[#F4F7FB]">{selectedCustomer.contactNumber}</span></div>
+                  <div><span className="text-[#A9B6C8]">Billing Address:</span> {selectedCustomer.address || 'Standard Commercial Billing'}</div>
+                </div>
+              ) : null}
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsChangingCustomer(!isChangingCustomer);
+                  }}
+                  className="flex-1 text-xs font-semibold py-2 px-3 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] text-[#19C3D1] border border-[rgba(148,163,184,0.12)] text-center cursor-pointer touch-target"
+                >
+                  {isChangingCustomer ? 'Done' : 'Change Client'}
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsAddCustomerOpen(true);
+                  }}
+                  className="flex-1 text-xs font-semibold py-2 px-3 rounded-xl bg-[rgba(25,195,209,0.10)] hover:bg-[rgba(25,195,209,0.18)] text-[#19C3D1] border border-[rgba(25,195,209,0.25)] flex items-center justify-center gap-1.5 cursor-pointer touch-target"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Register Client</span>
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Tablet & Desktop View (>= sm) */}
+        <div className="hidden sm:flex sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <div className="w-10 h-10 rounded-xl bg-[rgba(25,195,209,0.10)] border border-[rgba(25,195,209,0.22)] flex items-center justify-center shrink-0 text-[#19C3D1]">
               <User className="w-5 h-5" />
@@ -300,7 +672,7 @@ export const POSPage: React.FC = () => {
             )}
           </div>
 
-          <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+          <div className="flex items-center gap-2 shrink-0">
             <button
               type="button"
               onClick={() => setIsChangingCustomer(!isChangingCustomer)}
@@ -340,7 +712,7 @@ export const POSPage: React.FC = () => {
             <button
               type="button"
               onClick={() => setIsChangingCustomer(false)}
-              className="text-xs text-[#A9B6C8] hover:text-[#F4F7FB] px-2 py-1 cursor-pointer"
+              className="text-xs text-[#A9B6C8] hover:text-[#F4F7FB] px-2.5 py-1.5 rounded-lg hover:bg-white/[0.04] cursor-pointer"
             >
               Cancel
             </button>
@@ -350,11 +722,11 @@ export const POSPage: React.FC = () => {
 
       {/* Main Split: Left = Catalog & Scanner, Right = Cart & Settlement */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-        {/* STEP 2 & 3: Catalog & Barcode Scanner (5 cols) */}
-        <div className="lg:col-span-5 glass-card rounded-2xl border border-[rgba(148,163,184,0.10)] shadow-glass-sm flex flex-col h-[700px] overflow-hidden">
+        {/* STEP 2 & 3: Catalog & Barcode Scanner (5 cols desktop, full width on mobile/tablet) */}
+        <div className="lg:col-span-5 glass-card rounded-2xl border border-[rgba(148,163,184,0.10)] shadow-glass-sm flex flex-col lg:h-[calc(100vh-210px)] lg:min-h-[560px] lg:max-h-[860px] overflow-hidden">
           {/* Hero Scan / Search Bar */}
-          <div className="p-3 border-b border-[rgba(148,163,184,0.10)] bg-[#070B14]/60 space-y-2.5">
-            <form onSubmit={handleBarcodeSubmit} className="relative flex items-center scan-hero-box p-0.5">
+          <div className="p-3 border-b border-[rgba(148,163,184,0.10)] bg-[#070B14]/60 space-y-2.5 shrink-0">
+            <form onSubmit={handleBarcodeSubmit} className="relative flex items-center scan-hero-box p-1">
               <Barcode className="w-4 h-4 absolute left-3 text-[#19C3D1] pointer-events-none" />
               <input
                 ref={barcodeRef}
@@ -365,13 +737,27 @@ export const POSPage: React.FC = () => {
                   setBarcodeInput(e.target.value);
                   setSearchCatalog(e.target.value);
                 }}
-                className="w-full text-xs bg-transparent rounded-lg pl-9 pr-20 py-2 font-mono text-[#F4F7FB] placeholder:text-[#6F7E92] font-medium outline-none"
+                className="w-full text-xs sm:text-sm bg-transparent rounded-lg pl-9 pr-24 py-2 font-mono text-[#F4F7FB] placeholder:text-[#6F7E92] font-medium outline-none min-h-[44px] sm:min-h-[40px]"
               />
               <div className="absolute right-1.5 flex items-center gap-1">
+                {barcodeInput && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setBarcodeInput('');
+                      setSearchCatalog('');
+                      barcodeRef.current?.focus();
+                    }}
+                    className="p-1 rounded-md text-[#6F7E92] hover:text-[#F4F7FB] hover:bg-white/[0.08] transition-colors cursor-pointer"
+                    aria-label="Clear search input"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
                 <button
                   type="submit"
                   disabled={!barcodeInput.trim()}
-                  className="bg-[#19C3D1] hover:bg-[#27D7E5] disabled:opacity-30 disabled:hover:bg-[#19C3D1] text-[#070B14] px-2.5 py-1 rounded-md text-xs font-bold transition-all cursor-pointer"
+                  className="bg-[#19C3D1] hover:bg-[#27D7E5] disabled:opacity-30 disabled:hover:bg-[#19C3D1] text-[#070B14] px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer touch-target h-[34px]"
                 >
                   Scan
                 </button>
@@ -379,11 +765,11 @@ export const POSPage: React.FC = () => {
             </form>
 
             {/* Category Filter Horizontal Pills */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none">
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none smooth-touch-scroll">
               <button
                 type="button"
                 onClick={() => setSelectedCategory('All Stocks')}
-                className={`pill-filter ${selectedCategory === 'All Stocks' ? 'active' : ''}`}
+                className={`pill-filter touch-target ${selectedCategory === 'All Stocks' ? 'active' : ''}`}
               >
                 All Stocks ({stockItems.length})
               </button>
@@ -394,7 +780,7 @@ export const POSPage: React.FC = () => {
                     key={cat}
                     type="button"
                     onClick={() => setSelectedCategory(cat)}
-                    className={`pill-filter ${selectedCategory === cat ? 'active' : ''}`}
+                    className={`pill-filter touch-target ${selectedCategory === cat ? 'active' : ''}`}
                   >
                     {cat} ({count})
                   </button>
@@ -403,14 +789,14 @@ export const POSPage: React.FC = () => {
             </div>
 
             {/* Quick Simulation Serials Strip */}
-            <div className="flex items-center gap-1.5 overflow-x-auto text-[10px] text-[#A9B6C8] pt-0.5">
+            <div className="flex items-center gap-1.5 overflow-x-auto text-[10px] text-[#A9B6C8] pt-0.5 scrollbar-none smooth-touch-scroll">
               <span className="shrink-0 text-[#6F7E92] font-medium">Quick Test:</span>
               {stockItems.slice(0, 3).map((item) => (
                 <button
                   key={item.id}
                   type="button"
                   onClick={() => handleAddToCart(item)}
-                  className="shrink-0 font-mono bg-[#121C2D]/60 hover:bg-[rgba(25,195,209,0.12)] border border-[rgba(148,163,184,0.10)] hover:border-[rgba(25,195,209,0.25)] text-[#19C3D1] px-2 py-0.5 rounded-md transition-all cursor-pointer"
+                  className="shrink-0 font-mono bg-[#121C2D]/60 hover:bg-[rgba(25,195,209,0.12)] border border-[rgba(148,163,184,0.10)] hover:border-[rgba(25,195,209,0.25)] text-[#19C3D1] px-2.5 py-1 rounded-lg transition-all cursor-pointer"
                   title={item.stockDetails}
                 >
                   + {item.stockSerial}
@@ -420,64 +806,69 @@ export const POSPage: React.FC = () => {
           </div>
 
           {/* Catalog Items List */}
-          <div className="flex-1 overflow-y-auto p-2.5 space-y-2">
-            {filteredCatalog.map((item) => {
-              const inCart = cart.some((c) => c.id === item.id);
-              return (
-                <div
-                  key={item.id}
-                  onClick={() => !inCart && handleAddToCart(item)}
-                  className={`card-product p-3 cursor-pointer flex items-start justify-between gap-3 ${
-                    inCart
-                      ? 'opacity-50 cursor-not-allowed border-[rgba(25,195,209,0.20)]'
-                      : ''
-                  }`}
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="text-[10px] font-mono font-bold bg-[#070B14] text-[#19C3D1] px-1.5 py-0.5 rounded border border-[rgba(148,163,184,0.10)]">
-                        {item.stockSerial}
-                      </span>
-                      <span className="text-[10px] bg-[rgba(25,195,209,0.10)] text-[#19C3D1] font-medium px-1.5 py-0.5 rounded border border-[rgba(25,195,209,0.20)]">
-                        {item.stockName}
-                      </span>
-                      <span className="text-[10px] text-[#A9B6C8]">
-                        {item.warranty}d war.
-                      </span>
+          <div className="flex-1 overflow-y-auto p-2.5 sm:p-3 smooth-touch-scroll">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2.5">
+              {filteredCatalog.map((item) => {
+                const inCart = cart.some((c) => c.id === item.id);
+                return (
+                  <div
+                    key={item.id}
+                    onClick={() => !inCart && handleAddToCart(item)}
+                    className={`card-product p-3 sm:p-3.5 cursor-pointer flex items-start justify-between gap-3 ${
+                      inCart
+                        ? 'opacity-50 cursor-not-allowed border-[rgba(25,195,209,0.20)]'
+                        : 'hover:border-[rgba(25,195,209,0.25)]'
+                    }`}
+                  >
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="text-[10px] font-mono font-bold bg-[#070B14] text-[#19C3D1] px-1.5 py-0.5 rounded border border-[rgba(148,163,184,0.10)]">
+                          {item.stockSerial}
+                        </span>
+                        <span className="text-[10px] bg-[rgba(25,195,209,0.10)] text-[#19C3D1] font-medium px-1.5 py-0.5 rounded border border-[rgba(25,195,209,0.20)]">
+                          {item.stockName}
+                        </span>
+                        <span className="text-[10px] text-[#A9B6C8]">
+                          {item.warranty}d war.
+                        </span>
+                      </div>
+
+                      <div className="text-xs font-semibold text-[#F4F7FB] mt-1.5 line-clamp-2 leading-relaxed">
+                        {item.stockDetails}
+                      </div>
+
+                      <div className="text-[11px] text-[#6F7E92] mt-1">
+                        Supplier: <span className="text-[#A9B6C8]">{item.supplierName}</span>
+                      </div>
                     </div>
 
-                    <div className="text-xs font-semibold text-[#F4F7FB] mt-1 line-clamp-2 leading-relaxed">
-                      {item.stockDetails}
-                    </div>
-
-                    <div className="text-[11px] text-[#6F7E92] mt-0.5">
-                      Distributor: <span className="text-[#A9B6C8]">{item.supplierName}</span>
+                    <div className="text-right shrink-0 flex flex-col items-end justify-between self-stretch gap-2">
+                      <div className="font-bold text-xs sm:text-sm text-[#F4F7FB] font-mono">
+                        ₱{item.stockPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                      </div>
+                      <button
+                        type="button"
+                        disabled={inCart}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (!inCart) handleAddToCart(item);
+                        }}
+                        className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all touch-target cursor-pointer ${
+                          inCart
+                            ? 'bg-[#0B1120] text-[#6F7E92] border border-[rgba(148,163,184,0.10)]'
+                            : 'bg-[rgba(25,195,209,0.12)] hover:bg-[rgba(25,195,209,0.22)] text-[#19C3D1] border border-[rgba(25,195,209,0.25)]'
+                        }`}
+                      >
+                        {inCart ? 'Added' : '+ Add'}
+                      </button>
                     </div>
                   </div>
-
-                  <div className="text-right shrink-0 flex flex-col items-end justify-between self-stretch">
-                    {/* Normal Product Price: #F4F7FB */}
-                    <div className="font-bold text-xs text-[#F4F7FB] font-mono">
-                      ₱{item.stockPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                    </div>
-                    <button
-                      type="button"
-                      disabled={inCart}
-                      className={`text-[11px] font-semibold px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
-                        inCart
-                          ? 'bg-[#0B1120] text-[#6F7E92] border border-[rgba(148,163,184,0.10)]'
-                          : 'bg-[rgba(25,195,209,0.12)] hover:bg-[rgba(25,195,209,0.22)] text-[#19C3D1] border border-[rgba(25,195,209,0.25)] font-bold'
-                      }`}
-                    >
-                      {inCart ? 'Added' : '+ Add'}
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
 
             {filteredCatalog.length === 0 && (
-              <div className="h-full flex flex-col items-center justify-center text-center p-8 text-[#A9B6C8]">
+              <div className="h-full min-h-[220px] flex flex-col items-center justify-center text-center p-8 text-[#A9B6C8]">
                 <Search className="w-8 h-8 text-[#6F7E92] mb-2" />
                 <p className="text-xs text-[#F4F7FB] font-medium">No hardware assets match your query</p>
                 <p className="text-[11px] text-[#6F7E92] mt-0.5">Try clearing filters or scanning a serial directly</p>
@@ -486,289 +877,68 @@ export const POSPage: React.FC = () => {
           </div>
         </div>
 
-        {/* STEP 4, 5, 6: Cart & Settlement (7 cols) - THE HERO */}
-        <div className="lg:col-span-7 cart-hero rounded-2xl border border-[rgba(148,163,184,0.16)] shadow-glass-sm flex flex-col h-[700px] overflow-hidden">
-          {/* Cart Header */}
-          <div className="p-3 border-b border-[rgba(148,163,184,0.12)] bg-[#070B14]/60 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <ShoppingCart className="w-4 h-4 text-[#19C3D1]" />
-              <span className="text-xs font-bold uppercase tracking-wider text-[#F4F7FB]">
-                Active Sales Order
-              </span>
-              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[rgba(25,195,209,0.10)] text-[#19C3D1] border border-[rgba(25,195,209,0.20)]">
-                {cart.length} {cart.length === 1 ? 'unit' : 'units'}
-              </span>
-            </div>
+        {/* STEP 4, 5, 6: Cart & Settlement (7 cols desktop) - HIDDEN ON MOBILE/TABLET */}
+        <div className="hidden lg:flex lg:col-span-7 cart-hero rounded-2xl border border-[rgba(148,163,184,0.16)] shadow-glass-sm flex-col lg:h-[calc(100vh-210px)] lg:min-h-[560px] lg:max-h-[860px] overflow-hidden">
+          {renderCartContent(false)}
+        </div>
+      </div>
 
-            {cart.length > 0 && (
-              <button
-                type="button"
-                onClick={handleReset}
-                className="text-xs text-[#F05D6C] hover:opacity-80 font-semibold flex items-center gap-1 transition-colors cursor-pointer"
-              >
-                <RotateCcw className="w-3 h-3" />
-                <span>Void Order</span>
-              </button>
-            )}
+      {/* Mobile Sticky Bottom Checkout Bar (< lg) */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-30 bg-[#070B14]/95 backdrop-blur-xl border-t border-[rgba(148,163,184,0.16)] px-4 py-3 pb-safe shadow-glass-lg">
+        <div className="flex items-center justify-between gap-3 max-w-lg mx-auto">
+          <div 
+            onClick={() => cart.length > 0 && setIsMobileCartOpen(true)}
+            className="flex items-center gap-2.5 min-w-0 cursor-pointer select-none"
+          >
+            <div className="relative">
+              <div className="w-10 h-10 rounded-xl bg-[rgba(25,195,209,0.12)] border border-[rgba(25,195,209,0.25)] flex items-center justify-center text-[#19C3D1]">
+                <ShoppingCart className="w-5 h-5" />
+              </div>
+              {cart.length > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-[#19C3D1] text-[#070B14] text-[11px] font-black flex items-center justify-center shadow-teal-glow">
+                  {cart.length}
+                </span>
+              )}
+            </div>
+            <div className="min-w-0">
+              <div className="text-[10px] uppercase font-bold text-[#A9B6C8] tracking-wider truncate">
+                Total ({paymentTier})
+              </div>
+              <div className="text-base font-black text-[#F1C968] font-mono tracking-tight truncate">
+                ₱{currentPayable.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </div>
+            </div>
           </div>
 
-          {/* Cart Items List */}
-          <div className="flex-1 overflow-y-auto p-2.5 space-y-1.5">
-            {cart.length > 0 ? (
-              cart.map((item, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-center justify-between gap-3 p-2.5 rounded-xl bg-[#070B14]/40 hover:bg-[#121C2D]/50 border border-[rgba(148,163,184,0.08)] transition-colors"
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="font-semibold text-xs text-[#F4F7FB] truncate">
-                      {item.stockDetails}
-                    </div>
-                    <div className="flex items-center gap-2 mt-0.5 text-[10px] text-[#A9B6C8]">
-                      <span className="font-mono text-[#19C3D1] font-bold bg-[#070B14] px-1.5 py-0.2 rounded border border-[rgba(148,163,184,0.10)]">
-                        {item.stockSerial}
-                      </span>
-                      <span>{item.stockName}</span>
-                      <span>•</span>
-                      <span>{item.warranty}d warranty</span>
-                    </div>
-                  </div>
+          <button
+            type="button"
+            disabled={cart.length === 0}
+            onClick={() => setIsMobileCartOpen(true)}
+            className="btn-finalize-sale disabled:opacity-30 disabled:cursor-not-allowed text-xs font-bold px-4 py-2.5 rounded-xl flex items-center gap-1.5 touch-target shrink-0 cursor-pointer"
+          >
+            <span>{cart.length === 0 ? 'Cart Empty' : 'View Cart & Pay'}</span>
+            <ArrowRight className="w-4 h-4 text-white" />
+          </button>
+        </div>
+      </div>
 
-                  <div className="flex items-center gap-3 shrink-0">
-                    <span className="font-bold text-xs text-[#F4F7FB] font-mono">
-                      ₱{item.stockPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveFromCart(idx)}
-                      className="text-[#6F7E92] hover:text-[#F05D6C] p-1 rounded-lg hover:bg-red-500/10 transition-colors cursor-pointer"
-                      title="Remove unit"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="h-full flex flex-col items-center justify-center text-center p-8 text-[#A9B6C8] space-y-3">
-                <div className="w-12 h-12 rounded-2xl bg-[#070B14]/60 border border-[rgba(148,163,184,0.10)] flex items-center justify-center text-[#6F7E92]">
-                  <ShoppingCart className="w-6 h-6 stroke-[1.5]" />
-                </div>
-                <div>
-                  <div className="font-bold text-sm text-[#F4F7FB]">Your Sales Order is Empty</div>
-                  <p className="text-xs max-w-xs text-[#A9B6C8] mt-1">
-                    Scan barcode serials or pick hardware assets from the catalog to begin checkout.
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => barcodeRef.current?.focus()}
-                  className="text-xs font-semibold px-3 py-1.5 rounded-xl bg-[rgba(25,195,209,0.12)] hover:bg-[rgba(25,195,209,0.20)] text-[#19C3D1] border border-[rgba(25,195,209,0.25)] transition-all cursor-pointer"
-                >
-                  Focus Scanner (F2)
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* STEP 5: Progressive Payment & Tendering Section */}
-          <div className="p-3.5 bg-[#070B14]/80 border-t border-[rgba(148,163,184,0.12)] space-y-3 shrink-0">
-            {/* Payment Method Selector */}
-            <div>
-              <div className="text-[10px] font-bold uppercase tracking-wider text-[#A9B6C8] mb-1.5 flex items-center justify-between">
-                <span>Payment Settlement Schedule</span>
-                <span className="text-[10px] text-[#6F7E92] font-normal">Select terms</span>
-              </div>
-              <div className="grid grid-cols-3 gap-2">
-                {/* Cash */}
-                <button
-                  type="button"
-                  onClick={() => setPaymentTier('Cash')}
-                  className={`p-2 rounded-xl border text-left transition-all cursor-pointer ${
-                    paymentTier === 'Cash'
-                      ? 'bg-[rgba(25,195,209,0.10)] text-[#19C3D1] border-[rgba(25,195,209,0.40)] shadow-glass-xs'
-                      : 'bg-[rgba(18,28,45,0.55)] text-[#A9B6C8] border-[rgba(148,163,184,0.12)] hover:border-[rgba(25,195,209,0.25)]'
-                  }`}
-                >
-                  <div className="text-[9px] font-bold uppercase tracking-wider opacity-80">
-                    Spot Cash
-                  </div>
-                  <div className="font-bold text-xs mt-0.5 font-mono text-[#F4F7FB]">
-                    ₱{p3Cash.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                  </div>
-                  <div className="text-[9px] text-[#6F7E92] mt-0.5">Base Net Cash</div>
-                </button>
-
-                {/* 3 Months Card */}
-                <button
-                  type="button"
-                  onClick={() => setPaymentTier('3months')}
-                  className={`p-2 rounded-xl border text-left transition-all cursor-pointer ${
-                    paymentTier === '3months'
-                      ? 'bg-[rgba(25,195,209,0.10)] text-[#19C3D1] border-[rgba(25,195,209,0.40)] shadow-glass-xs'
-                      : 'bg-[rgba(18,28,45,0.55)] text-[#A9B6C8] border-[rgba(148,163,184,0.12)] hover:border-[rgba(25,195,209,0.25)]'
-                  }`}
-                >
-                  <div className="text-[9px] font-bold uppercase tracking-wider opacity-80">
-                    3-Mo Card
-                  </div>
-                  <div className="font-bold text-xs mt-0.5 font-mono text-[#F4F7FB]">
-                    ₱{p2ThreeMonths.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                  </div>
-                  <div className="text-[9px] text-[#6F7E92] mt-0.5">+4% MDR</div>
-                </button>
-
-                {/* 12 Months Financing */}
-                <button
-                  type="button"
-                  onClick={() => setPaymentTier('12months')}
-                  className={`p-2 rounded-xl border text-left transition-all cursor-pointer ${
-                    paymentTier === '12months'
-                      ? 'bg-[rgba(25,195,209,0.10)] text-[#19C3D1] border-[rgba(25,195,209,0.40)] shadow-glass-xs'
-                      : 'bg-[rgba(18,28,45,0.55)] text-[#A9B6C8] border-[rgba(148,163,184,0.12)] hover:border-[rgba(25,195,209,0.25)]'
-                  }`}
-                >
-                  <div className="text-[9px] font-bold uppercase tracking-wider opacity-80">
-                    12-Mo Financing
-                  </div>
-                  <div className="font-bold text-xs mt-0.5 font-mono text-[#F4F7FB]">
-                    ₱{p1TwelveMonths.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                  </div>
-                  <div className="text-[9px] text-[#6F7E92] mt-0.5">+15% APR</div>
-                </button>
-              </div>
-            </div>
-
-            {/* Progressive Disclosure: Cash Tendered vs. Amortization */}
-            {paymentTier === 'Cash' ? (
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs bg-[#0B1120]/60 p-2.5 rounded-xl border border-[rgba(148,163,184,0.10)]">
-                <div>
-                  <label className="text-[9px] font-bold uppercase tracking-wider text-[#A9B6C8] block mb-1">
-                    Discount (%)
-                  </label>
-                  <div className="relative">
-                    <Percent className="w-3 h-3 absolute left-2.5 top-2.5 text-[#6F7E92]" />
-                    <input
-                      type="number"
-                      min={0}
-                      max={100}
-                      value={discountPercent || ''}
-                      onChange={(e) => setDiscountPercent(Number(e.target.value))}
-                      placeholder="0"
-                      className="w-full text-xs font-mono glass-input rounded-xl px-2 py-1.5 pl-7 font-bold text-[#F1C968] placeholder:text-[#6F7E92]"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="text-[9px] font-bold uppercase tracking-wider text-[#A9B6C8] block mb-1">
-                    Amount Tendered (₱)
-                  </label>
-                  <div className="relative">
-                    <Coins className="w-3 h-3 absolute left-2.5 top-2.5 text-[#6F7E92]" />
-                    <input
-                      type="number"
-                      value={amountTendered}
-                      onChange={(e) => setAmountTendered(e.target.value === '' ? '' : Number(e.target.value))}
-                      placeholder={currentPayable.toString()}
-                      className="w-full text-xs font-mono glass-input rounded-xl px-2 py-1.5 pl-7 font-bold text-[#19C3D1] placeholder:text-[#6F7E92]"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="text-[9px] font-bold uppercase tracking-wider text-[#A9B6C8] block mb-1">
-                    Change Due
-                  </label>
-                  <div className="text-xs font-mono font-bold text-[#20C997] bg-[#20C997]/10 px-3 py-1.5 rounded-xl border border-[#20C997]/20 flex items-center h-[34px]">
-                    ₱{changeDue.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs bg-[#0B1120]/60 p-2.5 rounded-xl border border-[rgba(148,163,184,0.10)]">
-                <div>
-                  <label className="text-[9px] font-bold uppercase tracking-wider text-[#A9B6C8] block mb-1">
-                    Monthly Amortization ({paymentTier === '3months' ? '3 Months' : '12 Months'})
-                  </label>
-                  <div className="text-xs font-mono font-bold text-[#19C3D1] bg-[rgba(25,195,209,0.10)] px-3 py-1.5 rounded-xl border border-[rgba(25,195,209,0.20)] flex items-center h-[34px]">
-                    ₱{(currentPayable / (paymentTier === '3months' ? 3 : 12)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} / month
-                  </div>
-                </div>
-
-                <div>
-                  <label className="text-[9px] font-bold uppercase tracking-wider text-[#A9B6C8] block mb-1">
-                    Promotional Discount (%)
-                  </label>
-                  <div className="relative">
-                    <Percent className="w-3 h-3 absolute left-2.5 top-2.5 text-[#6F7E92]" />
-                    <input
-                      type="number"
-                      min={0}
-                      max={100}
-                      value={discountPercent || ''}
-                      onChange={(e) => setDiscountPercent(Number(e.target.value))}
-                      placeholder="0"
-                      className="w-full text-xs font-mono glass-input rounded-xl px-2 py-1.5 pl-7 font-bold text-[#F1C968] placeholder:text-[#6F7E92]"
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Cashier & Remarks */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-              <div>
-                <label className="text-[9px] font-bold uppercase tracking-wider text-[#A9B6C8] block mb-1">
-                  Cashier Operator
-                </label>
-                <input
-                  type="text"
-                  value={preparedBy}
-                  onChange={(e) => setPreparedBy(e.target.value)}
-                  className="w-full text-xs glass-input rounded-xl px-2.5 py-1.5 text-[#F4F7FB]"
-                />
-              </div>
-
-              <div>
-                <label className="text-[9px] font-bold uppercase tracking-wider text-[#A9B6C8] block mb-1">
-                  Invoice Memo / Terms
-                </label>
-                <input
-                  type="text"
-                  value={remarks}
-                  onChange={(e) => setRemarks(e.target.value)}
-                  placeholder="e.g., Verified serial, seal intact"
-                  className="w-full text-xs glass-input rounded-xl px-2.5 py-1.5 text-[#F4F7FB] placeholder:text-[#6F7E92]"
-                />
-              </div>
-            </div>
-
-            {/* STEP 6: Total Due & Finalize CTA */}
-            <div className="flex items-center justify-between pt-2 border-t border-[rgba(148,163,184,0.12)]">
-              <div>
-                <div className="text-[9px] uppercase font-bold text-[#A9B6C8]">
-                  Total Due ({paymentTier})
-                </div>
-                {/* Final Amount Due in Champagne Gold Light #F1C968 */}
-                <div className="text-2xl font-black text-[#F1C968] font-mono tracking-tight">
-                  ₱{currentPayable.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </div>
-              </div>
-
-              <button
-                type="button"
-                disabled={cart.length === 0}
-                onClick={handleCheckout}
-                className="btn-finalize-sale flex items-center gap-2 disabled:opacity-30 disabled:cursor-not-allowed font-black text-xs px-6 py-3 rounded-xl cursor-pointer"
-              >
-                <Printer className="w-4 h-4 text-white" />
-                <span>Finalize & Print Tax Invoice</span>
-              </button>
+      {/* Mobile Cart & Settlement Bottom Sheet (< lg) */}
+      {isMobileCartOpen && (
+        <div className="fixed inset-0 bg-[#070B14]/80 backdrop-blur-md z-50 lg:hidden flex flex-col justify-end animate-fadeIn">
+          <div 
+            className="absolute inset-0"
+            onClick={() => setIsMobileCartOpen(false)}
+          />
+          <div className="relative bg-[#080E1A] border-t border-[rgba(25,195,209,0.25)] rounded-t-3xl max-h-[92vh] flex flex-col overflow-hidden shadow-2xl z-10 animate-slideUp">
+            {/* Drawer pull handle indicator */}
+            <div className="w-12 h-1.5 bg-[#6F7E92]/40 rounded-full mx-auto mt-2.5 mb-1 shrink-0" />
+            
+            <div className="flex-1 overflow-hidden flex flex-col">
+              {renderCartContent(true)}
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Invoice Printable Modal */}
       {isInvoiceOpen && completedOrder && (

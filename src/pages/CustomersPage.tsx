@@ -77,8 +77,8 @@ export const CustomersPage: React.FC = () => {
       </div>
 
       {/* Search toolbar */}
-      <div className="bg-slate-900/60 backdrop-blur-md p-3.5 rounded-2xl border border-white/[0.08] shadow-glass-xs flex items-center gap-3">
-        <div className="relative flex-1 max-w-md">
+      <div className="bg-slate-900/60 backdrop-blur-md p-3.5 rounded-2xl border border-white/[0.08] shadow-glass-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="relative flex-1 max-w-md w-full">
           <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400" />
           <input
             type="text"

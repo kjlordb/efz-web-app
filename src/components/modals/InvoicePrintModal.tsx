@@ -141,7 +141,7 @@ export const InvoicePrintModal: React.FC<InvoicePrintModalProps> = ({ order, onC
         style={{ transform: `scale(${zoomLevel / 100})` }}
       >
         {/* The Physical Document Sheet (A4 Proportion Canvas) */}
-        <div className="print-area bg-white text-slate-800 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.5)] border border-slate-300 rounded-lg w-full max-w-[820px] p-10 sm:p-12 space-y-7 relative overflow-hidden font-sans select-text">
+        <div className="print-area bg-white text-slate-800 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.5)] border border-slate-300 rounded-lg w-full max-w-[820px] p-5 sm:p-12 space-y-7 relative overflow-hidden font-sans select-text">
           
           {/* Subtle Background Watermark of Official 3D Emblem */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.03] select-none">
@@ -257,7 +257,7 @@ export const InvoicePrintModal: React.FC<InvoicePrintModalProps> = ({ order, onC
           </div>
 
           {/* Itemized Hardware & Serial Ledger Table */}
-          <div className="relative z-10 overflow-hidden">
+          <div className="relative z-10 overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
                 <tr className="bg-slate-100 border-y-2 border-slate-800 text-slate-800 font-black uppercase text-[10px] tracking-wider">
