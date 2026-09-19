@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { installmentService, DATA_UPDATED_EVENT } from '../services/api';
 import { InstallmentPlan } from '../types';
+import { Pagination } from '../components/common/Pagination';
 import { useAuth } from '../context/AuthContext';
 
 export const InstallmentSalesPage: React.FC = () => {
@@ -24,6 +25,10 @@ export const InstallmentSalesPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [selectedPlanForPayment, setSelectedPlanForPayment] = useState<InstallmentPlan | null>(null);
   const [expandedPlans, setExpandedPlans] = useState<Record<string, boolean>>({});
+
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   // Payment modal state
   const [payAmount, setPayAmount] = useState<number | ''>('');
@@ -90,6 +95,9 @@ export const InstallmentSalesPage: React.FC = () => {
   const totalPrincipal = plans.reduce((acc, p) => acc + p.totalPrincipal, 0);
   const totalRemainingAR = plans.reduce((acc, p) => acc + p.remainingBalance, 0);
   const totalCollected = totalPrincipal - totalRemainingAR;
+
+  const totalPlansCount = plans.length;
+  const paginatedPlans = plans.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   return (
     <div className="space-y-4">
@@ -174,7 +182,7 @@ export const InstallmentSalesPage: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/[0.04]">
-              {plans.map((plan) => {
+              {paginatedPlans.map((plan) => {
                 const isExpanded = !!expandedPlans[plan.id];
                 const pct = Math.round((plan.paidMonths / plan.totalMonths) * 100);
 
@@ -277,6 +285,18 @@ export const InstallmentSalesPage: React.FC = () => {
             </tbody>
           </table>
         </div>
+
+        {totalPlansCount > 0 && (
+          <Pagination
+            currentPage={currentPage}
+            totalItems={totalPlansCount}
+            pageSize={pageSize}
+            pageSizeOptions={[5, 10, 20, 50]}
+            onPageChange={setCurrentPage}
+            onPageSizeChange={setPageSize}
+            label="installment plans"
+          />
+        )}
       </div>
 
       {/* Record Payment Modal */}

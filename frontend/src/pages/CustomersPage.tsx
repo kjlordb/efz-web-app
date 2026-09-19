@@ -14,6 +14,7 @@ import {
 import { customerService } from '../services/api';
 import { Customer } from '../types';
 import { AddCustomerModal } from '../components/modals/AddCustomerModal';
+import { Pagination } from '../components/common/Pagination';
 
 export const CustomersPage: React.FC = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -22,6 +23,14 @@ export const CustomersPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(18);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search]);
 
   useEffect(() => {
     loadCustomers();
@@ -41,6 +50,9 @@ export const CustomersPage: React.FC = () => {
     setToast(msg);
     setTimeout(() => setToast(null), 3000);
   };
+
+  const totalCustomersCount = customers.length;
+  const paginatedCustomers = customers.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   return (
     <div className="space-y-4">
@@ -89,13 +101,13 @@ export const CustomersPage: React.FC = () => {
           />
         </div>
         <div className="text-xs text-slate-400 font-medium">
-          Showing <strong className="text-white">{customers.length}</strong> client records
+          Showing <strong className="text-white">{totalCustomersCount}</strong> client records
         </div>
       </div>
 
       {/* Customers Card Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {customers.map((c) => (
+        {paginatedCustomers.map((c) => (
           <div
             key={c.id}
             className="bg-slate-900/60 backdrop-blur-md p-5 rounded-2xl border border-white/[0.08] shadow-glass-xs hover:border-teal-500/40 hover:shadow-glass-sm transition-all flex flex-col justify-between space-y-3.5"
@@ -151,7 +163,7 @@ export const CustomersPage: React.FC = () => {
           </div>
         ))}
 
-        {customers.length === 0 && (
+        {totalCustomersCount === 0 && (
           <div className="col-span-full bg-slate-900/40 backdrop-blur-md rounded-2xl border border-white/[0.08] p-12 text-center text-slate-400 space-y-2">
             <Users className="w-10 h-10 mx-auto text-slate-500 stroke-[1.5]" />
             <div className="text-sm font-semibold text-white">No Customers Found</div>
@@ -161,6 +173,24 @@ export const CustomersPage: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Pagination Bar */}
+      {totalCustomersCount > 0 && (
+        <div className="bg-slate-900/60 backdrop-blur-md rounded-2xl border border-white/[0.08] overflow-hidden">
+          <Pagination
+            currentPage={currentPage}
+            totalItems={totalCustomersCount}
+            pageSize={pageSize}
+            pageSizeOptions={[12, 18, 36, 72]}
+            onPageChange={(page) => {
+              setCurrentPage(page);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onPageSizeChange={setPageSize}
+            label="client accounts"
+          />
+        </div>
+      )}
 
       {/* Customer Modal */}
       {isModalOpen && (

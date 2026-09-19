@@ -13,11 +13,16 @@ import {
 import { inventoryService } from '../services/api';
 import { CATEGORIES } from '../services/mockData';
 import { StockItem } from '../types';
+import { Pagination } from '../components/common/Pagination';
 
 export const InventoryAuditPage: React.FC = () => {
   const [items, setItems] = useState<StockItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedAuditTab, setSelectedAuditTab] = useState<'category' | 'supplier' | 'movement'>('category');
+
+  // Movement Log Pagination
+  const [movementPage, setMovementPage] = useState(1);
+  const [movementPageSize, setMovementPageSize] = useState(25);
 
   useEffect(() => {
     loadData();
@@ -244,7 +249,9 @@ export const InventoryAuditPage: React.FC = () => {
             Inbound vs Outbound Stock Log
           </div>
           <div className="divide-y divide-white/[0.04]">
-            {items.slice(0, 10).map((item) => (
+            {items
+              .slice((movementPage - 1) * movementPageSize, movementPage * movementPageSize)
+              .map((item) => (
               <div key={item.id} className="py-2.5 flex items-center justify-between text-xs">
                 <div className="flex items-center gap-3">
                   <div
@@ -285,6 +292,18 @@ export const InventoryAuditPage: React.FC = () => {
               </div>
             ))}
           </div>
+
+          {items.length > 0 && (
+            <Pagination
+              currentPage={movementPage}
+              totalItems={items.length}
+              pageSize={movementPageSize}
+              pageSizeOptions={[10, 25, 50, 100]}
+              onPageChange={setMovementPage}
+              onPageSizeChange={setMovementPageSize}
+              label="movements"
+            />
+          )}
         </div>
       )}
     </div>

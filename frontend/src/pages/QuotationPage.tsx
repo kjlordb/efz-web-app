@@ -17,6 +17,7 @@ import { CATEGORIES } from '../services/mockData';
 import { Customer, QuotationDetailItem, QuotationHeader, StockItem } from '../types';
 import { QuotationPrintModal } from '../components/modals/QuotationPrintModal';
 import { AddCustomerModal } from '../components/modals/AddCustomerModal';
+import { Pagination } from '../components/common/Pagination';
 import { useAuth } from '../context/AuthContext';
 
 export const QuotationPage: React.FC = () => {
@@ -25,6 +26,10 @@ export const QuotationPage: React.FC = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [selectedCustomerId, setSelectedCustomerId] = useState<number | ''>('');
   const [stockItems, setStockItems] = useState<StockItem[]>([]);
+
+  // Quotations List Pagination
+  const [quotePage, setQuotePage] = useState(1);
+  const quotePageSize = 8;
 
   // Quote form state
   const [quoteItems, setQuoteItems] = useState<QuotationDetailItem[]>([
@@ -424,7 +429,9 @@ export const QuotationPage: React.FC = () => {
                 <div className="w-6 h-6 border-2 border-teal-400 border-t-transparent rounded-full animate-spin mx-auto"></div>
                 <p>Loading database quotations...</p>
               </div>
-            ) : quotations.map((q, idx) => {
+            ) : quotations
+                .slice((quotePage - 1) * quotePageSize, quotePage * quotePageSize)
+                .map((q, idx) => {
               const quoteNum = q.quotationId ?? (q as any).id ?? (idx + 1);
               let formattedDate = 'Recent';
               try {
@@ -483,6 +490,18 @@ export const QuotationPage: React.FC = () => {
               </div>
             )}
           </div>
+
+          {/* Quotations Compact Pagination */}
+          {quotations.length > 0 && (
+            <Pagination
+              compact={true}
+              currentPage={quotePage}
+              totalItems={quotations.length}
+              pageSize={quotePageSize}
+              onPageChange={setQuotePage}
+              label="quotes"
+            />
+          )}
         </div>
       </div>
 

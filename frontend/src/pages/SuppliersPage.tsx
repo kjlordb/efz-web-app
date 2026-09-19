@@ -11,11 +11,16 @@ import {
 } from 'lucide-react';
 import { supplierService, inventoryService } from '../services/api';
 import { Supplier, StockItem } from '../types';
+import { Pagination } from '../components/common/Pagination';
 
 export const SuppliersPage: React.FC = () => {
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [stock, setStock] = useState<StockItem[]>([]);
   const [isAddOpen, setIsAddOpen] = useState(false);
+
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(12);
 
   // New supplier form
   const [name, setName] = useState('');
@@ -94,7 +99,9 @@ export const SuppliersPage: React.FC = () => {
 
       {/* Supplier Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {suppliers.map((s) => {
+        {suppliers
+          .slice((currentPage - 1) * pageSize, currentPage * pageSize)
+          .map((s) => {
           const supplierStockCount = stock.filter(
             (i) => i.supplierName.toLowerCase() === s.supplierName.toLowerCase()
           ).length;
@@ -140,6 +147,20 @@ export const SuppliersPage: React.FC = () => {
           );
         })}
       </div>
+
+      {suppliers.length > 0 && (
+        <div className="bg-slate-900/60 backdrop-blur-md rounded-2xl border border-white/[0.08] overflow-hidden">
+          <Pagination
+            currentPage={currentPage}
+            totalItems={suppliers.length}
+            pageSize={pageSize}
+            pageSizeOptions={[6, 12, 24, 48]}
+            onPageChange={setCurrentPage}
+            onPageSizeChange={setPageSize}
+            label="suppliers"
+          />
+        </div>
+      )}
 
       {/* Add Supplier Modal */}
       {isAddOpen && (

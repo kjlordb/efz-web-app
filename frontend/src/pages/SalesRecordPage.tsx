@@ -20,6 +20,7 @@ import {
 import { salesService, DATA_UPDATED_EVENT } from '../services/api';
 import { Order, PaymentMethodType, StockItem } from '../types';
 import { InvoicePrintModal } from '../components/modals/InvoicePrintModal';
+import { Pagination } from '../components/common/Pagination';
 
 interface SalesRecordPageProps {
   onInitiateRMA?: (serial: string, item: StockItem, order: Order) => void;
@@ -35,6 +36,10 @@ export const SalesRecordPage: React.FC<SalesRecordPageProps> = ({ onInitiateRMA 
   const [endDate, setEndDate] = useState('');
   const [searchCustomer, setSearchCustomer] = useState('');
   const [paymentTierFilter, setPaymentTierFilter] = useState<string>('all');
+
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
 
   // Accordion state
   const [expandedOrders, setExpandedOrders] = useState<Record<number, boolean>>({});
@@ -137,6 +142,13 @@ export const SalesRecordPage: React.FC<SalesRecordPageProps> = ({ onInitiateRMA 
     );
   });
 
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchCustomer, paymentTierFilter, scanSerial, startDate, endDate]);
+
+  const totalOrdersCount = filteredOrders.length;
+  const paginatedOrders = filteredOrders.slice((currentPage - 1) * pageSize, currentPage * pageSize);
   const totalSalesVolume = filteredOrders.reduce((acc, o) => acc + o.orderAmount, 0);
 
   return (
@@ -319,7 +331,7 @@ export const SalesRecordPage: React.FC<SalesRecordPageProps> = ({ onInitiateRMA 
 
       {/* Orders List with Real-time Warranty Cards */}
       <div className="space-y-3">
-        {filteredOrders.map((order) => {
+        {paginatedOrders.map((order) => {
           const isExpanded = !!expandedOrders[order.id];
           const orderDateFormatted = new Date(order.orderDate).toLocaleDateString('en-US', {
             month: 'short',
@@ -510,6 +522,23 @@ export const SalesRecordPage: React.FC<SalesRecordPageProps> = ({ onInitiateRMA 
             <p className="text-xs text-slate-400 max-w-sm mx-auto">
               No customer invoices matched your barcode serial search or filter parameters.
             </p>
+          </div>
+        )}
+
+        {totalOrdersCount > 0 && (
+          <div className="glass-card rounded-2xl border border-white/[0.08] overflow-hidden">
+            <Pagination
+              currentPage={currentPage}
+              totalItems={totalOrdersCount}
+              pageSize={pageSize}
+              pageSizeOptions={[10, 20, 50, 100]}
+              onPageChange={(page) => {
+                setCurrentPage(page);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              onPageSizeChange={setPageSize}
+              label="tax invoices"
+            />
           </div>
         )}
       </div>

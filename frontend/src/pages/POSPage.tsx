@@ -26,6 +26,7 @@ import { inventoryService, salesService, customerService, DATA_UPDATED_EVENT } f
 import { Customer, Order, PaymentMethodType, StockItem } from '../types';
 import { InvoicePrintModal } from '../components/modals/InvoicePrintModal';
 import { AddCustomerModal } from '../components/modals/AddCustomerModal';
+import { Pagination } from '../components/common/Pagination';
 import { useAuth } from '../context/AuthContext';
 
 export const POSPage: React.FC = () => {
@@ -39,6 +40,14 @@ export const POSPage: React.FC = () => {
   const [searchCatalog, setSearchCatalog] = useState('');
   const [barcodeInput, setBarcodeInput] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All Stocks');
+
+  // Catalog Pagination
+  const [catalogPage, setCatalogPage] = useState(1);
+  const [catalogPageSize, setCatalogPageSize] = useState(16);
+
+  useEffect(() => {
+    setCatalogPage(1);
+  }, [selectedCategory, searchCatalog]);
 
   // Checkout info
   const [paymentTier, setPaymentTier] = useState<PaymentMethodType>('Cash');
@@ -242,6 +251,12 @@ export const POSPage: React.FC = () => {
       item.stockName.toLowerCase().includes(searchCatalog.toLowerCase());
     return matchCat && matchSearch;
   });
+
+  const totalCatalogItems = filteredCatalog.length;
+  const paginatedCatalog = filteredCatalog.slice(
+    (catalogPage - 1) * catalogPageSize,
+    catalogPage * catalogPageSize
+  );
 
   const categories = Array.from(new Set(stockItems.map((i) => i.stockName)));
 
@@ -808,7 +823,7 @@ export const POSPage: React.FC = () => {
           {/* Catalog Items List */}
           <div className="flex-1 overflow-y-auto p-2.5 sm:p-3 smooth-touch-scroll">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2.5">
-              {filteredCatalog.map((item) => {
+              {paginatedCatalog.map((item) => {
                 const inCart = cart.some((c) => c.id === item.id);
                 return (
                   <div
@@ -867,7 +882,7 @@ export const POSPage: React.FC = () => {
               })}
             </div>
 
-            {filteredCatalog.length === 0 && (
+            {totalCatalogItems === 0 && (
               <div className="h-full min-h-[220px] flex flex-col items-center justify-center text-center p-8 text-[#A9B6C8]">
                 <Search className="w-8 h-8 text-[#6F7E92] mb-2" />
                 <p className="text-xs text-[#F4F7FB] font-medium">No hardware assets match your query</p>
@@ -875,6 +890,18 @@ export const POSPage: React.FC = () => {
               </div>
             )}
           </div>
+
+          {/* POS Compact Catalog Pagination */}
+          {totalCatalogItems > 0 && (
+            <Pagination
+              compact={true}
+              currentPage={catalogPage}
+              totalItems={totalCatalogItems}
+              pageSize={catalogPageSize}
+              onPageChange={setCatalogPage}
+              label="units"
+            />
+          )}
         </div>
 
         {/* STEP 4, 5, 6: Cart & Settlement (7 cols desktop) - HIDDEN ON MOBILE/TABLET */}

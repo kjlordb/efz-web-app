@@ -26,6 +26,7 @@ import { CATEGORIES } from '../services/mockData';
 import { StockItem, Supplier } from '../types';
 import { AddStockModal } from '../components/modals/AddStockModal';
 import { BatchPriceModal } from '../components/modals/BatchPriceModal';
+import { Pagination } from '../components/common/Pagination';
 import { useAuth } from '../context/AuthContext';
 
 export const InventoryPage: React.FC = () => {
@@ -56,7 +57,7 @@ export const InventoryPage: React.FC = () => {
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 50;
+  const [pageSize, setPageSize] = useState(50);
 
   // Modals
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -637,34 +638,16 @@ export const InventoryPage: React.FC = () => {
           </table>
         </div>
 
-        {/* Pagination bar matching desktop 50 items/page */}
-        <div className="p-3 border-t border-white/[0.08] bg-slate-950/60 flex items-center justify-between text-xs text-slate-400">
-          <div>
-            Displaying <strong className="font-semibold text-slate-200">{totalRecords > 0 ? (currentPage - 1) * pageSize + 1 : 0}</strong> to{' '}
-            <strong className="font-semibold text-slate-200">{Math.min(currentPage * pageSize, totalRecords)}</strong> of{' '}
-            <strong className="font-semibold text-slate-200">{totalRecords}</strong> registered units
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              disabled={currentPage <= 1}
-              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              className="p-1.5 rounded-xl border border-white/[0.1] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-white/[0.06] text-slate-200 transition-colors cursor-pointer"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <span className="font-medium text-slate-300">
-              Page {currentPage} of {totalPages}
-            </span>
-            <button
-              disabled={currentPage >= totalPages}
-              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-              className="p-1.5 rounded-xl border border-white/[0.1] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-white/[0.06] text-slate-200 transition-colors cursor-pointer"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
+        {/* Responsive Pagination Component */}
+        <Pagination
+          currentPage={currentPage}
+          totalItems={totalRecords}
+          pageSize={pageSize}
+          pageSizeOptions={[25, 50, 100, 250]}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={setPageSize}
+          label="registered units"
+        />
       </div>
 
       {/* Add / Edit Stock Modal */}

@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { rmaService, salesService, inventoryService, DATA_UPDATED_EVENT } from '../services/api';
 import { RMATicket, RMAStatus, StockItem } from '../types';
+import { Pagination } from '../components/common/Pagination';
 import { useAuth } from '../context/AuthContext';
 
 interface RMAPageProps {
@@ -38,6 +39,10 @@ export const RMAPage: React.FC<RMAPageProps> = ({ initialRMAData, onClearInitial
   const [loading, setLoading] = useState(false);
   const [isNewTicketOpen, setIsNewTicketOpen] = useState(false);
   const [selectedTicketForUpdate, setSelectedTicketForUpdate] = useState<RMATicket | null>(null);
+
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(15);
 
   // New Ticket Form State
   const [serial, setSerial] = useState('');
@@ -138,6 +143,9 @@ export const RMAPage: React.FC<RMAPageProps> = ({ initialRMAData, onClearInitial
     }
   };
 
+  const totalTicketsCount = tickets.length;
+  const paginatedTickets = tickets.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
   const activeClaims = tickets.filter((t) => t.status !== 'Resolved & Released').length;
   const readyClaims = tickets.filter((t) => t.status === 'Replacement Ready').length;
 
@@ -228,7 +236,7 @@ export const RMAPage: React.FC<RMAPageProps> = ({ initialRMAData, onClearInitial
               </tr>
             </thead>
             <tbody className="divide-y divide-white/[0.04]">
-              {tickets.map((t) => (
+              {paginatedTickets.map((t) => (
                 <tr key={t.id} className="hover:bg-white/[0.02] transition-colors">
                   <td className="py-3 px-3.5 font-mono font-bold text-teal-300">
                     {t.id}
@@ -297,6 +305,18 @@ export const RMAPage: React.FC<RMAPageProps> = ({ initialRMAData, onClearInitial
             </tbody>
           </table>
         </div>
+
+        {totalTicketsCount > 0 && (
+          <Pagination
+            currentPage={currentPage}
+            totalItems={totalTicketsCount}
+            pageSize={pageSize}
+            pageSizeOptions={[10, 15, 25, 50]}
+            onPageChange={setCurrentPage}
+            onPageSizeChange={setPageSize}
+            label="RMA tickets"
+          />
+        )}
       </div>
 
       {/* New Ticket Modal */}
