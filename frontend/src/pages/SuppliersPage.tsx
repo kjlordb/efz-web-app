@@ -7,7 +7,9 @@ import {
   MapPin,
   Building,
   CheckCircle2,
-  Package
+  Package,
+  Search,
+  X
 } from 'lucide-react';
 import { supplierService, inventoryService } from '../services/api';
 import { Supplier, StockItem } from '../types';
@@ -18,9 +20,14 @@ export const SuppliersPage: React.FC = () => {
   const [stock, setStock] = useState<StockItem[]>([]);
   const [isAddOpen, setIsAddOpen] = useState(false);
 
-  // Pagination
+  // Search & Pagination
+  const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(12);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
 
   // New supplier form
   const [name, setName] = useState('');
@@ -66,6 +73,24 @@ export const SuppliersPage: React.FC = () => {
     }
   };
 
+  const filteredSuppliers = suppliers.filter((s) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase().trim();
+    return (
+      s.supplierName.toLowerCase().includes(q) ||
+      s.supplierContact.toLowerCase().includes(q) ||
+      s.supplierEmail.toLowerCase().includes(q) ||
+      s.supplierAddress.toLowerCase().includes(q) ||
+      s.id.toString().includes(q)
+    );
+  });
+
+  const totalSuppliersCount = filteredSuppliers.length;
+  const paginatedSuppliers = filteredSuppliers.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
   return (
     <div className="space-y-4">
       {/* Toast */}
@@ -97,11 +122,36 @@ export const SuppliersPage: React.FC = () => {
         </button>
       </div>
 
+      {/* Search Toolbar */}
+      <div className="bg-slate-900/60 backdrop-blur-md p-3.5 rounded-2xl border border-white/[0.08] shadow-glass-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="relative flex-1 max-w-md w-full">
+          <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400" />
+          <input
+            type="text"
+            placeholder="Search by supplier name, contact, email, address, or ID..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="glass-input w-full pl-9 pr-8 py-1.5 text-xs"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-2.5 top-2 text-slate-400 hover:text-white transition-colors cursor-pointer"
+              title="Clear search"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
+        <div className="text-xs text-slate-400 font-medium">
+          Showing <strong className="text-white">{totalSuppliersCount}</strong> of{' '}
+          <strong className="text-slate-300">{suppliers.length}</strong> registered vendors
+        </div>
+      </div>
+
       {/* Supplier Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {suppliers
-          .slice((currentPage - 1) * pageSize, currentPage * pageSize)
-          .map((s) => {
+        {paginatedSuppliers.map((s) => {
           const supplierStockCount = stock.filter(
             (i) => i.supplierName.toLowerCase() === s.supplierName.toLowerCase()
           ).length;
@@ -146,16 +196,39 @@ export const SuppliersPage: React.FC = () => {
             </div>
           );
         })}
+
+        {totalSuppliersCount === 0 && (
+          <div className="col-span-full bg-slate-900/40 backdrop-blur-md rounded-2xl border border-white/[0.08] p-12 text-center text-slate-400 space-y-2">
+            <Truck className="w-10 h-10 mx-auto text-slate-500 stroke-[1.5]" />
+            <div className="text-sm font-semibold text-white">No Suppliers Found</div>
+            <p className="text-xs text-slate-400">
+              {searchQuery
+                ? `No supplier records matched your search "${searchQuery}".`
+                : 'Click "+ Add New Supplier" above to register distributor accounts.'}
+            </p>
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="text-xs text-teal-400 hover:text-teal-300 font-semibold underline mt-2 inline-block cursor-pointer"
+              >
+                Clear search query
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
-      {suppliers.length > 0 && (
+      {totalSuppliersCount > 0 && (
         <div className="bg-slate-900/60 backdrop-blur-md rounded-2xl border border-white/[0.08] overflow-hidden">
           <Pagination
             currentPage={currentPage}
-            totalItems={suppliers.length}
+            totalItems={totalSuppliersCount}
             pageSize={pageSize}
             pageSizeOptions={[6, 12, 24, 48]}
-            onPageChange={setCurrentPage}
+            onPageChange={(p) => {
+              setCurrentPage(p);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
             onPageSizeChange={setPageSize}
             label="suppliers"
           />

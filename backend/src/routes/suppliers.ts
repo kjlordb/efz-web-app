@@ -4,10 +4,13 @@ import { getPool, sql } from '../db.js';
 export const supplierRouter = Router();
 
 // GET /api/suppliers - List suppliers with active stock units
-supplierRouter.get('/', async (_req, res) => {
+supplierRouter.get('/', async (req, res) => {
   try {
     const pool = await getPool();
-    const result = await pool.request().query(`
+    const { search } = req.query;
+
+    const request = pool.request();
+    let query = `
       SELECT 
         s.id,
         s.SupplierName,
@@ -20,8 +23,22 @@ supplierRouter.get('/', async (_req, res) => {
           WHERE SupplierName = s.SupplierName AND StockStatus = 'stored'
         ) AS activeStockUnits
       FROM dbo.Suppliers s
-      ORDER BY s.SupplierName ASC
-    `);
+      WHERE 1=1
+    `;
+
+    if (search && typeof search === 'string' && search.trim()) {
+      request.input('search', sql.NVarChar, `%${search.trim()}%`);
+      query += ` AND (
+        s.SupplierName LIKE @search OR
+        s.SupplierAddress LIKE @search OR
+        s.SupplierEmail LIKE @search OR
+        s.SupplierContact LIKE @search
+      )`;
+    }
+
+    query += ` ORDER BY s.SupplierName ASC`;
+
+    const result = await request.query(query);
 
     const suppliers = result.recordset.map((row) => ({
       id: row.id,

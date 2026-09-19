@@ -748,11 +748,12 @@ export const customerService = {
 // VENDOR / SUPPLIER SERVICES
 // ==========================================
 export const supplierService = {
-  async getSuppliers(): Promise<Supplier[]> {
+  async getSuppliers(search?: string): Promise<Supplier[]> {
     const health = await getDbHealth();
     if (health.connected) {
       try {
-        const res = await fetch('/api/suppliers');
+        const url = search ? `/api/suppliers?search=${encodeURIComponent(search.trim())}` : '/api/suppliers';
+        const res = await fetch(url);
         if (res.ok) {
           return await res.json();
         }
@@ -762,12 +763,25 @@ export const supplierService = {
     }
 
     await delay();
-    return suppliers.map((s) => ({
+    let result = suppliers.map((s) => ({
       ...s,
       activeStockUnits: stockItems.filter(
         (i) => i.supplierName.toLowerCase() === s.supplierName.toLowerCase() && i.stockStatus === 'stored'
       ).length
     }));
+
+    if (search && search.trim()) {
+      const q = search.toLowerCase().trim();
+      result = result.filter(
+        (s) =>
+          s.supplierName.toLowerCase().includes(q) ||
+          s.supplierContact.toLowerCase().includes(q) ||
+          s.supplierEmail.toLowerCase().includes(q) ||
+          s.supplierAddress.toLowerCase().includes(q)
+      );
+    }
+
+    return result;
   },
 
   async addSupplier(supplier: Omit<Supplier, 'id'>): Promise<Supplier> {
