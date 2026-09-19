@@ -16,7 +16,10 @@ import {
   CheckCircle2,
   AlertCircle,
   Download,
-  TrendingUp
+  TrendingUp,
+  ArrowUpDown,
+  Archive,
+  Database
 } from 'lucide-react';
 import { inventoryService, supplierService, DATA_UPDATED_EVENT } from '../services/api';
 import { CATEGORIES } from '../services/mockData';
@@ -32,12 +35,24 @@ export const InventoryPage: React.FC = () => {
 
   const [items, setItems] = useState<StockItem[]>([]);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+  const [stats, setStats] = useState<{
+    totalUnits: number;
+    legacyUnsoldUnits: number;
+    activeSellableUnits: number;
+    storedUnits: number;
+    updatedUnits: number;
+    deletedUnits: number;
+    soldUnits: number;
+    activeInventoryRetailValue: number;
+    activeInventoryCostValue: number;
+  } | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Filters
+  // Filters - defaults to 'unsold' matching the legacy desktop app's 4,248 count
   const [selectedCategory, setSelectedCategory] = useState('All Stocks');
-  const [statusFilter, setStatusFilter] = useState<'stored' | 'sold' | 'Deleted' | 'all'>('stored');
+  const [statusFilter, setStatusFilter] = useState<'unsold' | 'stored' | 'sold' | 'Deleted' | 'all'>('unsold');
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -50,17 +65,31 @@ export const InventoryPage: React.FC = () => {
 
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
 
+  const loadStats = async () => {
+    try {
+      const s = await inventoryService.getStockStats();
+      setStats(s);
+    } catch (err) {
+      console.warn('Failed to load inventory stats', err);
+    }
+  };
+
   useEffect(() => {
     loadInventory();
-  }, [selectedCategory, statusFilter]);
+  }, [selectedCategory, statusFilter, sortOrder]);
+
+  useEffect(() => {
+    loadStats();
+  }, []);
 
   useEffect(() => {
     const handleUpdate = () => {
       loadInventory();
+      loadStats();
     };
     window.addEventListener(DATA_UPDATED_EVENT, handleUpdate);
     return () => window.removeEventListener(DATA_UPDATED_EVENT, handleUpdate);
-  }, [selectedCategory, statusFilter]);
+  }, [selectedCategory, statusFilter, sortOrder]);
 
   const loadInventory = async () => {
     setLoading(true);
@@ -69,12 +98,15 @@ export const InventoryPage: React.FC = () => {
         inventoryService.getStockItems({
           category: selectedCategory,
           includeDeleted: true,
-          status: statusFilter === 'all' ? undefined : statusFilter
+          status: statusFilter === 'all' ? undefined : statusFilter,
+          sort: sortOrder,
+          limit: 5000,
         }),
         supplierService.getSuppliers()
       ]);
       setItems(data);
       setSuppliers(sups);
+      loadStats();
     } catch (err: any) {
       showNotify('error', err.message || 'Error loading stock catalog');
     } finally {
@@ -112,6 +144,7 @@ export const InventoryPage: React.FC = () => {
   // Export inventory to CSV
   const handleExportCSV = () => {
     const headers = [
+      'Stock ID',
       'Serial Number',
       'Category',
       'Model Specifications',
@@ -129,6 +162,7 @@ export const InventoryPage: React.FC = () => {
       const marginPhp = i.stockPrice - i.suppliersPrice;
       const marginPct = i.stockPrice > 0 ? ((marginPhp / i.stockPrice) * 100).toFixed(1) : '0';
       return [
+        i.id,
         `"${i.stockSerial}"`,
         `"${i.stockName}"`,
         `"${i.stockDetails.replace(/"/g, '""')}"`,
@@ -243,17 +277,151 @@ export const InventoryPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Inventory Health & Serial Count Reconciliation Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        {/* Card 1: Legacy Desktop App Count */}
+        <div
+          onClick={() => { setStatusFilter('unsold'); setCurrentPage(1); }}
+          className={`p-3.5 rounded-2xl border transition-all cursor-pointer ${
+            statusFilter === 'unsold'
+              ? 'bg-teal-500/15 border-teal-400/50 shadow-glass-teal ring-1 ring-teal-400/30'
+              : 'glass-card border-white/[0.08] hover:border-white/[0.15]'
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-semibold text-teal-300 uppercase tracking-wider">Legacy Unsold</span>
+            <span className="text-[9px] bg-teal-400/20 text-teal-300 font-bold px-1.5 py-0.5 rounded border border-teal-400/30">
+              Desktop Match
+            </span>
+          </div>
+          <div className="mt-1.5 flex items-baseline gap-2">
+            <span className="text-xl font-bold font-mono text-white">
+              {stats ? stats.legacyUnsoldUnits.toLocaleString() : '4,248'}
+            </span>
+            <span className="text-[10px] text-slate-400">units</span>
+          </div>
+          <div className="text-[10px] text-slate-400 mt-1 truncate">
+            Matches legacy desktop list (4,248)
+          </div>
+        </div>
+
+        {/* Card 2: Active Sellable */}
+        <div
+          onClick={() => { setStatusFilter('stored'); setCurrentPage(1); }}
+          className={`p-3.5 rounded-2xl border transition-all cursor-pointer ${
+            statusFilter === 'stored'
+              ? 'bg-emerald-500/15 border-emerald-400/50 shadow-glass-teal ring-1 ring-emerald-400/30'
+              : 'glass-card border-white/[0.08] hover:border-white/[0.15]'
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-semibold text-emerald-300 uppercase tracking-wider">Active Sellable</span>
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          </div>
+          <div className="mt-1.5 flex items-baseline gap-2">
+            <span className="text-xl font-bold font-mono text-emerald-300">
+              {stats ? stats.activeSellableUnits.toLocaleString() : '3,498'}
+            </span>
+            <span className="text-[10px] text-slate-400">units</span>
+          </div>
+          <div className="text-[10px] text-slate-400 mt-1 truncate">
+            {stats ? `₱${stats.activeInventoryRetailValue.toLocaleString()} SRP` : 'In-stock sellable inventory'}
+          </div>
+        </div>
+
+        {/* Card 3: Liquidated / Sold */}
+        <div
+          onClick={() => { setStatusFilter('sold'); setCurrentPage(1); }}
+          className={`p-3.5 rounded-2xl border transition-all cursor-pointer ${
+            statusFilter === 'sold'
+              ? 'bg-blue-500/15 border-blue-400/50 shadow-glass-teal ring-1 ring-blue-400/30'
+              : 'glass-card border-white/[0.08] hover:border-white/[0.15]'
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-semibold text-blue-300 uppercase tracking-wider">Sold / Liquidated</span>
+            <CheckCircle2 className="w-3.5 h-3.5 text-blue-400" />
+          </div>
+          <div className="mt-1.5 flex items-baseline gap-2">
+            <span className="text-xl font-bold font-mono text-blue-200">
+              {stats ? stats.soldUnits.toLocaleString() : '37,686'}
+            </span>
+            <span className="text-[10px] text-slate-400">serials</span>
+          </div>
+          <div className="text-[10px] text-slate-400 mt-1 truncate">
+            Across 12,718 sales orders
+          </div>
+        </div>
+
+        {/* Card 4: Decommissioned */}
+        <div
+          onClick={() => { setStatusFilter('Deleted'); setCurrentPage(1); }}
+          className={`p-3.5 rounded-2xl border transition-all cursor-pointer ${
+            statusFilter === 'Deleted'
+              ? 'bg-red-500/15 border-red-400/50 shadow-glass-teal ring-1 ring-red-400/30'
+              : 'glass-card border-white/[0.08] hover:border-white/[0.15]'
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-semibold text-red-300 uppercase tracking-wider">Decommissioned</span>
+            <Archive className="w-3.5 h-3.5 text-red-400" />
+          </div>
+          <div className="mt-1.5 flex items-baseline gap-2">
+            <span className="text-xl font-bold font-mono text-red-300">
+              {stats ? stats.deletedUnits.toLocaleString() : '750'}
+            </span>
+            <span className="text-[10px] text-slate-400">serials</span>
+          </div>
+          <div className="text-[10px] text-slate-400 mt-1 truncate">
+            Soft-deleted / RMA write-offs
+          </div>
+        </div>
+
+        {/* Card 5: Complete Master History */}
+        <div
+          onClick={() => { setStatusFilter('all'); setCurrentPage(1); }}
+          className={`p-3.5 rounded-2xl border transition-all cursor-pointer col-span-2 sm:col-span-1 ${
+            statusFilter === 'all'
+              ? 'bg-amber-500/15 border-amber-400/50 shadow-glass-teal ring-1 ring-amber-400/30'
+              : 'glass-card border-white/[0.08] hover:border-white/[0.15]'
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-semibold text-amber-300 uppercase tracking-wider">Master Registry</span>
+            <Database className="w-3.5 h-3.5 text-amber-400" />
+          </div>
+          <div className="mt-1.5 flex items-baseline gap-2">
+            <span className="text-xl font-bold font-mono text-amber-200">
+              {stats ? stats.totalUnits.toLocaleString() : '41,934'}
+            </span>
+            <span className="text-[10px] text-slate-400">total</span>
+          </div>
+          <div className="text-[10px] text-slate-400 mt-1 truncate">
+            All registered units in EFZApp
+          </div>
+        </div>
+      </div>
+
       {/* Filter and Search Bar */}
       <div className="glass-card p-3 rounded-2xl border border-white/[0.08] shadow-glass-sm flex flex-wrap items-center justify-between gap-3">
         {/* Status Tabs with business terminology */}
-        <div className="flex items-center gap-1 bg-slate-950/60 p-1 rounded-xl border border-white/[0.08] text-xs font-semibold shadow-inner">
+        <div className="flex items-center gap-1 bg-slate-950/60 p-1 rounded-xl border border-white/[0.08] text-xs font-semibold shadow-inner flex-wrap sm:flex-nowrap">
+          <button
+            onClick={() => { setStatusFilter('unsold'); setCurrentPage(1); }}
+            className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+              statusFilter === 'unsold' ? 'bg-teal-500/20 text-teal-300 border border-teal-500/40 shadow-glass-xs font-bold' : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <span>Legacy Unsold ({stats ? stats.legacyUnsoldUnits.toLocaleString() : '4,248'})</span>
+            <span className="text-[9px] bg-teal-500/30 text-teal-200 px-1 py-0.5 rounded font-mono font-normal">Desktop</span>
+          </button>
           <button
             onClick={() => { setStatusFilter('stored'); setCurrentPage(1); }}
             className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-              statusFilter === 'stored' ? 'bg-teal-500/20 text-teal-300 border border-teal-500/40 shadow-glass-xs font-bold' : 'text-slate-400 hover:text-slate-200'
+              statusFilter === 'stored' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-glass-xs font-bold' : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            In-Stock (Available)
+            In-Stock Sellable ({stats ? stats.activeSellableUnits.toLocaleString() : '3,498'})
           </button>
           <button
             onClick={() => { setStatusFilter('sold'); setCurrentPage(1); }}
@@ -261,7 +429,7 @@ export const InventoryPage: React.FC = () => {
               statusFilter === 'sold' ? 'bg-teal-500/20 text-teal-300 border border-teal-500/40 shadow-glass-xs font-bold' : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            Liquidated (Sold)
+            Liquidated ({stats ? stats.soldUnits.toLocaleString() : '37,686'})
           </button>
           <button
             onClick={() => { setStatusFilter('Deleted'); setCurrentPage(1); }}
@@ -269,7 +437,7 @@ export const InventoryPage: React.FC = () => {
               statusFilter === 'Deleted' ? 'bg-red-500/20 text-red-300 border border-red-500/40 shadow-glass-xs font-bold' : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            Decommissioned
+            Decommissioned ({stats ? stats.deletedUnits.toLocaleString() : '750'})
           </button>
           <button
             onClick={() => { setStatusFilter('all'); setCurrentPage(1); }}
@@ -277,12 +445,24 @@ export const InventoryPage: React.FC = () => {
               statusFilter === 'all' ? 'bg-teal-500/20 text-teal-300 border border-teal-500/40 shadow-glass-xs font-bold' : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            Complete Master
+            All Serials ({stats ? stats.totalUnits.toLocaleString() : '41,934'})
           </button>
         </div>
 
-        {/* Category & Search inputs */}
-        <div className="flex items-center gap-2.5 flex-1 max-w-xl justify-end">
+        {/* Category, Search, & Sort controls */}
+        <div className="flex items-center gap-2.5 flex-1 max-w-2xl justify-end flex-wrap sm:flex-nowrap">
+          <button
+            onClick={() => {
+              setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+              setCurrentPage(1);
+            }}
+            className="flex items-center gap-1.5 text-xs glass-input rounded-xl px-3 py-2 font-medium text-slate-200 hover:text-teal-300 transition-colors cursor-pointer whitespace-nowrap"
+            title={sortOrder === 'asc' ? 'Legacy Desktop Order (ID 1 -> N)' : 'Newest First (ID N -> 1)'}
+          >
+            <ArrowUpDown className="w-3.5 h-3.5 text-teal-400" />
+            <span>{sortOrder === 'asc' ? 'ID Asc (Desktop)' : 'ID Desc (Newest)'}</span>
+          </button>
+
           <select
             value={selectedCategory}
             onChange={(e) => { setSelectedCategory(e.target.value); setCurrentPage(1); }}
@@ -313,7 +493,8 @@ export const InventoryPage: React.FC = () => {
           <table className="w-full text-left text-xs border-collapse">
             <thead>
               <tr className="bg-slate-950/60 border-b border-white/[0.08] text-slate-400 font-bold uppercase tracking-wider text-[10px]">
-                <th className="py-3 px-3.5">Serial Barcode</th>
+                <th className="py-3 px-3.5 text-center font-mono"># ID</th>
+                <th className="py-3 px-3 font-mono">Serial Barcode</th>
                 <th className="py-3 px-3">Category</th>
                 <th className="py-3 px-3">Product Description & Specifications</th>
                 <th className="py-3 px-3 text-right">Selling Price (SRP)</th>
@@ -336,7 +517,10 @@ export const InventoryPage: React.FC = () => {
 
                 return (
                   <tr key={item.id} className="hover:bg-white/[0.04] transition-colors">
-                    <td className="py-2.5 px-3.5 font-mono font-bold text-teal-300 whitespace-nowrap">
+                    <td className="py-2.5 px-3.5 font-mono text-center text-slate-400 font-semibold whitespace-nowrap">
+                      {item.id}
+                    </td>
+                    <td className="py-2.5 px-3 font-mono font-bold text-teal-300 whitespace-nowrap">
                       {item.stockSerial}
                     </td>
                     <td className="py-2.5 px-3">
@@ -351,7 +535,7 @@ export const InventoryPage: React.FC = () => {
                       ₱{item.stockPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                     </td>
                     {canViewCosts && (
-                  <>
+                      <>
                         <td className="py-2.5 px-3 text-right text-slate-400 font-mono whitespace-nowrap">
                           ₱{item.suppliersPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                         </td>
@@ -385,9 +569,14 @@ export const InventoryPage: React.FC = () => {
                           In-Stock
                         </span>
                       )}
-                      {item.stockStatus === 'sold' && (
+                      {item.stockStatus === 'updated' && (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-teal-500/15 text-teal-300 border border-teal-500/30" title="Specifications or price modified in-stock">
+                          In-Stock (Updated)
+                        </span>
+                      )}
+                      {(item.stockStatus === 'sold' || item.stockStatus === 'Sold') && (
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/15 text-blue-300 border border-blue-500/30">
-                          Sold #{item.orderId}
+                          Sold {item.orderId ? `#${item.orderId}` : ''}
                         </span>
                       )}
                       {item.stockStatus === 'Deleted' && (
@@ -439,7 +628,7 @@ export const InventoryPage: React.FC = () => {
 
               {paginatedItems.length === 0 && (
                 <tr>
-                  <td colSpan={canViewCosts ? 10 : 8} className="py-12 text-center text-slate-500">
+                  <td colSpan={canViewCosts ? 11 : 9} className="py-12 text-center text-slate-500">
                     No hardware assets match the selected filter criteria.
                   </td>
                 </tr>

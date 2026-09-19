@@ -3,6 +3,29 @@ import { getPool, sql } from '../db.js';
 
 export const stockRouter = Router();
 
+// GET /api/stock/stats - Get complete breakdown of inventory numbers
+stockRouter.get('/stats', async (_req, res) => {
+  try {
+    const pool = await getPool();
+    const result = await pool.request().query(`
+      SELECT 
+        COUNT(*) AS totalUnits,
+        SUM(CASE WHEN LOWER(StockStatus) != 'sold' THEN 1 ELSE 0 END) AS legacyUnsoldUnits,
+        SUM(CASE WHEN StockStatus IN ('stored', 'updated') THEN 1 ELSE 0 END) AS activeSellableUnits,
+        SUM(CASE WHEN StockStatus = 'stored' THEN 1 ELSE 0 END) AS storedUnits,
+        SUM(CASE WHEN StockStatus = 'updated' THEN 1 ELSE 0 END) AS updatedUnits,
+        SUM(CASE WHEN StockStatus = 'Deleted' THEN 1 ELSE 0 END) AS deletedUnits,
+        SUM(CASE WHEN StockStatus = 'sold' THEN 1 ELSE 0 END) AS soldUnits,
+        COALESCE(SUM(CASE WHEN StockStatus IN ('stored', 'updated') THEN StockPrice ELSE 0 END), 0) AS activeInventoryRetailValue,
+        COALESCE(SUM(CASE WHEN StockStatus IN ('stored', 'updated') THEN SuppliersPrice ELSE 0 END), 0) AS activeInventoryCostValue
+      FROM dbo.StockItems
+    `);
+    res.json(result.recordset[0]);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // GET /api/stock - List stock items with filtering and pagination
 stockRouter.get('/', async (req, res) => {
   try {
@@ -14,6 +37,7 @@ stockRouter.get('/', async (req, res) => {
       includeDeleted,
       limit = '200',
       offset = '0',
+      sort = 'desc',
     } = req.query;
 
     const request = pool.request();
@@ -36,13 +60,21 @@ stockRouter.get('/', async (req, res) => {
       WHERE 1=1
     `;
 
-    if (!includeDeleted || includeDeleted === 'false') {
-      query += ` AND (StockStatus != 'Deleted' OR StockStatus IS NULL)`;
-    }
-
-    if (status && typeof status === 'string') {
+    // Filter by StockStatus:
+    // - 'unsold' or 'legacy-unsold': exactly matches legacy desktop app "Stock Items" list (4,248 units)
+    // - 'stored': active sellable items ('stored' and 'updated' - 3,498 units)
+    // - 'sold': historically liquidated items (37,686 units)
+    // - 'Deleted': decommissioned items (750 units)
+    // - 'all': all master records (41,934 units)
+    if (status === 'unsold' || status === 'legacy-unsold') {
+      query += ` AND LOWER(StockStatus) != 'sold'`;
+    } else if (status === 'stored') {
+      query += ` AND StockStatus IN ('stored', 'updated')`;
+    } else if (status && status !== 'all') {
       request.input('status', sql.NVarChar, status);
       query += ` AND StockStatus = @status`;
+    } else if (!includeDeleted || includeDeleted === 'false') {
+      query += ` AND (StockStatus != 'Deleted' OR StockStatus IS NULL)`;
     }
 
     if (category && typeof category === 'string' && category !== 'All Stocks') {
@@ -60,13 +92,14 @@ stockRouter.get('/', async (req, res) => {
       )`;
     }
 
-    const parsedLimit = Math.min(Math.max(parseInt(limit as string, 10) || 50, 1), 1000);
+    const parsedLimit = Math.min(Math.max(parseInt(limit as string, 10) || 50, 1), 5000);
     const parsedOffset = Math.max(parseInt(offset as string, 10) || 0, 0);
+    const orderDirection = String(sort).toLowerCase() === 'asc' ? 'ASC' : 'DESC';
 
     request.input('offset', sql.Int, parsedOffset);
     request.input('limit', sql.Int, parsedLimit);
 
-    query += ` ORDER BY id DESC OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY`;
+    query += ` ORDER BY id ${orderDirection} OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY`;
 
     const result = await request.query(query);
 

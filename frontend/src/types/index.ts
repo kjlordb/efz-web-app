@@ -1,4 +1,4 @@
-export type StockStatus = 'stored' | 'sold' | 'Deleted';
+export type StockStatus = 'stored' | 'updated' | 'sold' | 'Sold' | 'Deleted' | string;
 
 /**
  * Serialized Inventory & Asset Unit

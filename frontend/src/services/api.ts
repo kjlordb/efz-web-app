@@ -167,11 +167,52 @@ export async function getDbHealth(force = false): Promise<DbHealthStatus> {
 // INVENTORY & ASSET SERVICES
 // ==========================================
 export const inventoryService = {
+  async getStockStats(): Promise<{
+    totalUnits: number;
+    legacyUnsoldUnits: number;
+    activeSellableUnits: number;
+    storedUnits: number;
+    updatedUnits: number;
+    deletedUnits: number;
+    soldUnits: number;
+    activeInventoryRetailValue: number;
+    activeInventoryCostValue: number;
+  }> {
+    const health = await getDbHealth();
+    if (health.connected) {
+      try {
+        const res = await fetch('/api/stock/stats');
+        if (res.ok) {
+          return await res.json();
+        }
+      } catch (err) {
+        console.warn('Live API /api/stock/stats failed', err);
+      }
+    }
+    const unsold = stockItems.filter((i) => i.stockStatus !== 'sold' && i.stockStatus !== 'Sold').length;
+    const stored = stockItems.filter((i) => i.stockStatus === 'stored').length;
+    const deleted = stockItems.filter((i) => i.stockStatus === 'Deleted').length;
+    const sold = stockItems.filter((i) => i.stockStatus === 'sold' || i.stockStatus === 'Sold').length;
+    return {
+      totalUnits: stockItems.length,
+      legacyUnsoldUnits: unsold,
+      activeSellableUnits: stored,
+      storedUnits: stored,
+      updatedUnits: 0,
+      deletedUnits: deleted,
+      soldUnits: sold,
+      activeInventoryRetailValue: stockItems.filter(i => i.stockStatus === 'stored').reduce((a, b) => a + b.stockPrice, 0),
+      activeInventoryCostValue: stockItems.filter(i => i.stockStatus === 'stored').reduce((a, b) => a + b.suppliersPrice, 0),
+    };
+  },
+
   async getStockItems(options?: {
     category?: string;
     search?: string;
     includeDeleted?: boolean;
     status?: string;
+    limit?: number;
+    sort?: 'asc' | 'desc';
   }): Promise<StockItem[]> {
     const health = await getDbHealth();
     if (health.connected) {
@@ -181,7 +222,8 @@ export const inventoryService = {
         if (options?.category && options.category !== 'All Stocks') params.set('category', options.category);
         if (options?.search) params.set('search', options.search);
         if (options?.includeDeleted) params.set('includeDeleted', 'true');
-        params.set('limit', '300');
+        if (options?.sort) params.set('sort', options.sort);
+        params.set('limit', String(options?.limit || 5000));
 
         const res = await fetch(`/api/stock?${params.toString()}`);
         if (res.ok) {
