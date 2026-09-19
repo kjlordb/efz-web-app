@@ -10,7 +10,8 @@ import {
   CheckCircle2,
   AlertCircle,
   Eye,
-  CreditCard
+  CreditCard,
+  X
 } from 'lucide-react';
 import { quotationService, customerService, inventoryService, DATA_UPDATED_EVENT } from '../services/api';
 import { CATEGORIES } from '../services/mockData';
@@ -27,9 +28,17 @@ export const QuotationPage: React.FC = () => {
   const [selectedCustomerId, setSelectedCustomerId] = useState<number | ''>('');
   const [stockItems, setStockItems] = useState<StockItem[]>([]);
 
+  // Search States
+  const [quoteSearch, setQuoteSearch] = useState('');
+  const [customerFilter, setCustomerFilter] = useState('');
+
   // Quotations List Pagination
   const [quotePage, setQuotePage] = useState(1);
   const quotePageSize = 8;
+
+  useEffect(() => {
+    setQuotePage(1);
+  }, [quoteSearch]);
 
   // Quote form state
   const [quoteItems, setQuoteItems] = useState<QuotationDetailItem[]>([
@@ -157,6 +166,28 @@ export const QuotationPage: React.FC = () => {
     }
   };
 
+  // Filtered Customers for quotation builder
+  const filteredCustomers = customers.filter((c) => {
+    if (!customerFilter.trim()) return true;
+    const f = customerFilter.toLowerCase().trim();
+    return (
+      c.fullName.toLowerCase().includes(f) ||
+      (c.company && c.company.toLowerCase().includes(f)) ||
+      c.contactNumber.toLowerCase().includes(f) ||
+      c.id.toString().includes(f)
+    );
+  }).slice(0, 150);
+
+  // Filtered Quotations for history sidebar
+  const filteredQuotations = quotations.filter((q) => {
+    if (!quoteSearch.trim()) return true;
+    const s = quoteSearch.toLowerCase().trim();
+    const qNum = (q.quotationId ?? (q as any).id ?? '').toString().toLowerCase();
+    const cust = (q.customerName || '').toLowerCase();
+    const rem = (q.remarks || '').toLowerCase();
+    return qNum.includes(s) || cust.includes(s) || rem.includes(s);
+  });
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -200,13 +231,38 @@ export const QuotationPage: React.FC = () => {
               </button>
             </div>
 
+            {/* Fast Customer Search Filter */}
+            <div className="relative">
+              <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Filter client by name, company, or contact #..."
+                value={customerFilter}
+                onChange={(e) => setCustomerFilter(e.target.value)}
+                className="glass-input w-full pl-9 pr-8 py-1.5 text-xs font-medium text-white"
+              />
+              {customerFilter && (
+                <button
+                  type="button"
+                  onClick={() => setCustomerFilter('')}
+                  className="absolute right-2.5 top-2 text-slate-400 hover:text-white transition-colors cursor-pointer"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+
             <select
               value={selectedCustomerId}
               onChange={(e) => setSelectedCustomerId(Number(e.target.value))}
               className="glass-input w-full text-xs font-medium text-white bg-slate-950"
             >
-              <option value="" className="bg-slate-950 text-slate-400">-- Select Customer --</option>
-              {customers.map((c) => (
+              <option value="" className="bg-slate-950 text-slate-400">
+                {filteredCustomers.length === 0
+                  ? 'No clients match filter'
+                  : `-- Select Client (${filteredCustomers.length} shown) --`}
+              </option>
+              {filteredCustomers.map((c) => (
                 <option key={c.id} value={c.id} className="bg-slate-950 text-white">
                   {c.fullName} {c.company ? `(${c.company})` : ''} - {c.contactNumber}
                 </option>
@@ -418,9 +474,37 @@ export const QuotationPage: React.FC = () => {
 
         {/* Previous Quotations List */}
         <div className="lg:col-span-4 bg-slate-900/60 backdrop-blur-md rounded-2xl border border-white/[0.08] shadow-glass-sm p-4 sm:p-5 flex flex-col h-[700px]">
-          <div className="border-b border-white/[0.08] pb-3 mb-3">
-            <h2 className="font-bold text-sm text-white">Saved Quotations</h2>
-            <p className="text-xs text-slate-400">History of quotations generated for clients</p>
+          <div className="border-b border-white/[0.08] pb-3 mb-3 space-y-2.5">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="font-bold text-sm text-white">Saved Quotations</h2>
+                <p className="text-xs text-slate-400">History of quotations generated for clients</p>
+              </div>
+              <span className="text-[10px] font-mono text-teal-300 bg-teal-500/10 border border-teal-500/20 px-2 py-0.5 rounded-full shrink-0">
+                {filteredQuotations.length} {filteredQuotations.length === 1 ? 'quote' : 'quotes'}
+              </span>
+            </div>
+
+            {/* Quotations Quick Search Bar */}
+            <div className="relative">
+              <Search className="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search quote #, customer, or remarks..."
+                value={quoteSearch}
+                onChange={(e) => setQuoteSearch(e.target.value)}
+                className="glass-input w-full pl-8 pr-7 py-1.5 text-xs text-white"
+              />
+              {quoteSearch && (
+                <button
+                  type="button"
+                  onClick={() => setQuoteSearch('')}
+                  className="absolute right-2.5 top-2 text-slate-400 hover:text-white transition-colors cursor-pointer"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="flex-1 overflow-y-auto space-y-3 pr-1">
@@ -429,7 +513,7 @@ export const QuotationPage: React.FC = () => {
                 <div className="w-6 h-6 border-2 border-teal-400 border-t-transparent rounded-full animate-spin mx-auto"></div>
                 <p>Loading database quotations...</p>
               </div>
-            ) : quotations
+            ) : filteredQuotations
                 .slice((quotePage - 1) * quotePageSize, quotePage * quotePageSize)
                 .map((q, idx) => {
               const quoteNum = q.quotationId ?? (q as any).id ?? (idx + 1);
@@ -484,19 +568,32 @@ export const QuotationPage: React.FC = () => {
               );
             })}
 
-            {!isLoading && quotations.length === 0 && (
-              <div className="p-8 text-center text-xs text-slate-500">
-                No quotations recorded yet.
+            {!isLoading && filteredQuotations.length === 0 && (
+              <div className="p-8 text-center text-xs text-slate-500 space-y-2">
+                <p>
+                  {quoteSearch
+                    ? `No quotations match "${quoteSearch}".`
+                    : 'No quotations recorded yet.'}
+                </p>
+                {quoteSearch && (
+                  <button
+                    type="button"
+                    onClick={() => setQuoteSearch('')}
+                    className="text-xs text-teal-400 hover:text-teal-300 underline font-medium cursor-pointer"
+                  >
+                    Clear search
+                  </button>
+                )}
               </div>
             )}
           </div>
 
           {/* Quotations Compact Pagination */}
-          {quotations.length > 0 && (
+          {filteredQuotations.length > 0 && (
             <Pagination
               compact={true}
               currentPage={quotePage}
-              totalItems={quotations.length}
+              totalItems={filteredQuotations.length}
               pageSize={quotePageSize}
               onPageChange={setQuotePage}
               label="quotes"

@@ -30,6 +30,14 @@ export const InstallmentSalesPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
+  // Search & Filter
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'All' | 'Current' | 'Settled' | 'Delinquent'>('All');
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, statusFilter]);
+
   // Payment modal state
   const [payAmount, setPayAmount] = useState<number | ''>('');
   const [payRef, setPayRef] = useState('');
@@ -96,8 +104,24 @@ export const InstallmentSalesPage: React.FC = () => {
   const totalRemainingAR = plans.reduce((acc, p) => acc + p.remainingBalance, 0);
   const totalCollected = totalPrincipal - totalRemainingAR;
 
-  const totalPlansCount = plans.length;
-  const paginatedPlans = plans.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  // Filtered plans
+  const filteredPlans = plans.filter((plan) => {
+    const q = searchQuery.toLowerCase().trim();
+    const matchesSearch =
+      !q ||
+      plan.customerName.toLowerCase().includes(q) ||
+      plan.id.toLowerCase().includes(q) ||
+      plan.orderId.toString().includes(q) ||
+      plan.status.toLowerCase().includes(q) ||
+      (plan.nextDueDate && plan.nextDueDate.toLowerCase().includes(q));
+
+    const matchesStatus = statusFilter === 'All' || plan.status === statusFilter;
+
+    return matchesSearch && matchesStatus;
+  });
+
+  const totalPlansCount = filteredPlans.length;
+  const paginatedPlans = filteredPlans.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   return (
     <div className="space-y-4">
@@ -155,6 +179,53 @@ export const InstallmentSalesPage: React.FC = () => {
             ₱{totalRemainingAR.toLocaleString('en-US', { minimumFractionDigits: 2 })}
           </div>
           <div className="text-[11px] text-slate-400 mt-0.5">Pending collection</div>
+        </div>
+      </div>
+
+      {/* Search & Filter Toolbar */}
+      <div className="bg-slate-900/60 backdrop-blur-md p-3.5 rounded-2xl border border-white/[0.08] shadow-glass-xs flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 flex-1 max-w-2xl">
+          <div className="relative flex-1">
+            <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Search by client name, plan ID (INST-...), invoice #, status..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="glass-input w-full pl-9 pr-8 py-1.5 text-xs"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-2.5 top-2 text-slate-400 hover:text-white transition-colors cursor-pointer"
+                title="Clear search"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+
+          <div className="flex items-center gap-1 bg-slate-950/60 p-1 rounded-xl border border-white/[0.08] text-[11px] shrink-0 overflow-x-auto">
+            {(['All', 'Current', 'Settled', 'Delinquent'] as const).map((status) => (
+              <button
+                key={status}
+                type="button"
+                onClick={() => setStatusFilter(status)}
+                className={`px-2.5 py-1 rounded-lg font-medium transition-all ${
+                  statusFilter === status
+                    ? 'bg-gradient-to-r from-teal-600 to-teal-700 text-white font-bold shadow-glass-xs'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                {status}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="text-xs text-slate-400 font-medium shrink-0">
+          Showing <strong className="text-white">{totalPlansCount}</strong> of{' '}
+          <strong className="text-slate-300">{plans.length}</strong> financing plans
         </div>
       </div>
 
@@ -282,6 +353,33 @@ export const InstallmentSalesPage: React.FC = () => {
                   </React.Fragment>
                 );
               })}
+              {paginatedPlans.length === 0 && (
+                <tr>
+                  <td colSpan={10} className="py-12 text-center text-slate-400">
+                    <div className="flex flex-col items-center justify-center space-y-2">
+                      <CreditCard className="w-8 h-8 text-slate-600 stroke-[1.5]" />
+                      <div className="text-sm font-semibold text-slate-300">No Financing Plans Found</div>
+                      <p className="text-xs text-slate-500 max-w-sm">
+                        {searchQuery || statusFilter !== 'All'
+                          ? `No installment records match your search criteria.`
+                          : `No installment financing plans have been recorded yet.`}
+                      </p>
+                      {(searchQuery || statusFilter !== 'All') && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSearchQuery('');
+                            setStatusFilter('All');
+                          }}
+                          className="mt-2 text-xs text-teal-400 hover:text-teal-300 underline font-medium cursor-pointer"
+                        >
+                          Clear search and filters
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

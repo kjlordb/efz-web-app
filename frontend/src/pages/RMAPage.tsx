@@ -44,6 +44,14 @@ export const RMAPage: React.FC<RMAPageProps> = ({ initialRMAData, onClearInitial
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(15);
 
+  // Search & Status Filter
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('All');
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, statusFilter]);
+
   // New Ticket Form State
   const [serial, setSerial] = useState('');
   const [itemName, setItemName] = useState('');
@@ -143,8 +151,27 @@ export const RMAPage: React.FC<RMAPageProps> = ({ initialRMAData, onClearInitial
     }
   };
 
-  const totalTicketsCount = tickets.length;
-  const paginatedTickets = tickets.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const filteredTickets = tickets.filter((t) => {
+    const q = searchQuery.toLowerCase().trim();
+    const matchesSearch =
+      !q ||
+      t.serialNumber.toLowerCase().includes(q) ||
+      (t.replacementSerial && t.replacementSerial.toLowerCase().includes(q)) ||
+      t.customerName.toLowerCase().includes(q) ||
+      t.itemName.toLowerCase().includes(q) ||
+      t.supplierName.toLowerCase().includes(q) ||
+      t.reportedDefect.toLowerCase().includes(q) ||
+      t.id.toLowerCase().includes(q) ||
+      t.orderId.toString().includes(q) ||
+      t.status.toLowerCase().includes(q);
+
+    const matchesStatus = statusFilter === 'All' || t.status === statusFilter;
+
+    return matchesSearch && matchesStatus;
+  });
+
+  const totalTicketsCount = filteredTickets.length;
+  const paginatedTickets = filteredTickets.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const activeClaims = tickets.filter((t) => t.status !== 'Resolved & Released').length;
   const readyClaims = tickets.filter((t) => t.status === 'Replacement Ready').length;
@@ -210,6 +237,64 @@ export const RMAPage: React.FC<RMAPageProps> = ({ initialRMAData, onClearInitial
           <div className="text-2xl font-black text-emerald-400 font-mono mt-1">
             {tickets.filter((t) => t.status === 'Resolved & Released').length}
           </div>
+        </div>
+      </div>
+
+      {/* Search & Status Filter Toolbar */}
+      <div className="bg-slate-900/60 backdrop-blur-md p-3.5 rounded-2xl border border-white/[0.08] shadow-glass-xs flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 flex-1">
+          <div className="relative flex-1 max-w-md">
+            <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Search by serial #, replacement SN, client, defect, ticket ID..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="glass-input w-full pl-9 pr-8 py-1.5 text-xs"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="absolute right-2.5 top-2 text-slate-400 hover:text-white transition-colors cursor-pointer"
+                title="Clear search"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+
+          <div className="flex items-center gap-1 bg-slate-950/60 p-1 rounded-xl border border-white/[0.08] text-[11px] shrink-0 overflow-x-auto">
+            {['All', ...RMA_STATUSES].map((status) => (
+              <button
+                key={status}
+                type="button"
+                onClick={() => setStatusFilter(status)}
+                className={`px-2.5 py-1 rounded-lg font-medium whitespace-nowrap transition-all ${
+                  statusFilter === status
+                    ? 'bg-gradient-to-r from-teal-600 to-teal-700 text-white font-bold shadow-glass-xs'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                {status === 'Pending Inspection'
+                  ? 'Pending'
+                  : status === 'In Distributor Diagnostic'
+                  ? 'Diagnostic'
+                  : status === 'Replacement Inbound'
+                  ? 'Inbound'
+                  : status === 'Replacement Ready'
+                  ? 'Ready'
+                  : status === 'Resolved & Released'
+                  ? 'Resolved'
+                  : status}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="text-xs text-slate-400 font-medium shrink-0">
+          Showing <strong className="text-white">{totalTicketsCount}</strong> of{' '}
+          <strong className="text-slate-300">{tickets.length}</strong> warranty claims
         </div>
       </div>
 
@@ -302,6 +387,33 @@ export const RMAPage: React.FC<RMAPageProps> = ({ initialRMAData, onClearInitial
                   </td>
                 </tr>
               ))}
+              {paginatedTickets.length === 0 && (
+                <tr>
+                  <td colSpan={8} className="py-12 text-center text-slate-400">
+                    <div className="flex flex-col items-center justify-center space-y-2">
+                      <RotateCcw className="w-8 h-8 text-slate-600 stroke-[1.5]" />
+                      <div className="text-sm font-semibold text-slate-300">No RMA Tickets Found</div>
+                      <p className="text-xs text-slate-500 max-w-sm">
+                        {searchQuery || statusFilter !== 'All'
+                          ? `No RMA warranty claims match your search criteria.`
+                          : `No RMA tickets have been filed yet.`}
+                      </p>
+                      {(searchQuery || statusFilter !== 'All') && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSearchQuery('');
+                            setStatusFilter('All');
+                          }}
+                          className="mt-2 text-xs text-teal-400 hover:text-teal-300 underline font-medium cursor-pointer"
+                        >
+                          Clear search and filters
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

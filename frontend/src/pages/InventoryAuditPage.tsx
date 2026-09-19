@@ -8,7 +8,8 @@ import {
   DollarSign,
   TrendingDown,
   TrendingUp,
-  Search
+  Search,
+  X
 } from 'lucide-react';
 import { inventoryService } from '../services/api';
 import { CATEGORIES } from '../services/mockData';
@@ -20,9 +21,20 @@ export const InventoryAuditPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [selectedAuditTab, setSelectedAuditTab] = useState<'category' | 'supplier' | 'movement'>('category');
 
+  // Search & Filters for Movement Log
+  const [movementSearch, setMovementSearch] = useState('');
+  const [movementStatusFilter, setMovementStatusFilter] = useState<'All' | 'stored' | 'sold'>('All');
+
+  // Search for Supplier Distribution
+  const [supplierSearch, setSupplierSearch] = useState('');
+
   // Movement Log Pagination
   const [movementPage, setMovementPage] = useState(1);
   const [movementPageSize, setMovementPageSize] = useState(25);
+
+  useEffect(() => {
+    setMovementPage(1);
+  }, [movementSearch, movementStatusFilter]);
 
   useEffect(() => {
     loadData();
@@ -72,6 +84,32 @@ export const InventoryAuditPage: React.FC = () => {
       supplierMap[sup].sold++;
     }
   });
+
+  // Filtered Supplier Distribution
+  const filteredSupplierEntries = Object.entries(supplierMap).filter(([name]) =>
+    !supplierSearch.trim() || name.toLowerCase().includes(supplierSearch.toLowerCase().trim())
+  );
+
+  // Filtered Stock Movements
+  const filteredMovements = items.filter((item) => {
+    const q = movementSearch.toLowerCase().trim();
+    const matchesSearch =
+      !q ||
+      item.stockSerial.toLowerCase().includes(q) ||
+      item.stockDetails.toLowerCase().includes(q) ||
+      item.supplierName.toLowerCase().includes(q) ||
+      (item.orderId && item.orderId.toString().includes(q));
+
+    const matchesStatus =
+      movementStatusFilter === 'All' || item.stockStatus === movementStatusFilter;
+
+    return matchesSearch && matchesStatus;
+  });
+
+  const paginatedMovements = filteredMovements.slice(
+    (movementPage - 1) * movementPageSize,
+    movementPage * movementPageSize
+  );
 
   return (
     <div className="space-y-5">
@@ -206,10 +244,33 @@ export const InventoryAuditPage: React.FC = () => {
       {/* Tab 2: Supplier Distribution */}
       {selectedAuditTab === 'supplier' && (
         <div className="bg-slate-900/60 backdrop-blur-md rounded-2xl border border-white/[0.08] shadow-glass-sm overflow-hidden">
-          <div className="p-3.5 border-b border-white/[0.08] bg-slate-950/40">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-300">
-              Supplier Sourcing & Distribution
-            </span>
+          <div className="p-3.5 border-b border-white/[0.08] bg-slate-950/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-300">
+                Supplier Sourcing & Distribution
+              </span>
+              <p className="text-[11px] text-slate-400">Capital exposure and unit volumes by vendor</p>
+            </div>
+
+            <div className="relative w-full sm:w-64">
+              <Search className="w-3.5 h-3.5 absolute left-3 top-2 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Filter supplier name..."
+                value={supplierSearch}
+                onChange={(e) => setSupplierSearch(e.target.value)}
+                className="glass-input w-full pl-9 pr-7 py-1 text-xs text-white"
+              />
+              {supplierSearch && (
+                <button
+                  type="button"
+                  onClick={() => setSupplierSearch('')}
+                  className="absolute right-2.5 top-2 text-slate-400 hover:text-white transition-colors cursor-pointer"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              )}
+            </div>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
@@ -222,7 +283,7 @@ export const InventoryAuditPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/[0.04]">
-                {Object.entries(supplierMap).map(([name, data]) => (
+                {filteredSupplierEntries.map(([name, data]) => (
                   <tr key={name} className="hover:bg-white/[0.02] transition-colors">
                     <td className="py-3 px-4 font-bold text-slate-200">{name}</td>
                     <td className="py-3 px-4 text-center font-mono font-bold text-teal-300">
@@ -236,6 +297,13 @@ export const InventoryAuditPage: React.FC = () => {
                     </td>
                   </tr>
                 ))}
+                {filteredSupplierEntries.length === 0 && (
+                  <tr>
+                    <td colSpan={4} className="py-8 text-center text-slate-500">
+                      No suppliers match "{supplierSearch}".
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -244,14 +312,61 @@ export const InventoryAuditPage: React.FC = () => {
 
       {/* Tab 3: Recent Movement */}
       {selectedAuditTab === 'movement' && (
-        <div className="bg-slate-900/60 backdrop-blur-md rounded-2xl border border-white/[0.08] shadow-glass-sm p-4 sm:p-5 space-y-3">
-          <div className="text-xs font-bold uppercase tracking-wider text-slate-300 border-b border-white/[0.08] pb-3">
-            Inbound vs Outbound Stock Log
+        <div className="bg-slate-900/60 backdrop-blur-md rounded-2xl border border-white/[0.08] shadow-glass-sm p-4 sm:p-5 space-y-4">
+          {/* Movement Search & Filter Toolbar */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-b border-white/[0.08] pb-3.5">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 flex-1 max-w-xl">
+              <div className="relative flex-1">
+                <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Search serial barcode, product specs, supplier, invoice #..."
+                  value={movementSearch}
+                  onChange={(e) => setMovementSearch(e.target.value)}
+                  className="glass-input w-full pl-9 pr-8 py-1.5 text-xs text-white"
+                />
+                {movementSearch && (
+                  <button
+                    type="button"
+                    onClick={() => setMovementSearch('')}
+                    className="absolute right-2.5 top-2 text-slate-400 hover:text-white transition-colors cursor-pointer"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+
+              <div className="flex items-center gap-1 bg-slate-950/60 p-1 rounded-xl border border-white/[0.08] text-[11px] shrink-0">
+                {(['All', 'stored', 'sold'] as const).map((status) => (
+                  <button
+                    key={status}
+                    type="button"
+                    onClick={() => setMovementStatusFilter(status)}
+                    className={`px-2.5 py-1 rounded-lg font-medium transition-all ${
+                      movementStatusFilter === status
+                        ? 'bg-gradient-to-r from-teal-600 to-teal-700 text-white font-bold shadow-glass-xs'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    {status === 'All'
+                      ? 'All Movement'
+                      : status === 'stored'
+                      ? 'Inbound (Stored)'
+                      : 'Outbound (Sold)'}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="text-xs text-slate-400 font-medium shrink-0">
+              Showing <strong className="text-white">{filteredMovements.length}</strong> of{' '}
+              <strong className="text-slate-300">{items.length}</strong> movements
+            </div>
           </div>
+
+          {/* Movement Log List */}
           <div className="divide-y divide-white/[0.04]">
-            {items
-              .slice((movementPage - 1) * movementPageSize, movementPage * movementPageSize)
-              .map((item) => (
+            {paginatedMovements.map((item) => (
               <div key={item.id} className="py-2.5 flex items-center justify-between text-xs">
                 <div className="flex items-center gap-3">
                   <div
@@ -293,10 +408,34 @@ export const InventoryAuditPage: React.FC = () => {
             ))}
           </div>
 
-          {items.length > 0 && (
+          {/* Empty State */}
+          {paginatedMovements.length === 0 && (
+            <div className="py-12 text-center text-slate-400 space-y-2">
+              <div className="text-sm font-semibold text-slate-300">No Stock Movements Found</div>
+              <p className="text-xs text-slate-500">
+                {movementSearch || movementStatusFilter !== 'All'
+                  ? `No movement records match your search criteria.`
+                  : `No stock movements recorded.`}
+              </p>
+              {(movementSearch || movementStatusFilter !== 'All') && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMovementSearch('');
+                    setMovementStatusFilter('All');
+                  }}
+                  className="text-xs text-teal-400 hover:text-teal-300 underline font-medium cursor-pointer"
+                >
+                  Clear search and filter
+                </button>
+              )}
+            </div>
+          )}
+
+          {filteredMovements.length > 0 && (
             <Pagination
               currentPage={movementPage}
-              totalItems={items.length}
+              totalItems={filteredMovements.length}
               pageSize={movementPageSize}
               pageSizeOptions={[10, 25, 50, 100]}
               onPageChange={setMovementPage}
