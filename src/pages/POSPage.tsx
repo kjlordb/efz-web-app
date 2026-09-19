@@ -242,60 +242,60 @@ export const POSPage: React.FC = () => {
     <div className="space-y-4">
       {/* Notifications */}
       {errorMsg && (
-        <div className="bg-red-500/15 border border-red-500/30 text-red-300 px-4 py-3 rounded-xl text-xs flex items-center justify-between shadow-glass-xs animate-fadeIn">
+        <div className="bg-[#F05D6C]/10 border border-[#F05D6C]/25 text-[#F05D6C] px-4 py-3 rounded-xl text-xs flex items-center justify-between shadow-glass-xs animate-fadeIn">
           <div className="flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <AlertTriangle className="w-4 h-4 text-[#F05D6C] shrink-0" />
             <span className="font-semibold">{errorMsg}</span>
           </div>
-          <button onClick={() => setErrorMsg(null)} className="text-red-400 hover:text-red-200 text-sm cursor-pointer">×</button>
+          <button onClick={() => setErrorMsg(null)} className="text-[#F05D6C] hover:opacity-80 text-sm cursor-pointer">×</button>
         </div>
       )}
 
       {successMsg && (
-        <div className="bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 px-4 py-3 rounded-xl text-xs flex items-center justify-between shadow-glass-xs animate-fadeIn">
+        <div className="bg-[#20C997]/10 border border-[#20C997]/25 text-[#20C997] px-4 py-3 rounded-xl text-xs flex items-center justify-between shadow-glass-xs animate-fadeIn">
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+            <CheckCircle2 className="w-4 h-4 text-[#20C997] shrink-0" />
             <span className="font-semibold">{successMsg}</span>
           </div>
-          <button onClick={() => setSuccessMsg(null)} className="text-emerald-400 hover:text-emerald-200 text-sm cursor-pointer">×</button>
+          <button onClick={() => setSuccessMsg(null)} className="text-[#20C997] hover:opacity-80 text-sm cursor-pointer">×</button>
         </div>
       )}
 
       {/* STEP 1: Customer Profile Bar */}
-      <div className="glass-card rounded-2xl p-3 border border-white/[0.06] shadow-glass-xs">
+      <div className="customer-panel p-3.5 shadow-glass-xs">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center shrink-0 text-teal-400">
+            <div className="w-10 h-10 rounded-xl bg-[rgba(25,195,209,0.10)] border border-[rgba(25,195,209,0.22)] flex items-center justify-center shrink-0 text-[#19C3D1]">
               <User className="w-5 h-5" />
             </div>
 
             {selectedCustomer ? (
               <div className="min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-sm font-bold text-slate-100 truncate">
+                  <span className="text-sm font-bold text-[#F4F7FB] truncate">
                     {selectedCustomer.fullName}
                   </span>
                   {selectedCustomer.company ? (
-                    <span className="text-[11px] font-medium text-teal-300 bg-teal-500/10 px-2 py-0.5 rounded-md border border-teal-500/20">
+                    <span className="text-[11px] font-medium text-[#A9B6C8] bg-[rgba(18,28,45,0.7)] px-2 py-0.5 rounded-md border border-[rgba(148,163,184,0.14)]">
                       {selectedCustomer.company}
                     </span>
                   ) : (
-                    <span className="text-[11px] text-slate-400 bg-white/[0.04] px-2 py-0.5 rounded-md border border-white/[0.06]">
+                    <span className="text-[11px] text-[#A9B6C8] bg-[rgba(18,28,45,0.7)] px-2 py-0.5 rounded-md border border-[rgba(148,163,184,0.14)]">
                       Direct Retail
                     </span>
                   )}
-                  <span className="text-xs text-slate-400 font-mono">
+                  <span className="text-xs text-[#A9B6C8] font-mono">
                     {selectedCustomer.contactNumber}
                   </span>
                 </div>
-                <div className="text-[11px] text-slate-400 truncate mt-0.5">
+                <div className="text-[11px] text-[#6F7E92] truncate mt-0.5">
                   {selectedCustomer.address || 'Standard Commercial Billing'}
                 </div>
               </div>
             ) : (
               <div>
-                <div className="text-sm font-bold text-amber-300">No Client Selected</div>
-                <div className="text-xs text-slate-400">Select or register a client to bill this sales order</div>
+                <div className="text-sm font-bold text-[#F1C968]">No Client Selected</div>
+                <div className="text-xs text-[#A9B6C8]">Select or register a client to bill this sales order</div>
               </div>
             )}
           </div>
@@ -304,14 +304,14 @@ export const POSPage: React.FC = () => {
             <button
               type="button"
               onClick={() => setIsChangingCustomer(!isChangingCustomer)}
-              className="text-xs font-semibold px-3 py-1.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] text-slate-300 hover:text-white border border-white/[0.08] transition-all cursor-pointer"
+              className="text-xs font-semibold px-3 py-1.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] text-[#19C3D1] hover:text-[#27D7E5] border border-[rgba(148,163,184,0.12)] transition-all cursor-pointer"
             >
               {isChangingCustomer ? 'Done' : 'Change Client'}
             </button>
             <button
               type="button"
               onClick={() => setIsAddCustomerOpen(true)}
-              className="text-xs font-semibold px-3 py-1.5 rounded-xl bg-teal-500/15 hover:bg-teal-500/25 text-teal-300 border border-teal-500/30 transition-all flex items-center gap-1.5 cursor-pointer"
+              className="text-xs font-semibold px-3 py-1.5 rounded-xl bg-[rgba(25,195,209,0.10)] hover:bg-[rgba(25,195,209,0.18)] text-[#19C3D1] border border-[rgba(25,195,209,0.25)] transition-all flex items-center gap-1.5 cursor-pointer"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Register Client</span>
@@ -321,18 +321,18 @@ export const POSPage: React.FC = () => {
 
         {/* Inline Customer Switcher */}
         {isChangingCustomer && (
-          <div className="mt-3 pt-3 border-t border-white/[0.06] flex items-center gap-2 animate-fadeIn">
+          <div className="mt-3 pt-3 border-t border-[rgba(148,163,184,0.10)] flex items-center gap-2 animate-fadeIn">
             <select
               value={selectedCustomerId}
               onChange={(e) => {
                 setSelectedCustomerId(Number(e.target.value));
                 setIsChangingCustomer(false);
               }}
-              className="flex-1 text-xs glass-input rounded-xl px-3 py-2 text-slate-100 cursor-pointer"
+              className="flex-1 text-xs glass-input rounded-xl px-3 py-2 text-[#F4F7FB] cursor-pointer"
             >
-              <option value="" className="bg-slate-900 text-slate-300">-- Choose Client Account --</option>
+              <option value="" className="bg-[#0B1120] text-[#A9B6C8]">-- Choose Client Account --</option>
               {customers.map((c) => (
-                <option key={c.id} value={c.id} className="bg-slate-900 text-slate-100">
+                <option key={c.id} value={c.id} className="bg-[#0B1120] text-[#F4F7FB]">
                   {c.fullName} {c.company ? `(${c.company})` : ''} • {c.contactNumber}
                 </option>
               ))}
@@ -340,7 +340,7 @@ export const POSPage: React.FC = () => {
             <button
               type="button"
               onClick={() => setIsChangingCustomer(false)}
-              className="text-xs text-slate-400 hover:text-white px-2 py-1 cursor-pointer"
+              className="text-xs text-[#A9B6C8] hover:text-[#F4F7FB] px-2 py-1 cursor-pointer"
             >
               Cancel
             </button>
@@ -351,11 +351,11 @@ export const POSPage: React.FC = () => {
       {/* Main Split: Left = Catalog & Scanner, Right = Cart & Settlement */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         {/* STEP 2 & 3: Catalog & Barcode Scanner (5 cols) */}
-        <div className="lg:col-span-5 glass-card rounded-2xl border border-white/[0.06] shadow-glass-sm flex flex-col h-[700px] overflow-hidden">
+        <div className="lg:col-span-5 glass-card rounded-2xl border border-[rgba(148,163,184,0.10)] shadow-glass-sm flex flex-col h-[700px] overflow-hidden">
           {/* Hero Scan / Search Bar */}
-          <div className="p-3 border-b border-white/[0.06] bg-slate-950/40 space-y-2.5">
-            <form onSubmit={handleBarcodeSubmit} className="relative flex items-center">
-              <Barcode className="w-4 h-4 absolute left-3 text-teal-400 pointer-events-none" />
+          <div className="p-3 border-b border-[rgba(148,163,184,0.10)] bg-[#070B14]/60 space-y-2.5">
+            <form onSubmit={handleBarcodeSubmit} className="relative flex items-center scan-hero-box p-0.5">
+              <Barcode className="w-4 h-4 absolute left-3 text-[#19C3D1] pointer-events-none" />
               <input
                 ref={barcodeRef}
                 type="text"
@@ -365,13 +365,13 @@ export const POSPage: React.FC = () => {
                   setBarcodeInput(e.target.value);
                   setSearchCatalog(e.target.value);
                 }}
-                className="w-full text-xs glass-input rounded-xl pl-9 pr-20 py-2.5 font-mono text-slate-100 placeholder:text-slate-500 font-medium"
+                className="w-full text-xs bg-transparent rounded-lg pl-9 pr-20 py-2 font-mono text-[#F4F7FB] placeholder:text-[#6F7E92] font-medium outline-none"
               />
               <div className="absolute right-1.5 flex items-center gap-1">
                 <button
                   type="submit"
                   disabled={!barcodeInput.trim()}
-                  className="bg-teal-500 hover:bg-teal-400 disabled:opacity-40 disabled:hover:bg-teal-500 text-slate-950 px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer"
+                  className="bg-[#19C3D1] hover:bg-[#27D7E5] disabled:opacity-30 disabled:hover:bg-[#19C3D1] text-[#070B14] px-2.5 py-1 rounded-md text-xs font-bold transition-all cursor-pointer"
                 >
                   Scan
                 </button>
@@ -403,14 +403,14 @@ export const POSPage: React.FC = () => {
             </div>
 
             {/* Quick Simulation Serials Strip */}
-            <div className="flex items-center gap-1.5 overflow-x-auto text-[10px] text-slate-400 pt-0.5">
-              <span className="shrink-0 text-slate-400 font-medium">Quick Test:</span>
+            <div className="flex items-center gap-1.5 overflow-x-auto text-[10px] text-[#A9B6C8] pt-0.5">
+              <span className="shrink-0 text-[#6F7E92] font-medium">Quick Test:</span>
               {stockItems.slice(0, 3).map((item) => (
                 <button
                   key={item.id}
                   type="button"
                   onClick={() => handleAddToCart(item)}
-                  className="shrink-0 font-mono bg-white/[0.03] hover:bg-teal-500/15 border border-white/[0.06] hover:border-teal-500/30 text-teal-300 px-2 py-0.5 rounded-md transition-all cursor-pointer"
+                  className="shrink-0 font-mono bg-[#121C2D]/60 hover:bg-[rgba(25,195,209,0.12)] border border-[rgba(148,163,184,0.10)] hover:border-[rgba(25,195,209,0.25)] text-[#19C3D1] px-2 py-0.5 rounded-md transition-all cursor-pointer"
                   title={item.stockDetails}
                 >
                   + {item.stockSerial}
@@ -427,36 +427,37 @@ export const POSPage: React.FC = () => {
                 <div
                   key={item.id}
                   onClick={() => !inCart && handleAddToCart(item)}
-                  className={`p-3 rounded-xl transition-all cursor-pointer flex items-start justify-between gap-3 ${
+                  className={`card-product p-3 cursor-pointer flex items-start justify-between gap-3 ${
                     inCart
-                      ? 'bg-teal-500/[0.04] border border-teal-500/20 opacity-60 cursor-not-allowed'
-                      : 'bg-white/[0.02] hover:bg-white/[0.05] border border-white/[0.05] hover:border-white/[0.1]'
+                      ? 'opacity-50 cursor-not-allowed border-[rgba(25,195,209,0.20)]'
+                      : ''
                   }`}
                 >
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="text-[10px] font-mono font-bold bg-slate-900/90 text-teal-300 px-1.5 py-0.5 rounded border border-white/[0.06]">
+                      <span className="text-[10px] font-mono font-bold bg-[#070B14] text-[#19C3D1] px-1.5 py-0.5 rounded border border-[rgba(148,163,184,0.10)]">
                         {item.stockSerial}
                       </span>
-                      <span className="text-[10px] bg-teal-500/10 text-teal-300 font-medium px-1.5 py-0.5 rounded border border-teal-500/20">
+                      <span className="text-[10px] bg-[rgba(25,195,209,0.10)] text-[#19C3D1] font-medium px-1.5 py-0.5 rounded border border-[rgba(25,195,209,0.20)]">
                         {item.stockName}
                       </span>
-                      <span className="text-[10px] text-slate-400">
+                      <span className="text-[10px] text-[#A9B6C8]">
                         {item.warranty}d war.
                       </span>
                     </div>
 
-                    <div className="text-xs font-semibold text-slate-100 mt-1 line-clamp-2 leading-relaxed">
+                    <div className="text-xs font-semibold text-[#F4F7FB] mt-1 line-clamp-2 leading-relaxed">
                       {item.stockDetails}
                     </div>
 
-                    <div className="text-[11px] text-slate-400 mt-0.5">
-                      Distributor: <span className="text-slate-300">{item.supplierName}</span>
+                    <div className="text-[11px] text-[#6F7E92] mt-0.5">
+                      Distributor: <span className="text-[#A9B6C8]">{item.supplierName}</span>
                     </div>
                   </div>
 
                   <div className="text-right shrink-0 flex flex-col items-end justify-between self-stretch">
-                    <div className="font-bold text-xs text-slate-100 font-mono">
+                    {/* Normal Product Price: #F4F7FB */}
+                    <div className="font-bold text-xs text-[#F4F7FB] font-mono">
                       ₱{item.stockPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                     </div>
                     <button
@@ -464,8 +465,8 @@ export const POSPage: React.FC = () => {
                       disabled={inCart}
                       className={`text-[11px] font-semibold px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
                         inCart
-                          ? 'bg-slate-800 text-slate-400 border border-white/[0.06]'
-                          : 'bg-teal-500/20 hover:bg-teal-500/30 text-teal-300 border border-teal-500/30 font-bold'
+                          ? 'bg-[#0B1120] text-[#6F7E92] border border-[rgba(148,163,184,0.10)]'
+                          : 'bg-[rgba(25,195,209,0.12)] hover:bg-[rgba(25,195,209,0.22)] text-[#19C3D1] border border-[rgba(25,195,209,0.25)] font-bold'
                       }`}
                     >
                       {inCart ? 'Added' : '+ Add'}
@@ -476,25 +477,25 @@ export const POSPage: React.FC = () => {
             })}
 
             {filteredCatalog.length === 0 && (
-              <div className="h-full flex flex-col items-center justify-center text-center p-8 text-slate-400">
-                <Search className="w-8 h-8 text-slate-500 mb-2" />
-                <p className="text-xs text-slate-300 font-medium">No hardware assets match your query</p>
-                <p className="text-[11px] text-slate-500 mt-0.5">Try clearing filters or scanning a serial directly</p>
+              <div className="h-full flex flex-col items-center justify-center text-center p-8 text-[#A9B6C8]">
+                <Search className="w-8 h-8 text-[#6F7E92] mb-2" />
+                <p className="text-xs text-[#F4F7FB] font-medium">No hardware assets match your query</p>
+                <p className="text-[11px] text-[#6F7E92] mt-0.5">Try clearing filters or scanning a serial directly</p>
               </div>
             )}
           </div>
         </div>
 
         {/* STEP 4, 5, 6: Cart & Settlement (7 cols) - THE HERO */}
-        <div className="lg:col-span-7 glass-card rounded-2xl border border-white/[0.06] shadow-glass-sm flex flex-col h-[700px] overflow-hidden">
+        <div className="lg:col-span-7 cart-hero rounded-2xl border border-[rgba(148,163,184,0.16)] shadow-glass-sm flex flex-col h-[700px] overflow-hidden">
           {/* Cart Header */}
-          <div className="p-3 border-b border-white/[0.06] bg-slate-950/40 flex items-center justify-between">
+          <div className="p-3 border-b border-[rgba(148,163,184,0.12)] bg-[#070B14]/60 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <ShoppingCart className="w-4 h-4 text-teal-400" />
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-200">
+              <ShoppingCart className="w-4 h-4 text-[#19C3D1]" />
+              <span className="text-xs font-bold uppercase tracking-wider text-[#F4F7FB]">
                 Active Sales Order
               </span>
-              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-300 border border-teal-500/20">
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[rgba(25,195,209,0.10)] text-[#19C3D1] border border-[rgba(25,195,209,0.20)]">
                 {cart.length} {cart.length === 1 ? 'unit' : 'units'}
               </span>
             </div>
@@ -503,7 +504,7 @@ export const POSPage: React.FC = () => {
               <button
                 type="button"
                 onClick={handleReset}
-                className="text-xs text-red-400 hover:text-red-300 font-semibold flex items-center gap-1 transition-colors cursor-pointer"
+                className="text-xs text-[#F05D6C] hover:opacity-80 font-semibold flex items-center gap-1 transition-colors cursor-pointer"
               >
                 <RotateCcw className="w-3 h-3" />
                 <span>Void Order</span>
@@ -517,14 +518,14 @@ export const POSPage: React.FC = () => {
               cart.map((item, idx) => (
                 <div
                   key={idx}
-                  className="flex items-center justify-between gap-3 p-2.5 rounded-xl bg-white/[0.02] hover:bg-white/[0.04] border border-white/[0.05] transition-colors"
+                  className="flex items-center justify-between gap-3 p-2.5 rounded-xl bg-[#070B14]/40 hover:bg-[#121C2D]/50 border border-[rgba(148,163,184,0.08)] transition-colors"
                 >
                   <div className="min-w-0 flex-1">
-                    <div className="font-semibold text-xs text-slate-100 truncate">
+                    <div className="font-semibold text-xs text-[#F4F7FB] truncate">
                       {item.stockDetails}
                     </div>
-                    <div className="flex items-center gap-2 mt-0.5 text-[10px] text-slate-400">
-                      <span className="font-mono text-teal-300 font-bold bg-slate-900/90 px-1.5 py-0.2 rounded border border-white/[0.06]">
+                    <div className="flex items-center gap-2 mt-0.5 text-[10px] text-[#A9B6C8]">
+                      <span className="font-mono text-[#19C3D1] font-bold bg-[#070B14] px-1.5 py-0.2 rounded border border-[rgba(148,163,184,0.10)]">
                         {item.stockSerial}
                       </span>
                       <span>{item.stockName}</span>
@@ -534,13 +535,13 @@ export const POSPage: React.FC = () => {
                   </div>
 
                   <div className="flex items-center gap-3 shrink-0">
-                    <span className="font-bold text-xs text-slate-100 font-mono">
+                    <span className="font-bold text-xs text-[#F4F7FB] font-mono">
                       ₱{item.stockPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                     </span>
                     <button
                       type="button"
                       onClick={() => handleRemoveFromCart(idx)}
-                      className="text-slate-400 hover:text-red-400 p-1 rounded-lg hover:bg-red-500/10 transition-colors cursor-pointer"
+                      className="text-[#6F7E92] hover:text-[#F05D6C] p-1 rounded-lg hover:bg-red-500/10 transition-colors cursor-pointer"
                       title="Remove unit"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -549,20 +550,20 @@ export const POSPage: React.FC = () => {
                 </div>
               ))
             ) : (
-              <div className="h-full flex flex-col items-center justify-center text-center p-8 text-slate-400 space-y-3">
-                <div className="w-12 h-12 rounded-2xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center text-slate-500">
+              <div className="h-full flex flex-col items-center justify-center text-center p-8 text-[#A9B6C8] space-y-3">
+                <div className="w-12 h-12 rounded-2xl bg-[#070B14]/60 border border-[rgba(148,163,184,0.10)] flex items-center justify-center text-[#6F7E92]">
                   <ShoppingCart className="w-6 h-6 stroke-[1.5]" />
                 </div>
                 <div>
-                  <div className="font-bold text-sm text-slate-200">Your Sales Order is Empty</div>
-                  <p className="text-xs max-w-xs text-slate-400 mt-1">
+                  <div className="font-bold text-sm text-[#F4F7FB]">Your Sales Order is Empty</div>
+                  <p className="text-xs max-w-xs text-[#A9B6C8] mt-1">
                     Scan barcode serials or pick hardware assets from the catalog to begin checkout.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => barcodeRef.current?.focus()}
-                  className="text-xs font-semibold px-3 py-1.5 rounded-xl bg-teal-500/15 hover:bg-teal-500/25 text-teal-300 border border-teal-500/30 transition-all cursor-pointer"
+                  className="text-xs font-semibold px-3 py-1.5 rounded-xl bg-[rgba(25,195,209,0.12)] hover:bg-[rgba(25,195,209,0.20)] text-[#19C3D1] border border-[rgba(25,195,209,0.25)] transition-all cursor-pointer"
                 >
                   Focus Scanner (F2)
                 </button>
@@ -571,12 +572,12 @@ export const POSPage: React.FC = () => {
           </div>
 
           {/* STEP 5: Progressive Payment & Tendering Section */}
-          <div className="p-3.5 bg-slate-950/60 border-t border-white/[0.06] space-y-3 shrink-0">
+          <div className="p-3.5 bg-[#070B14]/80 border-t border-[rgba(148,163,184,0.12)] space-y-3 shrink-0">
             {/* Payment Method Selector */}
             <div>
-              <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center justify-between">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-[#A9B6C8] mb-1.5 flex items-center justify-between">
                 <span>Payment Settlement Schedule</span>
-                <span className="text-[10px] text-slate-400 font-normal">Select terms</span>
+                <span className="text-[10px] text-[#6F7E92] font-normal">Select terms</span>
               </div>
               <div className="grid grid-cols-3 gap-2">
                 {/* Cash */}
@@ -585,17 +586,17 @@ export const POSPage: React.FC = () => {
                   onClick={() => setPaymentTier('Cash')}
                   className={`p-2 rounded-xl border text-left transition-all cursor-pointer ${
                     paymentTier === 'Cash'
-                      ? 'bg-teal-500/15 text-teal-300 border-teal-500/40 shadow-glass-xs'
-                      : 'bg-white/[0.02] text-slate-300 border-white/[0.06] hover:bg-white/[0.04]'
+                      ? 'bg-[rgba(25,195,209,0.10)] text-[#19C3D1] border-[rgba(25,195,209,0.40)] shadow-glass-xs'
+                      : 'bg-[rgba(18,28,45,0.55)] text-[#A9B6C8] border-[rgba(148,163,184,0.12)] hover:border-[rgba(25,195,209,0.25)]'
                   }`}
                 >
                   <div className="text-[9px] font-bold uppercase tracking-wider opacity-80">
                     Spot Cash
                   </div>
-                  <div className="font-bold text-xs mt-0.5 font-mono text-slate-100">
+                  <div className="font-bold text-xs mt-0.5 font-mono text-[#F4F7FB]">
                     ₱{p3Cash.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                   </div>
-                  <div className="text-[9px] text-slate-400 mt-0.5">Base Net Cash</div>
+                  <div className="text-[9px] text-[#6F7E92] mt-0.5">Base Net Cash</div>
                 </button>
 
                 {/* 3 Months Card */}
@@ -604,17 +605,17 @@ export const POSPage: React.FC = () => {
                   onClick={() => setPaymentTier('3months')}
                   className={`p-2 rounded-xl border text-left transition-all cursor-pointer ${
                     paymentTier === '3months'
-                      ? 'bg-teal-500/15 text-teal-300 border-teal-500/40 shadow-glass-xs'
-                      : 'bg-white/[0.02] text-slate-300 border-white/[0.06] hover:bg-white/[0.04]'
+                      ? 'bg-[rgba(25,195,209,0.10)] text-[#19C3D1] border-[rgba(25,195,209,0.40)] shadow-glass-xs'
+                      : 'bg-[rgba(18,28,45,0.55)] text-[#A9B6C8] border-[rgba(148,163,184,0.12)] hover:border-[rgba(25,195,209,0.25)]'
                   }`}
                 >
                   <div className="text-[9px] font-bold uppercase tracking-wider opacity-80">
                     3-Mo Card
                   </div>
-                  <div className="font-bold text-xs mt-0.5 font-mono text-slate-100">
+                  <div className="font-bold text-xs mt-0.5 font-mono text-[#F4F7FB]">
                     ₱{p2ThreeMonths.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                   </div>
-                  <div className="text-[9px] text-slate-400 mt-0.5">+4% MDR</div>
+                  <div className="text-[9px] text-[#6F7E92] mt-0.5">+4% MDR</div>
                 </button>
 
                 {/* 12 Months Financing */}
@@ -623,30 +624,30 @@ export const POSPage: React.FC = () => {
                   onClick={() => setPaymentTier('12months')}
                   className={`p-2 rounded-xl border text-left transition-all cursor-pointer ${
                     paymentTier === '12months'
-                      ? 'bg-teal-500/15 text-teal-300 border-teal-500/40 shadow-glass-xs'
-                      : 'bg-white/[0.02] text-slate-300 border-white/[0.06] hover:bg-white/[0.04]'
+                      ? 'bg-[rgba(25,195,209,0.10)] text-[#19C3D1] border-[rgba(25,195,209,0.40)] shadow-glass-xs'
+                      : 'bg-[rgba(18,28,45,0.55)] text-[#A9B6C8] border-[rgba(148,163,184,0.12)] hover:border-[rgba(25,195,209,0.25)]'
                   }`}
                 >
                   <div className="text-[9px] font-bold uppercase tracking-wider opacity-80">
                     12-Mo Financing
                   </div>
-                  <div className="font-bold text-xs mt-0.5 font-mono text-slate-100">
+                  <div className="font-bold text-xs mt-0.5 font-mono text-[#F4F7FB]">
                     ₱{p1TwelveMonths.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                   </div>
-                  <div className="text-[9px] text-slate-400 mt-0.5">+15% APR</div>
+                  <div className="text-[9px] text-[#6F7E92] mt-0.5">+15% APR</div>
                 </button>
               </div>
             </div>
 
             {/* Progressive Disclosure: Cash Tendered vs. Amortization */}
             {paymentTier === 'Cash' ? (
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs bg-slate-900/40 p-2.5 rounded-xl border border-white/[0.06]">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs bg-[#0B1120]/60 p-2.5 rounded-xl border border-[rgba(148,163,184,0.10)]">
                 <div>
-                  <label className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                  <label className="text-[9px] font-bold uppercase tracking-wider text-[#A9B6C8] block mb-1">
                     Discount (%)
                   </label>
                   <div className="relative">
-                    <Percent className="w-3 h-3 absolute left-2.5 top-2.5 text-slate-400" />
+                    <Percent className="w-3 h-3 absolute left-2.5 top-2.5 text-[#6F7E92]" />
                     <input
                       type="number"
                       min={0}
@@ -654,53 +655,53 @@ export const POSPage: React.FC = () => {
                       value={discountPercent || ''}
                       onChange={(e) => setDiscountPercent(Number(e.target.value))}
                       placeholder="0"
-                      className="w-full text-xs font-mono glass-input rounded-xl px-2 py-1.5 pl-7 font-bold text-amber-300 placeholder:text-slate-500"
+                      className="w-full text-xs font-mono glass-input rounded-xl px-2 py-1.5 pl-7 font-bold text-[#F1C968] placeholder:text-[#6F7E92]"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                  <label className="text-[9px] font-bold uppercase tracking-wider text-[#A9B6C8] block mb-1">
                     Amount Tendered (₱)
                   </label>
                   <div className="relative">
-                    <Coins className="w-3 h-3 absolute left-2.5 top-2.5 text-slate-400" />
+                    <Coins className="w-3 h-3 absolute left-2.5 top-2.5 text-[#6F7E92]" />
                     <input
                       type="number"
                       value={amountTendered}
                       onChange={(e) => setAmountTendered(e.target.value === '' ? '' : Number(e.target.value))}
                       placeholder={currentPayable.toString()}
-                      className="w-full text-xs font-mono glass-input rounded-xl px-2 py-1.5 pl-7 font-bold text-teal-300 placeholder:text-slate-500"
+                      className="w-full text-xs font-mono glass-input rounded-xl px-2 py-1.5 pl-7 font-bold text-[#19C3D1] placeholder:text-[#6F7E92]"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                  <label className="text-[9px] font-bold uppercase tracking-wider text-[#A9B6C8] block mb-1">
                     Change Due
                   </label>
-                  <div className="text-xs font-mono font-bold text-emerald-300 bg-emerald-500/10 px-3 py-1.5 rounded-xl border border-emerald-500/20 flex items-center h-[34px]">
+                  <div className="text-xs font-mono font-bold text-[#20C997] bg-[#20C997]/10 px-3 py-1.5 rounded-xl border border-[#20C997]/20 flex items-center h-[34px]">
                     ₱{changeDue.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs bg-slate-900/40 p-2.5 rounded-xl border border-white/[0.06]">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs bg-[#0B1120]/60 p-2.5 rounded-xl border border-[rgba(148,163,184,0.10)]">
                 <div>
-                  <label className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                  <label className="text-[9px] font-bold uppercase tracking-wider text-[#A9B6C8] block mb-1">
                     Monthly Amortization ({paymentTier === '3months' ? '3 Months' : '12 Months'})
                   </label>
-                  <div className="text-xs font-mono font-bold text-teal-300 bg-teal-500/10 px-3 py-1.5 rounded-xl border border-teal-500/20 flex items-center h-[34px]">
+                  <div className="text-xs font-mono font-bold text-[#19C3D1] bg-[rgba(25,195,209,0.10)] px-3 py-1.5 rounded-xl border border-[rgba(25,195,209,0.20)] flex items-center h-[34px]">
                     ₱{(currentPayable / (paymentTier === '3months' ? 3 : 12)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} / month
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                  <label className="text-[9px] font-bold uppercase tracking-wider text-[#A9B6C8] block mb-1">
                     Promotional Discount (%)
                   </label>
                   <div className="relative">
-                    <Percent className="w-3 h-3 absolute left-2.5 top-2.5 text-slate-400" />
+                    <Percent className="w-3 h-3 absolute left-2.5 top-2.5 text-[#6F7E92]" />
                     <input
                       type="number"
                       min={0}
@@ -708,7 +709,7 @@ export const POSPage: React.FC = () => {
                       value={discountPercent || ''}
                       onChange={(e) => setDiscountPercent(Number(e.target.value))}
                       placeholder="0"
-                      className="w-full text-xs font-mono glass-input rounded-xl px-2 py-1.5 pl-7 font-bold text-amber-300 placeholder:text-slate-500"
+                      className="w-full text-xs font-mono glass-input rounded-xl px-2 py-1.5 pl-7 font-bold text-[#F1C968] placeholder:text-[#6F7E92]"
                     />
                   </div>
                 </div>
@@ -718,19 +719,19 @@ export const POSPage: React.FC = () => {
             {/* Cashier & Remarks */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
               <div>
-                <label className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                <label className="text-[9px] font-bold uppercase tracking-wider text-[#A9B6C8] block mb-1">
                   Cashier Operator
                 </label>
                 <input
                   type="text"
                   value={preparedBy}
                   onChange={(e) => setPreparedBy(e.target.value)}
-                  className="w-full text-xs glass-input rounded-xl px-2.5 py-1.5"
+                  className="w-full text-xs glass-input rounded-xl px-2.5 py-1.5 text-[#F4F7FB]"
                 />
               </div>
 
               <div>
-                <label className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                <label className="text-[9px] font-bold uppercase tracking-wider text-[#A9B6C8] block mb-1">
                   Invoice Memo / Terms
                 </label>
                 <input
@@ -738,18 +739,19 @@ export const POSPage: React.FC = () => {
                   value={remarks}
                   onChange={(e) => setRemarks(e.target.value)}
                   placeholder="e.g., Verified serial, seal intact"
-                  className="w-full text-xs glass-input rounded-xl px-2.5 py-1.5 placeholder:text-slate-500"
+                  className="w-full text-xs glass-input rounded-xl px-2.5 py-1.5 text-[#F4F7FB] placeholder:text-[#6F7E92]"
                 />
               </div>
             </div>
 
             {/* STEP 6: Total Due & Finalize CTA */}
-            <div className="flex items-center justify-between pt-2 border-t border-white/[0.06]">
+            <div className="flex items-center justify-between pt-2 border-t border-[rgba(148,163,184,0.12)]">
               <div>
-                <div className="text-[9px] uppercase font-bold text-slate-400">
+                <div className="text-[9px] uppercase font-bold text-[#A9B6C8]">
                   Total Due ({paymentTier})
                 </div>
-                <div className="text-2xl font-black text-slate-100 font-mono tracking-tight">
+                {/* Final Amount Due in Champagne Gold Light #F1C968 */}
+                <div className="text-2xl font-black text-[#F1C968] font-mono tracking-tight">
                   ₱{currentPayable.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </div>
               </div>
@@ -758,9 +760,9 @@ export const POSPage: React.FC = () => {
                 type="button"
                 disabled={cart.length === 0}
                 onClick={handleCheckout}
-                className="flex items-center gap-2 bg-gradient-to-r from-teal-500 to-emerald-400 hover:from-teal-400 hover:to-emerald-300 disabled:opacity-40 disabled:cursor-not-allowed text-slate-950 font-black text-xs px-6 py-3 rounded-xl shadow-lg shadow-teal-950/30 transition-all cursor-pointer"
+                className="btn-finalize-sale flex items-center gap-2 disabled:opacity-30 disabled:cursor-not-allowed font-black text-xs px-6 py-3 rounded-xl cursor-pointer"
               >
-                <Printer className="w-4 h-4 text-slate-950" />
+                <Printer className="w-4 h-4 text-white" />
                 <span>Finalize & Print Tax Invoice</span>
               </button>
             </div>

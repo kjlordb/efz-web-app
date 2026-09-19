@@ -85,17 +85,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
     .filter((sec) => sec.items.length > 0);
 
   return (
-    <aside className="no-print w-64 bg-[#090d16] text-slate-300 flex flex-col shrink-0 border-r border-white/[0.06] select-none">
+    <aside className="no-print w-64 bg-[#080E1A] text-[#A9B6C8] flex flex-col shrink-0 border-r border-[rgba(148,163,184,0.10)] select-none">
       {/* Brand Header */}
-      <div className="p-5 border-b border-white/[0.06] flex items-center gap-3">
+      <div className="p-5 border-b border-[rgba(148,163,184,0.10)] flex items-center gap-3">
         <div className="shrink-0">
           <BrandLogo size="sm" withMotion glowEffect />
         </div>
         <div className="min-w-0">
-          <h1 className="text-white font-extrabold text-sm tracking-wide uppercase truncate">
-            EFZ Computer
+          <h1 className="text-[#F4F7FB] font-black text-sm tracking-wide uppercase truncate">
+            EFZ <span className="text-[#D8A83E] font-extrabold">Computer</span>
           </h1>
-          <p className="text-[11px] text-teal-400 font-semibold tracking-wider uppercase truncate">
+          <p className="text-[11px] text-[#19C3D1] font-semibold tracking-wider uppercase truncate">
             Sales & Enterprise POS
           </p>
         </div>
@@ -105,7 +105,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <div className="flex-1 overflow-y-auto py-4 px-3 space-y-5">
         {filteredNavSections.map((sec, sIdx) => (
           <div key={sIdx} className="space-y-1">
-            <div className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">
+            <div className="px-3 text-[10px] font-bold uppercase tracking-wider text-[#6F7E92] mb-1.5">
               {sec.group}
             </div>
             <div className="space-y-0.5">
@@ -116,15 +116,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <button
                     key={item.id}
                     onClick={() => setActiveTab(item.id as ActiveTab)}
-                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-left text-xs transition-all cursor-pointer ${
+                    className={`relative w-full flex items-center gap-3 px-3 py-2 rounded-xl text-left text-xs transition-all cursor-pointer ${
                       isActive
-                        ? 'bg-teal-500/15 text-teal-300 font-semibold border-l-2 border-teal-400 pl-2.5'
-                        : 'text-slate-400 hover:text-slate-100 hover:bg-white/[0.04]'
+                        ? 'bg-[rgba(25,195,209,0.10)] border border-[rgba(25,195,209,0.18)] text-[#F4F7FB] font-semibold pl-3.5'
+                        : 'text-[#A9B6C8] hover:text-[#F4F7FB] hover:bg-white/[0.04]'
                     }`}
                   >
+                    {isActive && (
+                      <span className="absolute left-1 top-2 bottom-2 w-1 rounded-full bg-[#19C3D1]" />
+                    )}
                     <Icon
                       className={`w-4 h-4 shrink-0 transition-colors ${
-                        isActive ? 'text-teal-400' : 'text-slate-500 group-hover:text-slate-300'
+                        isActive ? 'text-[#19C3D1]' : 'text-[#6F7E92] group-hover:text-[#A9B6C8]'
                       }`}
                     />
                     <span className="truncate">{item.label}</span>
@@ -137,21 +140,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* Operator Status & Footer */}
-      <div className="p-3 border-t border-white/[0.06] bg-slate-950/40 space-y-2">
-        <div className="flex items-center justify-between p-2 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+      <div className="p-3 border-t border-[rgba(148,163,184,0.10)] bg-[#070B14]/60 space-y-2">
+        <div className="flex items-center justify-between p-2 rounded-xl bg-white/[0.02] border border-[rgba(148,163,184,0.08)]">
           <div className="flex items-center gap-2.5 min-w-0">
             <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 ${
-              currentUser?.isGuest
-                ? 'bg-amber-500/20 text-amber-300'
-                : 'bg-teal-500/20 text-teal-300'
+              currentUser?.role === 'admin'
+                ? 'bg-[#D8A83E]/15 text-[#F1C968]'
+                : 'bg-[rgba(25,195,209,0.12)] text-[#19C3D1]'
             }`}>
               {currentUser?.avatar || 'U'}
             </div>
             <div className="min-w-0">
-              <div className="text-xs font-semibold text-slate-200 truncate">
+              <div className="text-xs font-semibold text-[#F4F7FB] truncate">
                 {currentUser?.name || 'Operator'}
               </div>
-              <div className="text-[10px] text-slate-500 truncate">
+              <div className="text-[10px] text-[#6F7E92] truncate">
                 {roleMeta.title}
               </div>
             </div>
@@ -160,7 +163,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <button
             onClick={logout}
             title="Sign Out"
-            className="text-slate-500 hover:text-rose-400 p-1.5 rounded-lg hover:bg-white/[0.04] transition-colors cursor-pointer"
+            className="text-[#6F7E92] hover:text-[#F05D6C] p-1.5 rounded-lg hover:bg-white/[0.04] transition-colors cursor-pointer"
           >
             <LogOut className="w-3.5 h-3.5" />
           </button>
@@ -169,9 +172,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {currentUser?.role === 'admin' && (
           <button
             onClick={onOpenBackupModal}
-            className="w-full flex items-center justify-center gap-1.5 py-1.5 text-[11px] font-medium text-slate-400 hover:text-teal-300 hover:bg-teal-500/10 rounded-lg transition-colors cursor-pointer"
+            className="w-full flex items-center justify-center gap-1.5 py-1.5 text-[11px] font-medium text-[#A9B6C8] hover:text-[#19C3D1] hover:bg-teal-500/10 rounded-lg transition-colors cursor-pointer"
           >
-            <Database className="w-3 h-3 text-teal-400" />
+            <Database className="w-3 h-3 text-[#19C3D1]" />
             <span>Database Backup</span>
           </button>
         )}

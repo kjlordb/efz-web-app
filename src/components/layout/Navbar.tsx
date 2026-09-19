@@ -36,19 +36,19 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBackupModal }) => {
   }, []);
 
   return (
-    <header className="no-print h-14 bg-[#090d16]/90 backdrop-blur-md border-b border-white/[0.06] px-5 flex items-center justify-between sticky top-0 z-20 select-none">
+    <header className="no-print h-14 bg-[#080E1A]/90 backdrop-blur-md border-b border-[rgba(148,163,184,0.10)] px-5 flex items-center justify-between sticky top-0 z-20 select-none">
       {/* Brand & Station Telemetry */}
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2">
-          <span className="font-black text-teal-400 text-base">EFZ</span>
-          <span className="hidden sm:inline font-bold text-slate-200 text-xs tracking-wide">
+          <span className="font-black text-[#19C3D1] text-base tracking-tight">EFZ</span>
+          <span className="hidden sm:inline font-bold text-[#F4F7FB] text-xs tracking-wide">
             Computer Sales
           </span>
         </div>
 
-        <div className="flex items-center gap-1.5 pl-3 border-l border-white/[0.06] text-xs text-slate-400">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse"></span>
-          <span className="font-mono text-slate-300 font-medium">{currentUser?.workstation || 'POS-01'}</span>
+        <div className="flex items-center gap-1.5 pl-3 border-l border-[rgba(148,163,184,0.10)] text-xs text-[#A9B6C8]">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#20C997] inline-block animate-pulse"></span>
+          <span className="font-mono text-[#A9B6C8] font-medium">{currentUser?.workstation || 'POS-01'}</span>
         </div>
       </div>
 
@@ -59,19 +59,19 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBackupModal }) => {
           <select
             value={currentRole}
             onChange={(e) => switchRole(e.target.value as any)}
-            className="bg-slate-900 text-slate-200 text-xs py-1 px-2.5 rounded-lg border border-white/[0.08] outline-none cursor-pointer hover:border-teal-500/40 transition-colors"
+            className="bg-[#0B1120] text-[#F4F7FB] text-xs py-1 px-2.5 rounded-lg border border-[rgba(148,163,184,0.14)] outline-none cursor-pointer hover:border-[#19C3D1]/40 transition-colors"
             title="Switch operating role"
           >
-            <option value="cashier" className="bg-slate-900 text-slate-200">Cashier (POS)</option>
-            <option value="inventory" className="bg-slate-900 text-slate-200">Warehouse (Inventory)</option>
-            <option value="technician" className="bg-slate-900 text-slate-200">Technician (RMA)</option>
-            <option value="admin" className="bg-slate-900 text-slate-200">Store Manager (Admin)</option>
+            <option value="cashier" className="bg-[#0B1120] text-[#F4F7FB]">Cashier (POS)</option>
+            <option value="inventory" className="bg-[#0B1120] text-[#F4F7FB]">Warehouse (Inventory)</option>
+            <option value="technician" className="bg-[#0B1120] text-[#F4F7FB]">Technician (RMA)</option>
+            <option value="admin" className="bg-[#0B1120] text-[#F4F7FB]">Store Manager (Admin)</option>
           </select>
         </div>
 
         {/* Live Clock */}
-        <div className="hidden md:flex items-center gap-1.5 text-xs text-slate-400 font-mono">
-          <Clock className="w-3.5 h-3.5 text-slate-500" />
+        <div className="hidden md:flex items-center gap-1.5 text-xs text-[#A9B6C8] font-mono">
+          <Clock className="w-3.5 h-3.5 text-[#6F7E92]" />
           <span>{time}</span>
         </div>
 
@@ -80,28 +80,28 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBackupModal }) => {
           <button
             onClick={onOpenBackupModal}
             title="Database Backup"
-            className="p-1.5 text-slate-400 hover:text-teal-300 hover:bg-white/[0.04] rounded-lg transition-colors cursor-pointer"
+            className="p-1.5 text-[#A9B6C8] hover:text-[#19C3D1] hover:bg-white/[0.04] rounded-lg transition-colors cursor-pointer"
           >
             <Database className="w-4 h-4" />
           </button>
         )}
 
         {/* User Info */}
-        <div className="flex items-center gap-2 pl-2 border-l border-white/[0.06]">
+        <div className="flex items-center gap-2 pl-2 border-l border-[rgba(148,163,184,0.10)]">
           <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold ${
             currentUser?.role === 'admin'
-              ? 'bg-amber-500/20 text-amber-300'
-              : 'bg-teal-500/20 text-teal-300'
+              ? 'bg-[#D8A83E]/15 text-[#F1C968]'
+              : 'bg-[rgba(25,195,209,0.12)] text-[#19C3D1]'
           }`}>
             {currentUser?.avatar || 'U'}
           </div>
-          <span className="hidden sm:inline text-xs font-medium text-slate-200 truncate max-w-[120px]">
+          <span className="hidden sm:inline text-xs font-medium text-[#F4F7FB] truncate max-w-[120px]">
             {currentUser?.name || 'Operator'}
           </span>
           <button
             onClick={logout}
             title="Sign Out"
-            className="text-slate-500 hover:text-rose-400 p-1 rounded-md hover:bg-white/[0.04] transition-colors cursor-pointer"
+            className="text-[#6F7E92] hover:text-[#F05D6C] p-1 rounded-md hover:bg-white/[0.04] transition-colors cursor-pointer"
           >
             <LogOut className="w-3.5 h-3.5" />
           </button>

@@ -111,9 +111,9 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
           <div className="flex flex-wrap items-center gap-2.5 shrink-0 pt-2 2xl:pt-0">
             <button
               onClick={() => onNavigate('pos')}
-              className="flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-bold text-xs px-4 py-2.5 rounded-xl transition-all shadow-lg shadow-teal-950/40 cursor-pointer"
+              className="btn-finalize-sale flex items-center gap-2 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-all cursor-pointer"
             >
-              <ShoppingCart className="w-4 h-4 text-slate-950" />
+              <ShoppingCart className="w-4 h-4 text-white" />
               <span>Launch POS Checkout</span>
             </button>
             <button

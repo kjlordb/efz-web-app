@@ -65,15 +65,15 @@ const MainLayout: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-[#070b12] text-slate-100 font-sans relative selection:bg-teal-500/30 selection:text-teal-200">
-      {/* Layer 0 Ambient Lighting Atmosphere (Soft, restrained background aura) */}
+    <div className="flex h-screen w-screen overflow-hidden bg-[#070B14] text-[#F4F7FB] font-sans relative selection:bg-teal-500/20 selection:text-teal-300">
+      {/* Layer 0 Ambient Lighting Atmosphere (Restrained Midnight Aura) */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        {/* Top-left ambient teal glow */}
-        <div className="absolute -top-32 left-1/4 w-[600px] h-[500px] bg-radial from-teal-900/20 via-teal-950/5 to-transparent rounded-full blur-3xl" />
-        {/* Center-right subtle warm amber glow */}
-        <div className="absolute top-1/3 -right-20 w-[550px] h-[450px] bg-radial from-amber-500/8 via-amber-900/3 to-transparent rounded-full blur-3xl" />
-        {/* Bottom-left subtle cyan accent glow */}
-        <div className="absolute -bottom-32 left-1/3 w-[600px] h-[450px] bg-radial from-teal-700/12 via-teal-950/4 to-transparent rounded-full blur-3xl" />
+        {/* Top-left subtle ambient electric teal aura */}
+        <div className="absolute -top-40 left-1/4 w-[550px] h-[450px] bg-radial from-teal-500/[0.08] via-teal-950/[0.02] to-transparent rounded-full blur-3xl pointer-events-none" />
+        {/* Center-right subtle champagne gold aura */}
+        <div className="absolute top-1/3 -right-24 w-[500px] h-[400px] bg-radial from-[#D8A83E]/[0.05] via-[#D8A83E]/[0.01] to-transparent rounded-full blur-3xl pointer-events-none" />
+        {/* Bottom-left subtle midnight teal accent */}
+        <div className="absolute -bottom-40 left-1/3 w-[550px] h-[400px] bg-radial from-teal-500/[0.05] via-transparent to-transparent rounded-full blur-3xl pointer-events-none" />
       </div>
 
       {/* Sidebar Navigation (Layer 1 Glass) */}

@@ -2,11 +2,53 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  /* Midnight Foundation */
+  --bg-primary: #070B14;
+  --bg-secondary: #0B1120;
+  --bg-tertiary: #101827;
+
+  /* Glass Surfaces */
+  --glass-primary: rgba(18, 28, 45, 0.72);
+  --glass-secondary: rgba(14, 23, 38, 0.82);
+  --glass-elevated: rgba(24, 37, 58, 0.88);
+
+  /* Subtle Blue-Gray Borders */
+  --border-subtle: rgba(148, 163, 184, 0.10);
+  --border-default: rgba(148, 163, 184, 0.16);
+  --border-strong: rgba(148, 163, 184, 0.24);
+
+  /* Primary Brand Color — Electric Teal */
+  --accent-primary: #19C3D1;
+  --accent-primary-hover: #27D7E5;
+  --accent-primary-soft: rgba(25, 195, 209, 0.12);
+  --accent-primary-glow: rgba(25, 195, 209, 0.22);
+
+  /* Secondary Brand Color — Champagne Gold */
+  --accent-gold: #D8A83E;
+  --accent-gold-light: #F1C968;
+  --accent-gold-soft: rgba(216, 168, 62, 0.12);
+  --accent-gold-glow: rgba(216, 168, 62, 0.18);
+
+  /* Typography Hierarchy */
+  --text-primary: #F4F7FB;
+  --text-secondary: #A9B6C8;
+  --text-muted: #6F7E92;
+
+  /* Status Colors */
+  --success: #20C997;
+  --success-soft: rgba(32, 201, 151, 0.12);
+  --warning: #F2B84B;
+  --warning-soft: rgba(242, 184, 75, 0.12);
+  --danger: #F05D6C;
+  --danger-soft: rgba(240, 93, 108, 0.12);
+}
+
 @layer base {
   body {
     font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    background-color: #080c14;
-    color: #f1f5f9;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
   }
 
   code, pre, .font-mono {
@@ -14,33 +56,77 @@
   }
 }
 
-/* Glassmorphic design tokens & utility classes */
+/* Premium EFZ Colorway design tokens & utility classes */
 @layer utilities {
   .glass-panel {
-    background-color: rgba(13, 20, 36, 0.75);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.07);
+    background-color: var(--glass-secondary);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid var(--border-subtle);
     box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
   }
 
   .glass-card {
-    background-color: rgba(13, 20, 36, 0.6);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    background-color: var(--glass-primary);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid var(--border-subtle);
     box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.35);
   }
 
+  .customer-panel {
+    background-color: rgba(18, 28, 45, 0.68);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid var(--border-default);
+    border-radius: 1rem;
+  }
+
+  .scan-hero-box {
+    background-color: rgba(25, 195, 209, 0.10);
+    border: 1px solid rgba(25, 195, 209, 0.25);
+    border-radius: 0.75rem;
+  }
+
+  .card-product {
+    background-color: rgba(13, 21, 35, 0.72);
+    border: 1px solid var(--border-subtle);
+    border-radius: 0.75rem;
+    transition: all 0.18s ease-out;
+  }
+  .card-product:hover {
+    background-color: rgba(20, 32, 51, 0.88);
+    border-color: rgba(25, 195, 209, 0.20);
+  }
+
+  .cart-hero {
+    background-color: rgba(11, 18, 31, 0.86);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid var(--border-default);
+  }
+
+  .btn-finalize-sale {
+    background: linear-gradient(135deg, #19C3D1 0%, #168FAE 100%);
+    color: #FFFFFF;
+    box-shadow: 0 8px 28px rgba(25, 195, 209, 0.18);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .btn-finalize-sale:hover {
+    background: linear-gradient(135deg, #27D7E5 0%, #19C3D1 100%);
+    box-shadow: 0 10px 32px rgba(25, 195, 209, 0.26);
+    transform: translateY(-1px);
+  }
+
   .card-clean {
-    background-color: rgba(15, 23, 42, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background-color: rgba(14, 23, 38, 0.55);
+    border: 1px solid var(--border-subtle);
     border-radius: 1rem;
     transition: all 0.15s ease-out;
   }
   .card-clean:hover {
-    background-color: rgba(22, 34, 60, 0.65);
-    border-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(20, 32, 51, 0.75);
+    border-color: var(--border-default);
   }
 
   .pill-filter {
@@ -50,68 +136,68 @@
     font-weight: 600;
     transition: all 0.15s ease-out;
     cursor: pointer;
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    background-color: rgba(15, 23, 42, 0.6);
-    color: #94a3b8;
+    border: 1px solid var(--border-subtle);
+    background-color: rgba(18, 28, 45, 0.55);
+    color: var(--text-secondary);
   }
   .pill-filter:hover {
-    background-color: rgba(30, 41, 59, 0.8);
-    color: #f1f5f9;
-    border-color: rgba(255, 255, 255, 0.12);
+    background-color: rgba(24, 37, 58, 0.8);
+    color: var(--text-primary);
+    border-color: var(--border-strong);
   }
   .pill-filter.active {
-    background-color: rgba(20, 184, 166, 0.15);
-    border-color: rgba(45, 212, 191, 0.4);
-    color: #2dd4bf;
+    background-color: var(--accent-primary-soft);
+    border-color: rgba(25, 195, 209, 0.40);
+    color: var(--accent-primary);
   }
 
   .glass-card-interactive {
-    background-color: rgba(13, 20, 36, 0.55);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    background-color: var(--glass-primary);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid var(--border-subtle);
     box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.35);
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .glass-card-interactive:hover {
-    background-color: rgba(20, 31, 54, 0.75);
-    border-color: rgba(45, 212, 191, 0.3);
+    background-color: rgba(20, 32, 51, 0.85);
+    border-color: rgba(25, 195, 209, 0.25);
     transform: translateY(-2px);
     box-shadow: 0 10px 24px -4px rgba(0, 0, 0, 0.5);
   }
 
   .glass-input {
-    background-color: rgba(10, 16, 30, 0.7);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    color: #f8fafc;
+    background-color: rgba(14, 23, 38, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-primary);
     transition: all 0.15s ease-out;
   }
   .glass-input:hover {
-    border-color: rgba(255, 255, 255, 0.16);
-    background-color: rgba(13, 21, 38, 0.8);
+    border-color: var(--border-default);
+    background-color: rgba(18, 28, 45, 0.85);
   }
   .glass-input:focus {
     outline: none;
-    border-color: rgba(45, 212, 191, 0.7);
-    box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.15);
-    background-color: rgba(15, 23, 42, 0.9);
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px var(--accent-primary-soft);
+    background-color: rgba(24, 37, 58, 0.9);
   }
 
   .glass-dropdown {
-    background-color: rgba(11, 18, 33, 0.95);
+    background-color: var(--glass-elevated);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border-default);
     box-shadow: 0 16px 40px -6px rgba(0, 0, 0, 0.6);
   }
 
   .glass-modal {
-    background-color: rgba(11, 18, 33, 0.94);
+    background-color: var(--glass-elevated);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--border-default);
     box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.85);
   }
 }
