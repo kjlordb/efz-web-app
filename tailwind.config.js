@@ -70,6 +70,18 @@ export default {
           950: '#03191E',
         }
       },
+      boxShadow: {
+        'glass-xs': '0 1px 2px 0 rgba(0, 0, 0, 0.35), inset 0 1px 0 0 rgba(255, 255, 255, 0.08)',
+        'glass-sm': '0 2px 8px -1px rgba(0, 0, 0, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.1)',
+        'glass-md': '0 8px 24px -4px rgba(0, 0, 0, 0.55), inset 0 1px 0 0 rgba(255, 255, 255, 0.12)',
+        'glass-lg': '0 16px 36px -6px rgba(0, 0, 0, 0.65), inset 0 1px 0 0 rgba(255, 255, 255, 0.15)',
+        'glass-modal': '0 25px 60px -12px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.12), inset 0 1px 0 0 rgba(255, 255, 255, 0.2)',
+        'glow-teal': '0 0 24px -4px rgba(29, 130, 150, 0.45)',
+        'glow-gold': '0 0 24px -4px rgba(248, 207, 67, 0.35)',
+      },
+      backdropBlur: {
+        'xs': '2px',
+      },
       keyframes: {
         'spin-slow': {
           '0%': { transform: 'rotate(0deg)' },

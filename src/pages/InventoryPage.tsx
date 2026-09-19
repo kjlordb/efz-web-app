@@ -174,43 +174,43 @@ export const InventoryPage: React.FC = () => {
       {/* Toast Notification */}
       {notification && (
         <div
-          className={`p-3 rounded-xl text-xs font-medium flex items-center justify-between border shadow-xs ${
+          className={`p-3.5 rounded-2xl text-xs font-medium flex items-center justify-between border shadow-glass-xs animate-fadeIn ${
             notification.type === 'success'
-              ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-              : 'bg-red-50 text-red-800 border-red-200'
+              ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
+              : 'bg-red-500/15 text-red-300 border-red-500/30'
           }`}
         >
           <div className="flex items-center gap-2">
             {notification.type === 'success' ? (
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
             ) : (
-              <AlertCircle className="w-4 h-4 text-red-600" />
+              <AlertCircle className="w-4 h-4 text-red-400" />
             )}
             <span>{notification.msg}</span>
           </div>
-          <button onClick={() => setNotification(null)} className="text-slate-400 hover:text-slate-600">×</button>
+          <button onClick={() => setNotification(null)} className="text-slate-400 hover:text-slate-200 text-sm cursor-pointer">×</button>
         </div>
       )}
 
       {/* Header bar with enterprise actions */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="glass-card p-4 sm:p-5 rounded-2xl border border-white/[0.08] shadow-glass-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-            <Package className="w-5 h-5 text-teal-700" />
+          <h1 className="text-lg sm:text-xl font-bold text-slate-100 flex items-center gap-2">
+            <Package className="w-5 h-5 text-teal-400 drop-shadow-[0_0_8px_rgba(29,130,150,0.5)]" />
             <span>Serialized Inventory & Asset Master</span>
           </h1>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-slate-400 mt-1 leading-relaxed">
             Unit-level hardware control, COGS margins, distributor warranty schedules, and price governance
           </p>
         </div>
 
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-2.5 flex-wrap">
           <button
             onClick={handleExportCSV}
-            className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 px-3 py-2 rounded-lg transition-colors"
+            className="flex items-center gap-1.5 text-xs font-semibold text-slate-200 bg-slate-800/80 hover:bg-white/[0.08] border border-white/[0.1] px-3.5 py-2 rounded-xl transition-all cursor-pointer shadow-glass-xs"
             title="Export CSV spreadsheet"
           >
-            <Download className="w-3.5 h-3.5 text-slate-600" />
+            <Download className="w-3.5 h-3.5 text-slate-300" />
             <span>Export CSV</span>
           </button>
 
@@ -218,9 +218,9 @@ export const InventoryPage: React.FC = () => {
             <>
               <button
                 onClick={() => setIsBatchPriceModalOpen(true)}
-                className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 px-3 py-2 rounded-lg transition-colors"
+                className="flex items-center gap-1.5 text-xs font-semibold text-slate-200 bg-slate-800/80 hover:bg-teal-500/20 hover:border-teal-400/50 border border-white/[0.1] px-3.5 py-2 rounded-xl transition-all cursor-pointer shadow-glass-xs"
               >
-                <Tag className="w-3.5 h-3.5 text-teal-700" />
+                <Tag className="w-3.5 h-3.5 text-teal-400" />
                 <span>Bulk Price Revision</span>
               </button>
 
@@ -229,14 +229,14 @@ export const InventoryPage: React.FC = () => {
                   setItemToEdit(null);
                   setIsAddModalOpen(true);
                 }}
-                className="flex items-center gap-1.5 text-xs font-bold text-white bg-teal-700 hover:bg-teal-800 px-4 py-2 rounded-lg shadow-sm transition-all"
+                className="flex items-center gap-1.5 text-xs font-bold text-slate-950 bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-500 hover:to-teal-400 px-4 py-2 rounded-xl shadow-lg shadow-teal-950/40 transition-all cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
                 <span>Receive Inward Stock</span>
               </button>
             </>
           ) : (
-            <div className="px-3 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-slate-600 text-xs font-semibold flex items-center gap-1.5">
+            <div className="px-3.5 py-2 rounded-xl bg-slate-900/80 border border-white/[0.08] text-slate-400 text-xs font-semibold flex items-center gap-1.5">
               <span>Read-Only Catalog View</span>
             </div>
           )}
@@ -244,76 +244,76 @@ export const InventoryPage: React.FC = () => {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-3">
+      <div className="glass-card p-3 rounded-2xl border border-white/[0.08] shadow-glass-sm flex flex-wrap items-center justify-between gap-3">
         {/* Status Tabs with business terminology */}
-        <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg text-xs font-semibold">
+        <div className="flex items-center gap-1 bg-slate-950/60 p-1 rounded-xl border border-white/[0.08] text-xs font-semibold shadow-inner">
           <button
             onClick={() => { setStatusFilter('stored'); setCurrentPage(1); }}
-            className={`px-3 py-1.5 rounded-md transition-all ${
-              statusFilter === 'stored' ? 'bg-white text-teal-900 shadow-sm font-bold' : 'text-slate-600 hover:text-slate-900'
+            className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+              statusFilter === 'stored' ? 'bg-teal-500/20 text-teal-300 border border-teal-500/40 shadow-glass-xs font-bold' : 'text-slate-400 hover:text-slate-200'
             }`}
           >
             In-Stock (Available)
           </button>
           <button
             onClick={() => { setStatusFilter('sold'); setCurrentPage(1); }}
-            className={`px-3 py-1.5 rounded-md transition-all ${
-              statusFilter === 'sold' ? 'bg-white text-teal-900 shadow-sm font-bold' : 'text-slate-600 hover:text-slate-900'
+            className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+              statusFilter === 'sold' ? 'bg-teal-500/20 text-teal-300 border border-teal-500/40 shadow-glass-xs font-bold' : 'text-slate-400 hover:text-slate-200'
             }`}
           >
             Liquidated (Sold)
           </button>
           <button
             onClick={() => { setStatusFilter('Deleted'); setCurrentPage(1); }}
-            className={`px-3 py-1.5 rounded-md transition-all ${
-              statusFilter === 'Deleted' ? 'bg-white text-red-700 shadow-sm font-bold' : 'text-slate-600 hover:text-slate-900'
+            className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+              statusFilter === 'Deleted' ? 'bg-red-500/20 text-red-300 border border-red-500/40 shadow-glass-xs font-bold' : 'text-slate-400 hover:text-slate-200'
             }`}
           >
             Decommissioned
           </button>
           <button
             onClick={() => { setStatusFilter('all'); setCurrentPage(1); }}
-            className={`px-3 py-1.5 rounded-md transition-all ${
-              statusFilter === 'all' ? 'bg-white text-teal-900 shadow-sm font-bold' : 'text-slate-600 hover:text-slate-900'
+            className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+              statusFilter === 'all' ? 'bg-teal-500/20 text-teal-300 border border-teal-500/40 shadow-glass-xs font-bold' : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            All Lifecycle Statuses
+            Complete Master
           </button>
         </div>
 
-        {/* Category Filter & Search Box */}
-        <div className="flex items-center gap-2 flex-1 max-w-md justify-end">
+        {/* Category & Search inputs */}
+        <div className="flex items-center gap-2.5 flex-1 max-w-xl justify-end">
           <select
             value={selectedCategory}
             onChange={(e) => { setSelectedCategory(e.target.value); setCurrentPage(1); }}
-            className="text-xs border border-slate-300 rounded-lg px-2.5 py-1.5 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 font-medium text-slate-700"
+            className="text-xs glass-input rounded-xl px-3 py-2 font-medium text-slate-200 cursor-pointer"
           >
-            <option value="All Stocks">All Hardware Categories</option>
-            {CATEGORIES.map((c) => (
-              <option key={c} value={c}>{c}</option>
+            <option value="All Stocks" className="bg-slate-900 text-slate-100">All Categories</option>
+            {CATEGORIES.map((cat) => (
+              <option key={cat} value={cat} className="bg-slate-900 text-slate-100">{cat}</option>
             ))}
           </select>
 
-          <div className="relative flex-1">
+          <div className="relative flex-1 min-w-[200px]">
             <Search className="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-slate-400" />
             <input
               type="text"
               placeholder="Search serial, specs, distributor..."
               value={searchQuery}
               onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-              className="w-full pl-8 pr-3 py-1.5 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
+              className="w-full pl-8 pr-3 py-1.5 text-xs glass-input rounded-xl placeholder:text-slate-500"
             />
           </div>
         </div>
       </div>
 
       {/* Main Stock Data Table */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      <div className="glass-card rounded-2xl border border-white/[0.08] shadow-glass-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[10px]">
-                <th className="py-3 px-3">Serial Barcode</th>
+              <tr className="bg-slate-950/60 border-b border-white/[0.08] text-slate-400 font-bold uppercase tracking-wider text-[10px]">
+                <th className="py-3 px-3.5">Serial Barcode</th>
                 <th className="py-3 px-3">Category</th>
                 <th className="py-3 px-3">Product Description & Specifications</th>
                 <th className="py-3 px-3 text-right">Selling Price (SRP)</th>
@@ -329,40 +329,40 @@ export const InventoryPage: React.FC = () => {
                 <th className="py-3 px-3 text-center">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-white/[0.06]">
               {paginatedItems.map((item) => {
                 const marginPhp = item.stockPrice - item.suppliersPrice;
                 const marginPct = item.stockPrice > 0 ? (marginPhp / item.stockPrice) * 100 : 0;
 
                 return (
-                  <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="py-2.5 px-3 font-mono font-bold text-teal-900 whitespace-nowrap">
+                  <tr key={item.id} className="hover:bg-white/[0.04] transition-colors">
+                    <td className="py-2.5 px-3.5 font-mono font-bold text-teal-300 whitespace-nowrap">
                       {item.stockSerial}
                     </td>
                     <td className="py-2.5 px-3">
-                      <span className="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-[11px] font-medium whitespace-nowrap">
+                      <span className="bg-slate-900/80 border border-white/[0.08] text-slate-300 px-2 py-0.5 rounded-lg text-[11px] font-medium whitespace-nowrap">
                         {item.stockName}
                       </span>
                     </td>
-                    <td className="py-2.5 px-3 font-medium text-slate-800 max-w-xs">
+                    <td className="py-2.5 px-3 font-medium text-slate-200 max-w-xs leading-relaxed">
                       {item.stockDetails}
                     </td>
-                    <td className="py-2.5 px-3 text-right font-bold text-slate-900 font-mono whitespace-nowrap">
+                    <td className="py-2.5 px-3 text-right font-bold text-slate-100 font-mono whitespace-nowrap">
                       ₱{item.stockPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                     </td>
                     {canViewCosts && (
-                      <>
-                        <td className="py-2.5 px-3 text-right text-slate-500 font-mono whitespace-nowrap">
+                  <>
+                        <td className="py-2.5 px-3 text-right text-slate-400 font-mono whitespace-nowrap">
                           ₱{item.suppliersPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                         </td>
                         <td className="py-2.5 px-3 text-center whitespace-nowrap">
                           <span
-                            className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-mono font-bold ${
+                            className={`inline-block px-2 py-0.5 rounded-lg text-[10px] font-mono font-bold ${
                               marginPct >= 15
-                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
                                 : marginPct >= 10
-                                ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                                : 'bg-amber-50 text-amber-700 border border-amber-200'
+                                ? 'bg-blue-500/15 text-blue-300 border border-blue-500/30'
+                                : 'bg-amber-500/15 text-amber-300 border border-amber-500/30'
                             }`}
                           >
                             +{marginPct.toFixed(1)}% (₱{marginPhp.toLocaleString()})
@@ -370,28 +370,28 @@ export const InventoryPage: React.FC = () => {
                         </td>
                       </>
                     )}
-                    <td className="py-2.5 px-3 text-slate-600 truncate max-w-[130px]" title={item.supplierName}>
+                    <td className="py-2.5 px-3 text-slate-300 truncate max-w-[130px]" title={item.supplierName}>
                       {item.supplierName}
                     </td>
                     <td className="py-2.5 px-3 text-center whitespace-nowrap">
-                      <span className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-700 bg-slate-100 px-1.5 py-0.5 rounded">
-                        <Shield className="w-3 h-3 text-teal-600" />
+                      <span className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-300 bg-slate-900/80 border border-white/[0.08] px-2 py-0.5 rounded-lg">
+                        <Shield className="w-3 h-3 text-teal-400" />
                         <span>{item.warranty}d</span>
                       </span>
                     </td>
                     <td className="py-2.5 px-3 whitespace-nowrap">
                       {item.stockStatus === 'stored' && (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
                           In-Stock
                         </span>
                       )}
                       {item.stockStatus === 'sold' && (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/15 text-blue-300 border border-blue-500/30">
                           Sold #{item.orderId}
                         </span>
                       )}
                       {item.stockStatus === 'Deleted' && (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-800">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-500/15 text-red-300 border border-red-500/30">
                           Decommissioned
                         </span>
                       )}
@@ -402,7 +402,7 @@ export const InventoryPage: React.FC = () => {
                           {item.stockStatus === 'Deleted' ? (
                             <button
                               onClick={() => handleRestore(item)}
-                              className="text-emerald-600 hover:text-emerald-800 p-1.5 rounded hover:bg-emerald-50 transition-colors"
+                              className="text-emerald-400 hover:text-emerald-200 p-1.5 rounded-lg hover:bg-emerald-500/15 transition-colors cursor-pointer"
                               title="Restore Stock Item"
                             >
                               <RotateCcw className="w-3.5 h-3.5" />
@@ -414,14 +414,14 @@ export const InventoryPage: React.FC = () => {
                                   setItemToEdit(item);
                                   setIsAddModalOpen(true);
                                 }}
-                                className="text-slate-500 hover:text-teal-700 p-1.5 rounded hover:bg-slate-100 transition-colors"
+                                className="text-slate-400 hover:text-teal-300 p-1.5 rounded-lg hover:bg-white/[0.08] transition-colors cursor-pointer"
                                 title="Edit Specifications & Pricing"
                               >
                                 <Edit2 className="w-3.5 h-3.5" />
                               </button>
                               <button
                                 onClick={() => handleDelete(item)}
-                                className="text-slate-400 hover:text-red-600 p-1.5 rounded hover:bg-red-50 transition-colors"
+                                className="text-slate-400 hover:text-red-400 p-1.5 rounded-lg hover:bg-red-500/15 transition-colors cursor-pointer"
                                 title="Decommission Stock Item"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
@@ -430,7 +430,7 @@ export const InventoryPage: React.FC = () => {
                           )}
                         </div>
                       ) : (
-                        <span className="text-[10px] text-slate-400 font-medium">Read-Only</span>
+                        <span className="text-[10px] text-slate-500 font-medium">Read-Only</span>
                       )}
                     </td>
                   </tr>
@@ -439,7 +439,7 @@ export const InventoryPage: React.FC = () => {
 
               {paginatedItems.length === 0 && (
                 <tr>
-                  <td colSpan={canViewCosts ? 10 : 8} className="py-12 text-center text-slate-400">
+                  <td colSpan={canViewCosts ? 10 : 8} className="py-12 text-center text-slate-500">
                     No hardware assets match the selected filter criteria.
                   </td>
                 </tr>
@@ -449,28 +449,28 @@ export const InventoryPage: React.FC = () => {
         </div>
 
         {/* Pagination bar matching desktop 50 items/page */}
-        <div className="p-3 border-t border-slate-200 bg-slate-50 flex items-center justify-between text-xs text-slate-600">
+        <div className="p-3 border-t border-white/[0.08] bg-slate-950/60 flex items-center justify-between text-xs text-slate-400">
           <div>
-            Displaying <strong className="font-semibold text-slate-800">{totalRecords > 0 ? (currentPage - 1) * pageSize + 1 : 0}</strong> to{' '}
-            <strong className="font-semibold text-slate-800">{Math.min(currentPage * pageSize, totalRecords)}</strong> of{' '}
-            <strong className="font-semibold text-slate-800">{totalRecords}</strong> registered units
+            Displaying <strong className="font-semibold text-slate-200">{totalRecords > 0 ? (currentPage - 1) * pageSize + 1 : 0}</strong> to{' '}
+            <strong className="font-semibold text-slate-200">{Math.min(currentPage * pageSize, totalRecords)}</strong> of{' '}
+            <strong className="font-semibold text-slate-200">{totalRecords}</strong> registered units
           </div>
 
           <div className="flex items-center gap-2">
             <button
               disabled={currentPage <= 1}
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              className="p-1.5 rounded border border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-white transition-colors"
+              className="p-1.5 rounded-xl border border-white/[0.1] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-white/[0.06] text-slate-200 transition-colors cursor-pointer"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <span className="font-medium">
+            <span className="font-medium text-slate-300">
               Page {currentPage} of {totalPages}
             </span>
             <button
               disabled={currentPage >= totalPages}
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-              className="p-1.5 rounded border border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-white transition-colors"
+              className="p-1.5 rounded-xl border border-white/[0.1] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-white/[0.06] text-slate-200 transition-colors cursor-pointer"
             >
               <ChevronRight className="w-4 h-4" />
             </button>

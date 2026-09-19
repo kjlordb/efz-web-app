@@ -145,30 +145,30 @@ export const RMAPage: React.FC<RMAPageProps> = ({ initialRMAData, onClearInitial
     <div className="space-y-4">
       {/* Toast */}
       {toast && (
-        <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs px-4 py-2.5 rounded-xl flex items-center gap-2 font-medium shadow-xs">
-          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+        <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs px-4 py-2.5 rounded-xl flex items-center gap-2 font-medium shadow-glass-xs animate-fadeIn">
+          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
           <span>{toast}</span>
         </div>
       )}
 
       {/* Header */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-slate-900/60 backdrop-blur-md p-4 sm:p-5 rounded-2xl border border-white/[0.08] shadow-glass-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2">
-            <RotateCcw className="w-5 h-5 text-teal-700" />
-            <h1 className="text-lg font-bold text-slate-900">Return Merchandise Authorization (RMA)</h1>
-            <span className="text-[10px] bg-teal-50 text-teal-700 font-bold px-2 py-0.5 rounded-full border border-teal-200">
+          <div className="flex items-center gap-2.5">
+            <RotateCcw className="w-5 h-5 text-teal-400" />
+            <h1 className="text-lg font-black text-white tracking-tight">Return Merchandise Authorization (RMA)</h1>
+            <span className="text-[10px] bg-teal-500/10 text-teal-300 font-bold px-2 py-0.5 rounded-full border border-teal-500/20">
               Warranty Claims
             </span>
           </div>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-slate-400 mt-0.5">
             Log defective hardware returns, coordinate distributor turnaround replacements, and record replacement serials
           </p>
         </div>
 
         <button
           onClick={() => setIsNewTicketOpen(true)}
-          className="flex items-center gap-1.5 text-xs font-bold text-white bg-teal-700 hover:bg-teal-800 px-4 py-2 rounded-lg shadow-sm transition-all self-start md:self-auto"
+          className="flex items-center gap-2 text-xs font-bold text-white bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-500 hover:to-teal-600 px-4 py-2.5 rounded-xl shadow-glass-xs hover:shadow-glow-teal transition-all self-start md:self-auto"
         >
           <Plus className="w-4 h-4" />
           <span>Initiate RMA Ticket</span>
@@ -177,38 +177,38 @@ export const RMAPage: React.FC<RMAPageProps> = ({ initialRMAData, onClearInitial
 
       {/* KPI Overview */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+        <div className="bg-slate-900/60 backdrop-blur-md p-4 rounded-2xl border border-white/[0.08] shadow-glass-xs hover:border-white/[0.14] transition-all">
           <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
             Active Defect Tickets
           </span>
-          <div className="text-2xl font-black text-slate-800 font-mono mt-1">
+          <div className="text-2xl font-black text-white font-mono mt-1">
             {activeClaims} <span className="text-xs font-normal text-slate-400">units in turnaround</span>
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-teal-700">
+        <div className="bg-slate-900/60 backdrop-blur-md p-4 rounded-2xl border border-white/[0.08] shadow-glass-xs hover:border-white/[0.14] transition-all">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-teal-400">
             Replacement Units Ready
           </span>
-          <div className="text-2xl font-black text-teal-900 font-mono mt-1">
+          <div className="text-2xl font-black text-teal-300 font-mono mt-1">
             {readyClaims} <span className="text-xs font-normal text-slate-400">awaiting client pickup</span>
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700">
+        <div className="bg-slate-900/60 backdrop-blur-md p-4 rounded-2xl border border-white/[0.08] shadow-glass-xs hover:border-white/[0.14] transition-all">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400">
             Resolved Claims
           </span>
-          <div className="text-2xl font-black text-emerald-900 font-mono mt-1">
+          <div className="text-2xl font-black text-emerald-400 font-mono mt-1">
             {tickets.filter((t) => t.status === 'Resolved & Released').length}
           </div>
         </div>
       </div>
 
       {/* Tickets Table */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="p-3 border-b border-slate-200 bg-slate-50">
-          <span className="text-xs font-bold uppercase tracking-wider text-slate-700">
+      <div className="bg-slate-900/60 backdrop-blur-md rounded-2xl border border-white/[0.08] shadow-glass-sm overflow-hidden">
+        <div className="p-3.5 border-b border-white/[0.08] bg-slate-950/40">
+          <span className="text-xs font-bold uppercase tracking-wider text-slate-300">
             RMA Ticket Ledger
           </span>
         </div>
@@ -216,65 +216,65 @@ export const RMAPage: React.FC<RMAPageProps> = ({ initialRMAData, onClearInitial
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 text-[10px] uppercase tracking-wider">
-                <th className="py-3 px-3">RMA Ticket ID</th>
-                <th className="py-3 px-3">Customer Account</th>
-                <th className="py-3 px-3">Hardware Serial & Model</th>
-                <th className="py-3 px-3">Distributor</th>
-                <th className="py-3 px-3">Reported Defect</th>
-                <th className="py-3 px-3 text-center">Warranty</th>
-                <th className="py-3 px-3">Turnaround Status</th>
-                <th className="py-3 px-3 text-center">Action</th>
+              <tr className="bg-slate-950/60 border-b border-white/[0.08] text-slate-400 text-[10px] uppercase tracking-wider font-semibold">
+                <th className="py-3 px-3.5">RMA Ticket ID</th>
+                <th className="py-3 px-3.5">Customer Account</th>
+                <th className="py-3 px-3.5">Hardware Serial & Model</th>
+                <th className="py-3 px-3.5">Distributor</th>
+                <th className="py-3 px-3.5">Reported Defect</th>
+                <th className="py-3 px-3.5 text-center">Warranty</th>
+                <th className="py-3 px-3.5">Turnaround Status</th>
+                <th className="py-3 px-3.5 text-center">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-white/[0.04]">
               {tickets.map((t) => (
-                <tr key={t.id} className="hover:bg-slate-50/70">
-                  <td className="py-3 px-3 font-mono font-bold text-teal-800">
+                <tr key={t.id} className="hover:bg-white/[0.02] transition-colors">
+                  <td className="py-3 px-3.5 font-mono font-bold text-teal-300">
                     {t.id}
-                    <div className="text-[10px] text-slate-400 font-normal">Invoice #{t.orderId}</div>
+                    <div className="text-[10px] text-slate-500 font-normal">Invoice #{t.orderId}</div>
                   </td>
-                  <td className="py-3 px-3 font-bold text-slate-800">{t.customerName}</td>
-                  <td className="py-3 px-3">
-                    <div className="font-mono text-xs font-bold text-teal-900">{t.serialNumber}</div>
-                    <div className="text-[11px] text-slate-600 line-clamp-1">{t.itemName}</div>
+                  <td className="py-3 px-3.5 font-bold text-slate-200">{t.customerName}</td>
+                  <td className="py-3 px-3.5">
+                    <div className="font-mono text-xs font-bold text-teal-300">{t.serialNumber}</div>
+                    <div className="text-[11px] text-slate-400 line-clamp-1">{t.itemName}</div>
                     {t.replacementSerial && (
-                      <div className="text-[10px] font-mono text-emerald-700 font-bold mt-0.5">
+                      <div className="text-[10px] font-mono text-emerald-400 font-bold mt-0.5">
                         Replacement SN: {t.replacementSerial}
                       </div>
                     )}
                   </td>
-                  <td className="py-3 px-3 text-slate-600">{t.supplierName}</td>
-                  <td className="py-3 px-3 text-slate-700 italic max-w-xs">{t.reportedDefect}</td>
-                  <td className="py-3 px-3 text-center">
+                  <td className="py-3 px-3.5 text-slate-300">{t.supplierName}</td>
+                  <td className="py-3 px-3.5 text-slate-400 italic max-w-xs">{t.reportedDefect}</td>
+                  <td className="py-3 px-3.5 text-center">
                     {t.warrantyValid ? (
-                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">
+                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-300 bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 rounded-full">
                         <ShieldCheck className="w-3 h-3" />
                         <span>Valid</span>
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-red-700 bg-red-50 px-1.5 py-0.5 rounded">
+                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-300 bg-rose-500/15 border border-rose-500/30 px-2 py-0.5 rounded-full">
                         <ShieldAlert className="w-3 h-3" />
                         <span>Expired</span>
                       </span>
                     )}
                   </td>
-                  <td className="py-3 px-3">
+                  <td className="py-3 px-3.5">
                     <span
-                      className={`font-bold text-[10px] px-2 py-0.5 rounded-full ${
+                      className={`font-bold text-[10px] px-2.5 py-0.5 rounded-full border ${
                         t.status === 'Resolved & Released'
-                          ? 'bg-emerald-100 text-emerald-800'
+                          ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
                           : t.status === 'Replacement Ready'
-                          ? 'bg-purple-100 text-purple-800'
+                          ? 'bg-purple-500/15 text-purple-300 border-purple-500/30'
                           : t.status === 'In Distributor Diagnostic'
-                          ? 'bg-blue-100 text-blue-800'
-                          : 'bg-amber-100 text-amber-800'
+                          ? 'bg-blue-500/15 text-blue-300 border-blue-500/30'
+                          : 'bg-amber-500/15 text-amber-300 border-amber-500/30'
                       }`}
                     >
                       {t.status}
                     </span>
                   </td>
-                  <td className="py-3 px-3 text-center">
+                  <td className="py-3 px-3.5 text-center">
                     {canManageRMA ? (
                       <button
                         onClick={() => {
@@ -283,13 +283,13 @@ export const RMAPage: React.FC<RMAPageProps> = ({ initialRMAData, onClearInitial
                           setTechNotes(t.technicianNotes || '');
                           setReplacementSerial(t.replacementSerial || '');
                         }}
-                        className="text-teal-700 hover:text-teal-900 font-semibold p-1 hover:bg-teal-50 rounded"
+                        className="text-slate-400 hover:text-teal-300 font-semibold p-1.5 hover:bg-white/[0.05] rounded-lg transition-colors"
                         title="Update Ticket Status & Notes"
                       >
                         <Edit2 className="w-3.5 h-3.5" />
                       </button>
                     ) : (
-                      <span className="text-[10px] text-slate-400 font-medium">Read-Only</span>
+                      <span className="text-[10px] text-slate-500 font-medium">Read-Only</span>
                     )}
                   </td>
                 </tr>
@@ -301,22 +301,22 @@ export const RMAPage: React.FC<RMAPageProps> = ({ initialRMAData, onClearInitial
 
       {/* New Ticket Modal */}
       {isNewTicketOpen && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-lg p-6 space-y-4 animate-scaleUp">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900/95 border border-white/[0.14] rounded-2xl shadow-glass-modal w-full max-w-lg p-6 space-y-4 backdrop-blur-xl animate-scaleUp text-white">
+            <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
               <div className="flex items-center gap-2">
-                <RotateCcw className="w-5 h-5 text-teal-700" />
-                <h2 className="font-bold text-base text-slate-800">File New Warranty RMA Ticket</h2>
+                <RotateCcw className="w-5 h-5 text-teal-400" />
+                <h2 className="font-bold text-base text-white">File New Warranty RMA Ticket</h2>
               </div>
-              <button onClick={() => setIsNewTicketOpen(false)} className="text-slate-400 hover:text-slate-600">
+              <button onClick={() => setIsNewTicketOpen(false)} className="text-slate-400 hover:text-white transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleCreateTicket} className="space-y-3 text-xs">
+            <form onSubmit={handleCreateTicket} className="space-y-3.5 text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1.5">
                     Defective Hardware Serial # *
                   </label>
                   <input
@@ -325,11 +325,11 @@ export const RMAPage: React.FC<RMAPageProps> = ({ initialRMAData, onClearInitial
                     placeholder="e.g. SN-GPU-4070-001"
                     value={serial}
                     onChange={(e) => setSerial(e.target.value)}
-                    className="w-full font-mono text-xs border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-teal-500"
+                    className="glass-input w-full font-mono text-xs"
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1.5">
                     Original Sales Invoice #
                   </label>
                   <input
@@ -337,13 +337,13 @@ export const RMAPage: React.FC<RMAPageProps> = ({ initialRMAData, onClearInitial
                     placeholder="1001"
                     value={orderId}
                     onChange={(e) => setOrderId(e.target.value === '' ? '' : Number(e.target.value))}
-                    className="w-full font-mono text-xs border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-teal-500"
+                    className="glass-input w-full font-mono text-xs"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+                <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1.5">
                   Product Description & Specifications
                 </label>
                 <input
@@ -351,13 +351,13 @@ export const RMAPage: React.FC<RMAPageProps> = ({ initialRMAData, onClearInitial
                   placeholder="e.g. ASUS TUF Gaming GeForce RTX 4070 SUPER..."
                   value={itemName}
                   onChange={(e) => setItemName(e.target.value)}
-                  className="w-full text-xs border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-teal-500"
+                  className="glass-input w-full text-xs"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1.5">
                     Customer / Client Account
                   </label>
                   <input
@@ -365,11 +365,11 @@ export const RMAPage: React.FC<RMAPageProps> = ({ initialRMAData, onClearInitial
                     placeholder="Gabriel Santos"
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
-                    className="w-full text-xs border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-teal-500"
+                    className="glass-input w-full text-xs"
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1.5">
                     Distributor / Supplier
                   </label>
                   <input
@@ -377,13 +377,13 @@ export const RMAPage: React.FC<RMAPageProps> = ({ initialRMAData, onClearInitial
                     placeholder="TechSource Distribution Corp"
                     value={supplierName}
                     onChange={(e) => setSupplierName(e.target.value)}
-                    className="w-full text-xs border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-teal-500"
+                    className="glass-input w-full text-xs"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+                <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1.5">
                   Reported Defect & Failure Symptoms *
                 </label>
                 <textarea
@@ -392,7 +392,7 @@ export const RMAPage: React.FC<RMAPageProps> = ({ initialRMAData, onClearInitial
                   placeholder="Describe failure behavior, crash logs, or visual defects..."
                   value={defect}
                   onChange={(e) => setDefect(e.target.value)}
-                  className="w-full text-xs border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-teal-500 resize-none"
+                  className="glass-input w-full text-xs resize-none"
                 ></textarea>
               </div>
 
@@ -402,24 +402,24 @@ export const RMAPage: React.FC<RMAPageProps> = ({ initialRMAData, onClearInitial
                   id="warrantyCheck"
                   checked={isWarrantyValid}
                   onChange={(e) => setIsWarrantyValid(e.target.checked)}
-                  className="rounded text-teal-600 focus:ring-teal-500"
+                  className="rounded border-white/[0.2] bg-slate-950 text-teal-600 focus:ring-teal-500"
                 />
-                <label htmlFor="warrantyCheck" className="text-xs text-slate-700 font-medium">
+                <label htmlFor="warrantyCheck" className="text-xs text-slate-300 font-medium cursor-pointer">
                   Unit verified within warranty period and stickers intact
                 </label>
               </div>
 
-              <div className="pt-3 border-t border-slate-100 flex justify-end gap-2">
+              <div className="pt-3 border-t border-white/[0.08] flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setIsNewTicketOpen(false)}
-                  className="px-4 py-2 text-slate-600 font-semibold hover:bg-slate-100 rounded-lg"
+                  className="px-4 py-2 text-slate-400 hover:text-white font-semibold hover:bg-white/[0.05] rounded-xl transition-all"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-teal-700 hover:bg-teal-800 text-white font-bold rounded-lg shadow-sm"
+                  className="px-5 py-2.5 bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-500 hover:to-teal-600 text-white font-bold rounded-xl shadow-glass-xs hover:shadow-glow-teal transition-all"
                 >
                   Create RMA Ticket
                 </button>
@@ -431,38 +431,38 @@ export const RMAPage: React.FC<RMAPageProps> = ({ initialRMAData, onClearInitial
 
       {/* Update Ticket Modal */}
       {selectedTicketForUpdate && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-md p-6 space-y-4 animate-scaleUp">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900/95 border border-white/[0.14] rounded-2xl shadow-glass-modal w-full max-w-md p-6 space-y-4 backdrop-blur-xl animate-scaleUp text-white">
+            <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
               <div className="flex items-center gap-2">
-                <FileCheck className="w-5 h-5 text-teal-700" />
-                <h2 className="font-bold text-base text-slate-800">
+                <FileCheck className="w-5 h-5 text-teal-400" />
+                <h2 className="font-bold text-base text-white">
                   Update RMA Ticket ({selectedTicketForUpdate.id})
                 </h2>
               </div>
-              <button onClick={() => setSelectedTicketForUpdate(null)} className="text-slate-400 hover:text-slate-600">
+              <button onClick={() => setSelectedTicketForUpdate(null)} className="text-slate-400 hover:text-white transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleUpdateTicket} className="space-y-3 text-xs">
+            <form onSubmit={handleUpdateTicket} className="space-y-3.5 text-xs">
               <div>
-                <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+                <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1.5">
                   Turnaround Lifecycle Status
                 </label>
                 <select
                   value={updateStatus}
                   onChange={(e) => setUpdateStatus(e.target.value as RMAStatus)}
-                  className="w-full text-xs border border-slate-300 rounded-lg px-3 py-2 bg-white font-medium"
+                  className="glass-input w-full text-xs font-medium bg-slate-950"
                 >
                   {RMA_STATUSES.map((status) => (
-                    <option key={status} value={status}>{status}</option>
+                    <option key={status} value={status} className="bg-slate-950 text-white">{status}</option>
                   ))}
                 </select>
               </div>
 
               <div>
-                <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+                <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1.5">
                   Replacement Unit Serial Number (If Replaced)
                 </label>
                 <input
@@ -470,12 +470,12 @@ export const RMAPage: React.FC<RMAPageProps> = ({ initialRMAData, onClearInitial
                   placeholder="e.g. SN-GPU-4070-REP01"
                   value={replacementSerial}
                   onChange={(e) => setReplacementSerial(e.target.value)}
-                  className="w-full font-mono text-xs border border-slate-300 rounded-lg px-3 py-2"
+                  className="glass-input w-full font-mono text-xs"
                 />
               </div>
 
               <div>
-                <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+                <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1.5">
                   Diagnostic & Technical Log Notes
                 </label>
                 <textarea
@@ -483,21 +483,21 @@ export const RMAPage: React.FC<RMAPageProps> = ({ initialRMAData, onClearInitial
                   placeholder="e.g., TechSource distributor confirmed GPU core defect; issued brand new replacement unit."
                   value={techNotes}
                   onChange={(e) => setTechNotes(e.target.value)}
-                  className="w-full text-xs border border-slate-300 rounded-lg px-3 py-2 resize-none"
+                  className="glass-input w-full text-xs resize-none"
                 ></textarea>
               </div>
 
-              <div className="pt-3 border-t border-slate-100 flex justify-end gap-2">
+              <div className="pt-3 border-t border-white/[0.08] flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setSelectedTicketForUpdate(null)}
-                  className="px-4 py-2 text-slate-600 font-semibold hover:bg-slate-100 rounded-lg"
+                  className="px-4 py-2 text-slate-400 hover:text-white font-semibold hover:bg-white/[0.05] rounded-xl transition-all"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-teal-700 hover:bg-teal-800 text-white font-bold rounded-lg shadow-sm"
+                  className="px-5 py-2.5 bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-500 hover:to-teal-600 text-white font-bold rounded-xl shadow-glass-xs hover:shadow-glow-teal transition-all"
                 >
                   Save RMA Status
                 </button>

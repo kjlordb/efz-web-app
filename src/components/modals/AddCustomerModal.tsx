@@ -61,31 +61,31 @@ export const AddCustomerModal: React.FC<AddCustomerModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-md p-6 space-y-4 animate-scaleUp">
-        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+    <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-md z-50 flex items-center justify-center p-4">
+      <div className="glass-modal rounded-2xl w-full max-w-md p-6 space-y-4 shadow-glass-modal border border-white/[0.14] animate-scaleUp">
+        <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
           <div className="flex items-center gap-2">
-            <UserPlus className="w-5 h-5 text-teal-700" />
-            <h2 className="font-bold text-base text-slate-800">
+            <UserPlus className="w-5 h-5 text-teal-400 drop-shadow-[0_0_8px_rgba(29,130,150,0.5)]" />
+            <h2 className="font-bold text-base text-slate-100">
               {customerToEdit ? 'Edit Customer Profile' : 'Register New Customer'}
             </h2>
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
+          <button onClick={onClose} className="p-1 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.08] transition-colors cursor-pointer">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-3.5 py-2.5 rounded-lg text-xs flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0" />
+          <div className="bg-red-500/15 border border-red-500/30 text-red-300 px-3.5 py-2.5 rounded-xl text-xs flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0 text-red-400" />
             <span>{error}</span>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-3 text-xs">
+        <form onSubmit={handleSubmit} className="space-y-3.5 text-xs">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+              <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
                 First Name *
               </label>
               <input
@@ -94,11 +94,11 @@ export const AddCustomerModal: React.FC<AddCustomerModalProps> = ({
                 placeholder="Gabriel"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
-                className="w-full text-xs border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className="w-full text-xs glass-input rounded-xl px-3 py-2 placeholder:text-slate-500"
               />
             </div>
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+              <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
                 Last Name
               </label>
               <input
@@ -106,13 +106,13 @@ export const AddCustomerModal: React.FC<AddCustomerModalProps> = ({
                 placeholder="Santos"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
-                className="w-full text-xs border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className="w-full text-xs glass-input rounded-xl px-3 py-2 placeholder:text-slate-500"
               />
             </div>
           </div>
 
           <div>
-            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
               Company / Institution (Optional)
             </label>
             <input
@@ -120,13 +120,13 @@ export const AddCustomerModal: React.FC<AddCustomerModalProps> = ({
               placeholder="e.g. PixelForge Studios Inc."
               value={company}
               onChange={(e) => setCompany(e.target.value)}
-              className="w-full text-xs border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className="w-full text-xs glass-input rounded-xl px-3 py-2 placeholder:text-slate-500"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+              <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
                 Contact Number
               </label>
               <input
@@ -134,11 +134,11 @@ export const AddCustomerModal: React.FC<AddCustomerModalProps> = ({
                 placeholder="0917-889-1122"
                 value={contactNumber}
                 onChange={(e) => setContactNumber(e.target.value)}
-                className="w-full text-xs border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className="w-full text-xs glass-input rounded-xl px-3 py-2 placeholder:text-slate-500"
               />
             </div>
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+              <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
                 Email Address
               </label>
               <input
@@ -146,36 +146,36 @@ export const AddCustomerModal: React.FC<AddCustomerModalProps> = ({
                 placeholder="client@domain.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full text-xs border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className="w-full text-xs glass-input rounded-xl px-3 py-2 placeholder:text-slate-500"
               />
             </div>
           </div>
 
           <div>
-            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
               Billing / Delivery Address
             </label>
             <textarea
               rows={2}
-              placeholder="Unit / House No., Street, City, Metro Manila"
+              placeholder="Unit / House No., Street, City, Davao City"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
-              className="w-full text-xs border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none"
+              className="w-full text-xs glass-input rounded-xl px-3 py-2 placeholder:text-slate-500 resize-none"
             ></textarea>
           </div>
 
-          <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+          <div className="pt-3 border-t border-white/[0.08] flex items-center justify-end gap-2.5">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-slate-600 font-semibold hover:bg-slate-100 rounded-lg"
+              className="px-4 py-2 text-slate-300 font-semibold hover:bg-white/[0.06] rounded-xl transition-colors cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="px-5 py-2 bg-teal-700 hover:bg-teal-800 text-white font-bold rounded-lg shadow-sm"
+              className="px-5 py-2 bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-500 hover:to-teal-400 text-slate-950 font-bold rounded-xl shadow-lg shadow-teal-900/40 transition-all cursor-pointer disabled:opacity-50"
             >
               {submitting ? 'Saving...' : customerToEdit ? 'Update Customer' : 'Save Customer'}
             </button>

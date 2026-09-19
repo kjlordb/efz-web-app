@@ -65,22 +65,32 @@ const MainLayout: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-slate-100 text-slate-800 font-sans">
-      {/* Sidebar Navigation */}
+    <div className="flex h-screen w-screen overflow-hidden bg-[#070b12] text-slate-100 font-sans relative selection:bg-teal-500/30 selection:text-teal-200">
+      {/* Layer 0 Ambient Lighting Atmosphere (Soft, restrained background aura) */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        {/* Top-left ambient teal glow */}
+        <div className="absolute -top-32 left-1/4 w-[600px] h-[500px] bg-radial from-teal-900/20 via-teal-950/5 to-transparent rounded-full blur-3xl" />
+        {/* Center-right subtle warm amber glow */}
+        <div className="absolute top-1/3 -right-20 w-[550px] h-[450px] bg-radial from-amber-500/8 via-amber-900/3 to-transparent rounded-full blur-3xl" />
+        {/* Bottom-left subtle cyan accent glow */}
+        <div className="absolute -bottom-32 left-1/3 w-[600px] h-[450px] bg-radial from-teal-700/12 via-teal-950/4 to-transparent rounded-full blur-3xl" />
+      </div>
+
+      {/* Sidebar Navigation (Layer 1 Glass) */}
       <Sidebar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onOpenBackupModal={() => setIsBackupOpen(true)}
       />
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
-        {/* Top Navbar */}
+      {/* Main Content Area (Layer 1/2) */}
+      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden relative z-10">
+        {/* Top Navbar (Layer 1 Floating Glass) */}
         <Navbar onOpenBackupModal={() => setIsBackupOpen(true)} />
 
         {/* Scrollable Viewport */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6">
-          <div className="max-w-7xl mx-auto">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-7">
+          <div className="max-w-7xl mx-auto space-y-6 pb-8">
             {!canAccess(activeTab) ? (
               <AccessRestricted
                 attemptedTab={activeTab}
@@ -113,7 +123,7 @@ const MainLayout: React.FC = () => {
         </main>
       </div>
 
-      {/* Database Backup Simulation Modal */}
+      {/* Database Backup Simulation Modal (Layer 4) */}
       {isBackupOpen && <BackupModal onClose={() => setIsBackupOpen(false)} />}
     </div>
   );

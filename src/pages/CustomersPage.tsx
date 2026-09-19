@@ -46,20 +46,20 @@ export const CustomersPage: React.FC = () => {
     <div className="space-y-4">
       {/* Toast */}
       {toast && (
-        <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs px-4 py-2.5 rounded-xl flex items-center gap-2 font-medium">
-          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+        <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs px-4 py-2.5 rounded-xl flex items-center gap-2 font-medium shadow-glass-xs animate-fadeIn">
+          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
           <span>{toast}</span>
         </div>
       )}
 
       {/* Header */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-slate-900/60 backdrop-blur-md p-4 sm:p-5 rounded-2xl border border-white/[0.08] shadow-glass-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-            <Users className="w-5 h-5 text-teal-700" />
+          <h1 className="text-lg font-black text-white tracking-tight flex items-center gap-2.5">
+            <Users className="w-5 h-5 text-teal-400" />
             <span>Customer Directory & CRM</span>
           </h1>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-slate-400 mt-0.5">
             Manage commercial and walk-in client accounts, contact details, and billing profiles
           </p>
         </div>
@@ -69,7 +69,7 @@ export const CustomersPage: React.FC = () => {
             setEditingCustomer(null);
             setIsModalOpen(true);
           }}
-          className="flex items-center gap-1.5 text-xs font-bold text-white bg-teal-700 hover:bg-teal-800 px-4 py-2 rounded-lg shadow-sm transition-all self-start sm:self-auto"
+          className="flex items-center gap-2 text-xs font-bold text-white bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-500 hover:to-teal-600 px-4 py-2.5 rounded-xl shadow-glass-xs hover:shadow-glow-teal transition-all self-start sm:self-auto"
         >
           <Plus className="w-4 h-4" />
           <span>Add New Customer</span>
@@ -77,19 +77,19 @@ export const CustomersPage: React.FC = () => {
       </div>
 
       {/* Search toolbar */}
-      <div className="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex items-center gap-3">
+      <div className="bg-slate-900/60 backdrop-blur-md p-3.5 rounded-2xl border border-white/[0.08] shadow-glass-xs flex items-center gap-3">
         <div className="relative flex-1 max-w-md">
-          <Search className="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-slate-400" />
+          <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400" />
           <input
             type="text"
             placeholder="Search by customer name, company, contact number, or address..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-8 pr-3 py-1.5 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 bg-slate-50 focus:bg-white"
+            className="glass-input w-full pl-9 pr-3 py-1.5 text-xs"
           />
         </div>
-        <div className="text-xs text-slate-500 font-medium">
-          Showing <strong>{customers.length}</strong> client records
+        <div className="text-xs text-slate-400 font-medium">
+          Showing <strong className="text-white">{customers.length}</strong> client records
         </div>
       </div>
 
@@ -98,21 +98,21 @@ export const CustomersPage: React.FC = () => {
         {customers.map((c) => (
           <div
             key={c.id}
-            className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:border-teal-300 transition-all flex flex-col justify-between space-y-3"
+            className="bg-slate-900/60 backdrop-blur-md p-5 rounded-2xl border border-white/[0.08] shadow-glass-xs hover:border-teal-500/40 hover:shadow-glass-sm transition-all flex flex-col justify-between space-y-3.5"
           >
             <div>
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="font-bold text-sm text-slate-900 leading-tight">
+                  <h3 className="font-bold text-sm text-white leading-tight">
                     {c.fullName}
                   </h3>
                   {c.company ? (
-                    <div className="text-xs text-teal-800 font-medium flex items-center gap-1 mt-0.5">
-                      <Building className="w-3 h-3 text-teal-600" />
+                    <div className="text-xs text-teal-300 font-medium flex items-center gap-1.5 mt-1">
+                      <Building className="w-3 h-3 text-teal-400" />
                       <span>{c.company}</span>
                     </div>
                   ) : (
-                    <div className="text-xs text-slate-400 mt-0.5">Individual Retail Buyer</div>
+                    <div className="text-xs text-slate-500 mt-1">Individual Retail Buyer</div>
                   )}
                 </div>
 
@@ -121,40 +121,40 @@ export const CustomersPage: React.FC = () => {
                     setEditingCustomer(c);
                     setIsModalOpen(true);
                   }}
-                  className="text-slate-400 hover:text-teal-700 p-1.5 rounded hover:bg-slate-100 transition-colors"
+                  className="text-slate-400 hover:text-teal-300 p-1.5 rounded-lg hover:bg-white/[0.05] transition-colors"
                   title="Edit Customer"
                 >
                   <Edit2 className="w-3.5 h-3.5" />
                 </button>
               </div>
 
-              <div className="space-y-1.5 pt-3 border-t border-slate-100 text-xs text-slate-600">
-                <div className="flex items-center gap-2">
-                  <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+              <div className="space-y-2 pt-3 border-t border-white/[0.06] text-xs text-slate-300">
+                <div className="flex items-center gap-2.5">
+                  <Phone className="w-3.5 h-3.5 text-slate-500 shrink-0" />
                   <span>{c.contactNumber || 'No phone provided'}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                <div className="flex items-center gap-2.5">
+                  <Mail className="w-3.5 h-3.5 text-slate-500 shrink-0" />
                   <span className="truncate">{c.email || 'No email provided'}</span>
                 </div>
-                <div className="flex items-start gap-2">
-                  <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" />
-                  <span className="line-clamp-2">{c.address || 'No physical address'}</span>
+                <div className="flex items-start gap-2.5">
+                  <MapPin className="w-3.5 h-3.5 text-slate-500 shrink-0 mt-0.5" />
+                  <span className="line-clamp-2 text-slate-400">{c.address || 'No physical address'}</span>
                 </div>
               </div>
             </div>
 
-            <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
-              <span className="font-mono">ID: #{c.id}</span>
+            <div className="pt-2.5 border-t border-white/[0.06] flex items-center justify-between text-[11px] text-slate-500">
+              <span className="font-mono text-teal-400">ID: #{c.id}</span>
               {c.createdAt && <span>Joined: {c.createdAt}</span>}
             </div>
           </div>
         ))}
 
         {customers.length === 0 && (
-          <div className="col-span-full bg-white rounded-xl border border-slate-200 p-12 text-center text-slate-400 space-y-2">
-            <Users className="w-10 h-10 mx-auto text-slate-300 stroke-[1.5]" />
-            <div className="text-sm font-semibold text-slate-600">No Customers Found</div>
+          <div className="col-span-full bg-slate-900/40 backdrop-blur-md rounded-2xl border border-white/[0.08] p-12 text-center text-slate-400 space-y-2">
+            <Users className="w-10 h-10 mx-auto text-slate-500 stroke-[1.5]" />
+            <div className="text-sm font-semibold text-white">No Customers Found</div>
             <p className="text-xs text-slate-400">
               Click "+ Add New Customer" above to create client profiles.
             </p>

@@ -62,7 +62,7 @@ export const InvoicePrintModal: React.FC<InvoicePrintModalProps> = ({ order, onC
   return (
     <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex flex-col items-center justify-start overflow-y-auto p-2 sm:p-6 select-none animate-fadeIn">
       {/* Top Floating Control Bar (Hidden on physical print) */}
-      <header className="no-print sticky top-2 z-40 w-full max-w-4xl bg-slate-900/95 border border-slate-700/80 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center justify-between gap-4 mb-4">
+      <header className="no-print sticky top-2 z-40 w-full max-w-4xl glass-panel border border-white/[0.12] text-white px-5 py-3 rounded-2xl shadow-glass-modal flex items-center justify-between gap-4 mb-4">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-teal-500/20 border border-teal-400/30 flex items-center justify-center text-teal-300">
             <FileText className="w-4 h-4" />

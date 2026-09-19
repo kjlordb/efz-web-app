@@ -65,27 +65,27 @@ export const SuppliersPage: React.FC = () => {
     <div className="space-y-4">
       {/* Toast */}
       {feedback && (
-        <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs px-4 py-2.5 rounded-xl flex items-center gap-2 font-medium">
-          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+        <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs px-4 py-2.5 rounded-xl flex items-center gap-2 font-medium shadow-glass-xs animate-fadeIn">
+          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
           <span>{feedback}</span>
         </div>
       )}
 
       {/* Header */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-slate-900/60 backdrop-blur-md p-4 sm:p-5 rounded-2xl border border-white/[0.08] shadow-glass-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-            <Truck className="w-5 h-5 text-teal-700" />
+          <h1 className="text-lg font-black text-white tracking-tight flex items-center gap-2.5">
+            <Truck className="w-5 h-5 text-teal-400" />
             <span>Supplier & Vendor Directory</span>
           </h1>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-slate-400 mt-0.5">
             Registered distributors, hardware importers, and procurement partners
           </p>
         </div>
 
         <button
           onClick={() => setIsAddOpen(true)}
-          className="flex items-center gap-1.5 text-xs font-bold text-white bg-teal-700 hover:bg-teal-800 px-4 py-2 rounded-lg shadow-sm transition-all self-start sm:self-auto"
+          className="flex items-center gap-2 text-xs font-bold text-white bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-500 hover:to-teal-600 px-4 py-2.5 rounded-xl shadow-glass-xs hover:shadow-glow-teal transition-all self-start sm:self-auto"
         >
           <Plus className="w-4 h-4" />
           <span>Add New Supplier</span>
@@ -102,38 +102,38 @@ export const SuppliersPage: React.FC = () => {
           return (
             <div
               key={s.id}
-              className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:border-teal-300 transition-all flex flex-col justify-between space-y-3"
+              className="bg-slate-900/60 backdrop-blur-md p-5 rounded-2xl border border-white/[0.08] shadow-glass-xs hover:border-teal-500/40 hover:shadow-glass-sm transition-all flex flex-col justify-between space-y-3.5"
             >
               <div>
                 <div className="flex items-center justify-between">
-                  <h3 className="font-bold text-sm text-slate-900 leading-tight">
+                  <h3 className="font-bold text-sm text-white leading-tight">
                     {s.supplierName}
                   </h3>
-                  <span className="text-[10px] font-mono font-bold bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">
+                  <span className="text-[10px] font-mono font-bold bg-slate-800 text-teal-300 border border-white/[0.08] px-2 py-0.5 rounded-full">
                     #{s.id}
                   </span>
                 </div>
 
-                <div className="space-y-1.5 pt-3 border-t border-slate-100 text-xs text-slate-600">
-                  <div className="flex items-center gap-2">
-                    <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                <div className="space-y-2 pt-3 border-t border-white/[0.06] text-xs text-slate-300">
+                  <div className="flex items-center gap-2.5">
+                    <Phone className="w-3.5 h-3.5 text-slate-500 shrink-0" />
                     <span>{s.supplierContact || 'No contact number'}</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                  <div className="flex items-center gap-2.5">
+                    <Mail className="w-3.5 h-3.5 text-slate-500 shrink-0" />
                     <span className="truncate">{s.supplierEmail || 'No email'}</span>
                   </div>
-                  <div className="flex items-start gap-2">
-                    <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" />
-                    <span className="line-clamp-2">{s.supplierAddress || 'No address specified'}</span>
+                  <div className="flex items-start gap-2.5">
+                    <MapPin className="w-3.5 h-3.5 text-slate-500 shrink-0 mt-0.5" />
+                    <span className="line-clamp-2 text-slate-400">{s.supplierAddress || 'No address specified'}</span>
                   </div>
                 </div>
               </div>
 
-              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                <span className="flex items-center gap-1">
-                  <Package className="w-3.5 h-3.5 text-teal-600" />
-                  <span>Supplied: <strong>{supplierStockCount} units</strong></span>
+              <div className="pt-2.5 border-t border-white/[0.06] flex items-center justify-between text-xs text-slate-400">
+                <span className="flex items-center gap-1.5">
+                  <Package className="w-3.5 h-3.5 text-teal-400" />
+                  <span>Supplied: <strong className="text-white font-mono">{supplierStockCount} units</strong></span>
                 </span>
               </div>
             </div>
@@ -143,24 +143,24 @@ export const SuppliersPage: React.FC = () => {
 
       {/* Add Supplier Modal */}
       {isAddOpen && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-md p-5 space-y-4 animate-scaleUp">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h2 className="font-bold text-sm text-slate-800 flex items-center gap-2">
-                <Truck className="w-4 h-4 text-teal-700" />
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900/95 border border-white/[0.14] rounded-2xl shadow-glass-modal w-full max-w-md p-6 space-y-4 backdrop-blur-xl animate-scaleUp text-white">
+            <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
+              <h2 className="font-bold text-sm text-white flex items-center gap-2">
+                <Truck className="w-4 h-4 text-teal-400" />
                 <span>Register New Supplier</span>
               </h2>
               <button
                 onClick={() => setIsAddOpen(false)}
-                className="text-slate-400 hover:text-slate-600 text-lg leading-none"
+                className="text-slate-400 hover:text-white transition-colors"
               >
-                ×
+                ✕
               </button>
             </div>
 
-            <form onSubmit={handleAddSupplier} className="space-y-3 text-xs">
+            <form onSubmit={handleAddSupplier} className="space-y-3.5 text-xs">
               <div>
-                <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+                <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1.5">
                   Supplier / Company Name *
                 </label>
                 <input
@@ -169,12 +169,12 @@ export const SuppliersPage: React.FC = () => {
                   placeholder="e.g., TechSource Distribution Corp"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full text-xs border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  className="glass-input w-full text-xs"
                 />
               </div>
 
               <div>
-                <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+                <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1.5">
                   Contact Number
                 </label>
                 <input
@@ -182,12 +182,12 @@ export const SuppliersPage: React.FC = () => {
                   placeholder="e.g., 0917-123-4567"
                   value={contact}
                   onChange={(e) => setContact(e.target.value)}
-                  className="w-full text-xs border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  className="glass-input w-full text-xs"
                 />
               </div>
 
               <div>
-                <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+                <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1.5">
                   Email Address
                 </label>
                 <input
@@ -195,12 +195,12 @@ export const SuppliersPage: React.FC = () => {
                   placeholder="e.g., sales@supplier.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full text-xs border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  className="glass-input w-full text-xs"
                 />
               </div>
 
               <div>
-                <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+                <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1.5">
                   Office / Warehouse Address
                 </label>
                 <textarea
@@ -208,21 +208,21 @@ export const SuppliersPage: React.FC = () => {
                   placeholder="Warehouse address..."
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
-                  className="w-full text-xs border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none"
+                  className="glass-input w-full text-xs resize-none"
                 ></textarea>
               </div>
 
-              <div className="pt-2 flex justify-end gap-2 border-t border-slate-100">
+              <div className="pt-3 flex justify-end gap-2 border-t border-white/[0.08]">
                 <button
                   type="button"
                   onClick={() => setIsAddOpen(false)}
-                  className="px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-100 font-semibold"
+                  className="px-4 py-2 rounded-xl text-slate-400 hover:text-white font-semibold hover:bg-white/[0.05] transition-all"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-lg bg-teal-700 hover:bg-teal-800 text-white font-bold shadow-sm"
+                  className="px-5 py-2.5 bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-500 hover:to-teal-600 text-white font-bold rounded-xl shadow-glass-xs hover:shadow-glow-teal transition-all"
                 >
                   Save Supplier
                 </button>

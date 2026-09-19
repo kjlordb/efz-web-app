@@ -142,35 +142,35 @@ export const SalesRecordPage: React.FC<SalesRecordPageProps> = ({ onInitiateRMA 
   return (
     <div className="space-y-4">
       {/* Header Banner */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="glass-card p-4 sm:p-5 rounded-2xl border border-white/[0.08] shadow-glass-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-            <Receipt className="w-5 h-5 text-teal-700" />
+          <h1 className="text-lg sm:text-xl font-bold text-slate-100 flex items-center gap-2">
+            <Receipt className="w-5 h-5 text-teal-400 drop-shadow-[0_0_8px_rgba(29,130,150,0.5)]" />
             <span>Sales Ledger & Warranty Claims Audit</span>
           </h1>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-slate-400 mt-1 leading-relaxed">
             Audit commercial tax invoices, examine liquidation dates, and evaluate real-time warranty eligibility
           </p>
         </div>
 
         {/* Action Controls & Volume Summary */}
-        <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex items-center gap-2.5 flex-wrap">
           <button
             onClick={handleExportCSV}
-            className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 px-3 py-1.5 rounded-lg transition-colors"
+            className="flex items-center gap-1.5 text-xs font-semibold text-slate-200 bg-slate-800/80 hover:bg-white/[0.08] border border-white/[0.1] px-3.5 py-2 rounded-xl transition-all cursor-pointer shadow-glass-xs"
           >
-            <Download className="w-3.5 h-3.5 text-slate-600" />
+            <Download className="w-3.5 h-3.5 text-slate-300" />
             <span>Export Ledger</span>
           </button>
 
-          <div className="bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg text-xs">
+          <div className="bg-slate-950/60 border border-white/[0.08] px-3 py-1.5 rounded-xl text-xs shadow-inner">
             <span className="text-slate-400 block text-[10px] uppercase font-bold">Total Invoices:</span>
-            <span className="font-bold text-slate-800 font-mono">{filteredOrders.length}</span>
+            <span className="font-bold text-slate-200 font-mono">{filteredOrders.length}</span>
           </div>
 
-          <div className="bg-emerald-50 border border-emerald-200 px-3.5 py-1.5 rounded-lg text-xs">
-            <span className="text-emerald-700 block text-[10px] uppercase font-bold">Revenue Volume:</span>
-            <span className="font-black text-emerald-900 text-sm font-mono">
+          <div className="bg-emerald-500/15 border border-emerald-500/30 px-3.5 py-1.5 rounded-xl text-xs shadow-glass-xs">
+            <span className="text-emerald-300 block text-[10px] uppercase font-bold">Revenue Volume:</span>
+            <span className="font-black text-emerald-300 text-sm font-mono tracking-tight drop-shadow-sm">
               ₱{totalSalesVolume.toLocaleString('en-US', { minimumFractionDigits: 2 })}
             </span>
           </div>
@@ -178,27 +178,27 @@ export const SalesRecordPage: React.FC<SalesRecordPageProps> = ({ onInitiateRMA 
       </div>
 
       {/* Filter and Barcode Scanner Toolbar */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">
+      <div className="glass-card p-4 rounded-2xl border border-white/[0.08] shadow-glass-sm space-y-3">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
           {/* Barcode Scanner Input (5 cols) */}
           <div className="md:col-span-5">
             <div className="flex items-center justify-between mb-1">
-              <label className="text-[10px] font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
-                <Barcode className="w-3.5 h-3.5 text-teal-600" />
+              <label className="text-[10px] font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                <Barcode className="w-3.5 h-3.5 text-teal-400" />
                 <span>Barcode Scanner Warranty Lookup</span>
               </label>
             </div>
-            <form onSubmit={handleScanSubmit} className="flex gap-1.5">
+            <form onSubmit={handleScanSubmit} className="flex gap-2">
               <input
                 type="text"
                 placeholder="Scan or enter hardware serial to inspect warranty..."
                 value={scanSerial}
                 onChange={(e) => setScanSerial(e.target.value)}
-                className="flex-1 text-xs border border-slate-300 rounded-lg px-3 py-2 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 font-mono font-semibold"
+                className="flex-1 text-xs glass-input rounded-xl px-3 py-2 font-mono font-bold text-teal-300 placeholder:text-slate-500"
               />
               <button
                 type="submit"
-                className="bg-teal-700 hover:bg-teal-800 text-white px-3.5 py-2 rounded-lg text-xs font-bold shrink-0"
+                className="bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-500 hover:to-teal-400 text-slate-950 px-4 py-2 rounded-xl text-xs font-bold shrink-0 shadow-lg shadow-teal-950/40 cursor-pointer transition-all"
               >
                 Scan Serial
               </button>
@@ -208,49 +208,49 @@ export const SalesRecordPage: React.FC<SalesRecordPageProps> = ({ onInitiateRMA 
           {/* Date Range Picker (3 cols) */}
           <div className="md:col-span-3 grid grid-cols-2 gap-2">
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+              <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
                 From Date
               </label>
               <input
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="w-full text-xs border border-slate-300 rounded-lg px-2 py-1.5 bg-slate-50 focus:bg-white text-slate-700"
+                className="w-full text-xs glass-input rounded-xl px-2 py-1.5 text-slate-200"
               />
             </div>
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+              <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
                 To Date
               </label>
               <input
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="w-full text-xs border border-slate-300 rounded-lg px-2 py-1.5 bg-slate-50 focus:bg-white text-slate-700"
+                className="w-full text-xs glass-input rounded-xl px-2 py-1.5 text-slate-200"
               />
             </div>
           </div>
 
           {/* Payment Tier Filter (2 cols) */}
           <div className="md:col-span-2">
-            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
               Payment Tier
             </label>
             <select
               value={paymentTierFilter}
               onChange={(e) => setPaymentTierFilter(e.target.value)}
-              className="w-full text-xs border border-slate-300 rounded-lg px-2.5 py-1.5 bg-slate-50 focus:bg-white font-medium"
+              className="w-full text-xs glass-input rounded-xl px-2.5 py-1.5 font-medium text-slate-200 cursor-pointer"
             >
-              <option value="all">All Payment Tiers</option>
-              <option value="Cash">Cash Settlement</option>
-              <option value="3months">3-Mo Deferred Plan</option>
-              <option value="12months">12-Mo Financed Plan</option>
+              <option value="all" className="bg-slate-900 text-slate-100">All Payment Tiers</option>
+              <option value="Cash" className="bg-slate-900 text-slate-100">Cash Settlement</option>
+              <option value="3months" className="bg-slate-900 text-slate-100">3-Mo Deferred Plan</option>
+              <option value="12months" className="bg-slate-900 text-slate-100">12-Mo Financed Plan</option>
             </select>
           </div>
 
           {/* Customer Search (2 cols) */}
           <div className="md:col-span-2">
-            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
               Client Account
             </label>
             <div className="relative">
@@ -260,15 +260,15 @@ export const SalesRecordPage: React.FC<SalesRecordPageProps> = ({ onInitiateRMA 
                 placeholder="Search name..."
                 value={searchCustomer}
                 onChange={(e) => setSearchCustomer(e.target.value)}
-                className="w-full pl-8 pr-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-slate-50 focus:bg-white"
+                className="w-full pl-8 pr-2.5 py-1.5 text-xs glass-input rounded-xl placeholder:text-slate-500"
               />
             </div>
           </div>
         </div>
 
         {/* Quick Diagnostic Test Links */}
-        <div className="flex items-center gap-2 pt-2 border-t border-slate-100 text-[11px] text-slate-500 flex-wrap">
-          <span className="font-bold text-teal-800">Quick Test Scanner:</span>
+        <div className="flex items-center gap-2 pt-2 border-t border-white/[0.08] text-[11px] text-slate-400 flex-wrap">
+          <span className="font-bold text-teal-300">Quick Test Scanner:</span>
           <button
             type="button"
             onClick={() => {
@@ -280,7 +280,7 @@ export const SalesRecordPage: React.FC<SalesRecordPageProps> = ({ onInitiateRMA 
                 setExpandedOrders(ex);
               });
             }}
-            className="font-mono bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded font-semibold"
+            className="font-mono bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 px-2.5 py-0.5 rounded-lg font-semibold transition-colors cursor-pointer"
           >
             [Test Active Warranty: SN-GPU-4070-SOLD1]
           </button>
@@ -295,7 +295,7 @@ export const SalesRecordPage: React.FC<SalesRecordPageProps> = ({ onInitiateRMA 
                 setExpandedOrders(ex);
               });
             }}
-            className="font-mono bg-red-50 hover:bg-red-100 text-red-800 border border-red-200 px-2 py-0.5 rounded font-semibold"
+            className="font-mono bg-red-500/15 hover:bg-red-500/25 text-red-300 border border-red-500/30 px-2.5 py-0.5 rounded-lg font-semibold transition-colors cursor-pointer"
           >
             [Test Expired Warranty: SN-SSD-980-EXPIRED]
           </button>
@@ -309,7 +309,7 @@ export const SalesRecordPage: React.FC<SalesRecordPageProps> = ({ onInitiateRMA 
                 setPaymentTierFilter('all');
                 loadSales();
               }}
-              className="text-teal-700 hover:underline font-semibold ml-auto"
+              className="text-teal-400 hover:text-teal-300 font-semibold ml-auto transition-colors cursor-pointer"
             >
               Reset Filters
             </button>
@@ -332,44 +332,44 @@ export const SalesRecordPage: React.FC<SalesRecordPageProps> = ({ onInitiateRMA 
           return (
             <div
               key={order.id}
-              className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden transition-all"
+              className="glass-card rounded-2xl border border-white/[0.08] shadow-glass-sm overflow-hidden transition-all"
             >
               {/* Order Header Summary Row */}
               <div
                 onClick={() => toggleExpand(order.id)}
-                className="p-4 hover:bg-slate-50/70 transition-colors cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-3 select-none"
+                className="p-4 hover:bg-white/[0.04] transition-colors cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-3 select-none"
               >
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-800 border border-teal-200 flex flex-col items-center justify-center shrink-0">
-                    <span className="text-[9px] uppercase font-black text-teal-600">INV</span>
+                  <div className="w-10 h-10 rounded-xl bg-teal-500/15 text-teal-300 border border-teal-500/30 flex flex-col items-center justify-center shrink-0 shadow-glass-xs">
+                    <span className="text-[9px] uppercase font-black text-teal-400">INV</span>
                     <span className="font-bold text-xs font-mono">#{order.id}</span>
                   </div>
 
                   <div>
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-bold text-sm text-slate-900">
+                      <span className="font-bold text-sm text-slate-100">
                         {order.customerName}
                       </span>
                       {order.customerCompany && (
-                        <span className="text-xs text-slate-500 font-medium">
+                        <span className="text-xs text-slate-400 font-medium">
                           • {order.customerCompany}
                         </span>
                       )}
-                      <span className="text-[10px] bg-slate-100 text-slate-700 border border-slate-200 px-2 py-0.5 rounded font-mono font-medium">
+                      <span className="text-[10px] bg-slate-800/80 text-teal-300 border border-white/[0.08] px-2 py-0.5 rounded-lg font-mono font-medium">
                         {order.paymentMethod}
                       </span>
                     </div>
 
-                    <div className="text-xs text-slate-500 mt-1 flex flex-wrap items-center gap-3">
-                      <span>Execution Date: <strong className="text-slate-700">{orderDateFormatted}</strong></span>
+                    <div className="text-xs text-slate-400 mt-1 flex flex-wrap items-center gap-3">
+                      <span>Execution Date: <strong className="text-slate-200">{orderDateFormatted}</strong></span>
                       <span>•</span>
-                      <span>Associate: <strong className="text-slate-700">{order.encoder}</strong></span>
+                      <span>Associate: <strong className="text-slate-200">{order.encoder}</strong></span>
                       <span>•</span>
-                      <span>Terminal: <strong className="font-mono text-slate-700">{order.computerName}</strong></span>
+                      <span>Terminal: <strong className="font-mono text-slate-200">{order.computerName}</strong></span>
                       {order.remarks && (
                         <>
                           <span>•</span>
-                          <span className="italic text-slate-600 truncate max-w-xs">"{order.remarks}"</span>
+                          <span className="italic text-slate-300 truncate max-w-xs">"{order.remarks}"</span>
                         </>
                       )}
                     </div>
@@ -380,7 +380,7 @@ export const SalesRecordPage: React.FC<SalesRecordPageProps> = ({ onInitiateRMA 
                 <div className="flex items-center gap-4 self-end md:self-center">
                   <div className="text-right">
                     <div className="text-[10px] uppercase font-bold text-slate-400">Total Billed</div>
-                    <div className="text-lg font-black text-slate-900 font-mono">
+                    <div className="text-lg font-black text-slate-100 font-mono tracking-tight drop-shadow-sm">
                       ₱{order.orderAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                     </div>
                   </div>
@@ -390,18 +390,18 @@ export const SalesRecordPage: React.FC<SalesRecordPageProps> = ({ onInitiateRMA 
                       e.stopPropagation();
                       setSelectedOrderToPrint(order);
                     }}
-                    className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 hover:text-teal-900 bg-slate-100 hover:bg-teal-50 border border-slate-300 hover:border-teal-300 px-3 py-1.5 rounded-lg transition-colors shadow-xs"
+                    className="flex items-center gap-1.5 text-xs font-semibold text-slate-200 hover:text-white bg-slate-800/80 hover:bg-teal-500/20 border border-white/[0.1] hover:border-teal-400/40 px-3 py-1.5 rounded-xl transition-all shadow-glass-xs cursor-pointer"
                     title="Print Customer Tax Invoice"
                   >
-                    <Printer className="w-3.5 h-3.5 text-teal-700" />
+                    <Printer className="w-3.5 h-3.5 text-teal-400" />
                     <span className="hidden sm:inline">Print Receipt</span>
                   </button>
 
-                  <button className="text-slate-400 hover:text-slate-600 p-1">
+                  <button className="text-slate-400 hover:text-slate-200 p-1 cursor-pointer">
                     {isExpanded ? (
-                      <ChevronUp className="w-5 h-5 text-teal-700" />
+                      <ChevronUp className="w-5 h-5 text-teal-400" />
                     ) : (
-                      <ChevronDown className="w-5 h-5" />
+                      <ChevronDown className="w-5 h-5 text-slate-400" />
                     )}
                   </button>
                 </div>
@@ -409,8 +409,8 @@ export const SalesRecordPage: React.FC<SalesRecordPageProps> = ({ onInitiateRMA 
 
               {/* Nested Items & Warranty Status */}
               {isExpanded && (
-                <div className="border-t border-slate-200 bg-slate-50/70 p-4 space-y-3">
-                  <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500 flex items-center justify-between">
+                <div className="border-t border-white/[0.08] bg-slate-950/60 p-4 space-y-3 shadow-inner">
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
                     <span>Itemized Assets & Warranty Verification Engine</span>
                     <span>{order.items?.length || 0} unit(s) linked to invoice</span>
                   </div>
@@ -428,50 +428,50 @@ export const SalesRecordPage: React.FC<SalesRecordPageProps> = ({ onInitiateRMA 
                             key={item.id}
                             className={`p-3.5 rounded-xl border transition-all flex flex-col md:flex-row md:items-center justify-between gap-3 ${
                               isHighlighted
-                                ? 'bg-amber-50 border-amber-300 ring-2 ring-amber-400/50'
-                                : 'bg-white border-slate-200 shadow-xs'
+                                ? 'bg-amber-500/15 border-amber-400/50 ring-2 ring-amber-400/30'
+                                : 'bg-slate-900/70 border-white/[0.08] shadow-glass-xs'
                             }`}
                           >
                             {/* Item details */}
                             <div className="space-y-1 min-w-0">
                               <div className="flex items-center gap-2 flex-wrap">
-                                <span className="font-mono text-xs font-bold text-teal-900 bg-teal-50 border border-teal-200 px-2 py-0.5 rounded">
+                                <span className="font-mono text-xs font-bold text-teal-300 bg-slate-950/80 border border-white/[0.08] px-2 py-0.5 rounded-lg">
                                   SN: {item.stockSerial}
                                 </span>
-                                <span className="text-xs font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded">
+                                <span className="text-xs font-semibold text-slate-300 bg-slate-800/80 border border-white/[0.08] px-2 py-0.5 rounded-lg">
                                   {item.stockName}
                                 </span>
-                                <span className="text-xs text-slate-500 font-medium">
-                                  Distributor: {item.supplierName}
+                                <span className="text-xs text-slate-400 font-medium">
+                                  Distributor: <span className="text-slate-300">{item.supplierName}</span>
                                 </span>
                               </div>
-                              <div className="text-xs font-bold text-slate-800">
+                              <div className="text-xs font-bold text-slate-100 leading-relaxed">
                                 {item.stockDetails}
                               </div>
-                              <div className="text-[11px] text-slate-500">
-                                Liquidated SRP: ₱{item.stockPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                              <div className="text-[11px] text-slate-400">
+                                Liquidated SRP: <span className="font-mono font-bold text-slate-200">₱{item.stockPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
                               </div>
                             </div>
 
                             {/* Warranty Status Card & RMA Trigger */}
                             <div className="shrink-0 flex items-center gap-3">
                               {warrantyInfo.isCovered ? (
-                                <div className="bg-emerald-50 border border-emerald-200 text-emerald-900 px-3.5 py-2 rounded-xl text-right">
-                                  <div className="flex items-center gap-1.5 font-bold text-xs text-emerald-700 justify-end">
-                                    <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                                <div className="bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 px-3.5 py-2 rounded-xl text-right shadow-glass-xs">
+                                  <div className="flex items-center gap-1.5 font-bold text-xs text-emerald-300 justify-end">
+                                    <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
                                     <span>WARRANTY COVERED</span>
                                   </div>
-                                  <div className="text-[11px] text-emerald-800 mt-0.5">
+                                  <div className="text-[11px] text-emerald-200/90 mt-0.5">
                                     <strong>{warrantyInfo.daysRemaining} days remaining</strong> ({warrantyInfo.daysPassed}d passed of {warrantyInfo.warrantyDays}d)
                                   </div>
                                 </div>
                               ) : (
-                                <div className="bg-red-50 border border-red-200 text-red-900 px-3.5 py-2 rounded-xl text-right">
-                                  <div className="flex items-center gap-1.5 font-bold text-xs text-red-700 justify-end">
-                                    <ShieldAlert className="w-4 h-4 text-red-600 shrink-0" />
+                                <div className="bg-red-500/15 border border-red-500/30 text-red-300 px-3.5 py-2 rounded-xl text-right shadow-glass-xs">
+                                  <div className="flex items-center gap-1.5 font-bold text-xs text-red-400 justify-end">
+                                    <ShieldAlert className="w-4 h-4 text-red-400 shrink-0" />
                                     <span>WARRANTY EXPIRED</span>
                                   </div>
-                                  <div className="text-[11px] text-red-800 mt-0.5">
+                                  <div className="text-[11px] text-red-200/90 mt-0.5">
                                     Expired by <strong>{warrantyInfo.daysPassed - warrantyInfo.warrantyDays} days</strong> ({warrantyInfo.daysPassed}d passed vs {warrantyInfo.warrantyDays}d term)
                                   </div>
                                 </div>
@@ -480,7 +480,7 @@ export const SalesRecordPage: React.FC<SalesRecordPageProps> = ({ onInitiateRMA 
                               {onInitiateRMA && (
                                 <button
                                   onClick={() => onInitiateRMA(item.stockSerial, item, order)}
-                                  className="flex items-center gap-1 text-[11px] font-semibold text-teal-800 hover:text-white hover:bg-teal-700 bg-teal-50 border border-teal-300 px-2.5 py-1.5 rounded-lg transition-colors"
+                                  className="flex items-center gap-1 text-[11px] font-semibold text-teal-300 hover:text-slate-950 hover:bg-teal-400 bg-teal-500/20 border border-teal-500/40 px-3 py-2 rounded-xl transition-all cursor-pointer shadow-glass-xs"
                                   title="Initiate Return Merchandise Authorization ticket"
                                 >
                                   <RotateCcw className="w-3.5 h-3.5" />
@@ -504,9 +504,9 @@ export const SalesRecordPage: React.FC<SalesRecordPageProps> = ({ onInitiateRMA 
         })}
 
         {filteredOrders.length === 0 && (
-          <div className="bg-white rounded-xl border border-slate-200 p-12 text-center text-slate-400 space-y-2">
-            <Receipt className="w-10 h-10 mx-auto text-slate-300 stroke-[1.5]" />
-            <div className="text-sm font-semibold text-slate-600">No Sales Records Found</div>
+          <div className="glass-card rounded-2xl border border-white/[0.08] p-12 text-center text-slate-400 space-y-2">
+            <Receipt className="w-10 h-10 mx-auto text-slate-500 stroke-[1.5]" />
+            <div className="text-sm font-semibold text-slate-300">No Sales Records Found</div>
             <p className="text-xs text-slate-400 max-w-sm mx-auto">
               No customer invoices matched your barcode serial search or filter parameters.
             </p>

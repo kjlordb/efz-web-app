@@ -80,23 +80,23 @@ export const AddStockModal: React.FC<AddStockModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-lg p-6 space-y-4 animate-scaleUp my-6">
-        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+    <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto">
+      <div className="glass-modal rounded-2xl w-full max-w-lg p-6 space-y-4 shadow-glass-modal border border-white/[0.14] animate-scaleUp my-6">
+        <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
           <div className="flex items-center gap-2">
-            <Package className="w-5 h-5 text-teal-700" />
-            <h2 className="font-bold text-base text-slate-800">
+            <Package className="w-5 h-5 text-teal-400 drop-shadow-[0_0_8px_rgba(29,130,150,0.5)]" />
+            <h2 className="font-bold text-base text-slate-100">
               {itemToEdit ? `Edit Stock Item (${itemToEdit.stockSerial})` : 'Add New Serialized Item'}
             </h2>
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
+          <button onClick={onClose} className="p-1 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.08] transition-colors cursor-pointer">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-3.5 py-2.5 rounded-lg text-xs flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0" />
+          <div className="bg-red-500/15 border border-red-500/30 text-red-300 px-3.5 py-2.5 rounded-xl text-xs flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0 text-red-400" />
             <span>{error}</span>
           </div>
         )}
@@ -104,7 +104,7 @@ export const AddStockModal: React.FC<AddStockModalProps> = ({
         <form onSubmit={handleSubmit} className="space-y-3.5 text-xs">
           {/* Serial number with Auto-Gen */}
           <div>
-            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
               Hardware Serial Number (Unique) *
             </label>
             <div className="flex gap-2">
@@ -114,15 +114,15 @@ export const AddStockModal: React.FC<AddStockModalProps> = ({
                 placeholder="e.g., SN-GPU-4070-001"
                 value={serial}
                 onChange={(e) => setSerial(e.target.value)}
-                className="flex-1 font-mono text-xs border border-slate-300 rounded-lg px-3 py-2 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 font-bold text-teal-900"
+                className="flex-1 font-mono text-xs glass-input rounded-xl px-3 py-2 font-bold text-teal-300"
               />
               <button
                 type="button"
                 onClick={generateRandomSerial}
-                className="flex items-center gap-1 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg font-medium border border-slate-300"
+                className="flex items-center gap-1 text-xs bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 px-3 py-2 rounded-xl font-medium border border-white/[0.1] hover:border-teal-400/40 transition-all cursor-pointer shadow-glass-xs"
                 title="Generate Random Serial"
               >
-                <Wand2 className="w-3.5 h-3.5 text-teal-700" />
+                <Wand2 className="w-3.5 h-3.5 text-teal-400" />
                 <span>Auto-Gen</span>
               </button>
             </div>
@@ -131,31 +131,31 @@ export const AddStockModal: React.FC<AddStockModalProps> = ({
           {/* Category & Supplier */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+              <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
                 Category *
               </label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full text-xs border border-slate-300 rounded-lg px-2.5 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 font-medium text-slate-800"
+                className="w-full text-xs glass-input rounded-xl px-2.5 py-2 font-medium text-slate-200"
               >
                 {CATEGORIES.map((c) => (
-                  <option key={c} value={c}>{c}</option>
+                  <option key={c} value={c} className="bg-slate-900 text-slate-100">{c}</option>
                 ))}
               </select>
             </div>
 
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+              <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
                 Supplier *
               </label>
               <select
                 value={supplier}
                 onChange={(e) => setSupplier(e.target.value)}
-                className="w-full text-xs border border-slate-300 rounded-lg px-2.5 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 font-medium text-slate-800"
+                className="w-full text-xs glass-input rounded-xl px-2.5 py-2 font-medium text-slate-200"
               >
                 {suppliers.map((s) => (
-                  <option key={s.id} value={s.supplierName}>{s.supplierName}</option>
+                  <option key={s.id} value={s.supplierName} className="bg-slate-900 text-slate-100">{s.supplierName}</option>
                 ))}
               </select>
             </div>
@@ -163,7 +163,7 @@ export const AddStockModal: React.FC<AddStockModalProps> = ({
 
           {/* Specifications / Details */}
           <div>
-            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
               Model & Specifications *
             </label>
             <input
@@ -172,15 +172,15 @@ export const AddStockModal: React.FC<AddStockModalProps> = ({
               placeholder="e.g., ASUS TUF Gaming GeForce RTX 4070 SUPER OC Edition 12GB GDDR6X"
               value={details}
               onChange={(e) => setDetails(e.target.value)}
-              className="w-full text-xs border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className="w-full text-xs glass-input rounded-xl px-3 py-2 placeholder:text-slate-500"
             />
           </div>
 
-          {/* Retail Price & Supplier Cost */}
+          {/* Pricing Row: Retail & Supplier Cost */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
-                Retail Price (₱) *
+              <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                Retail Price (₱ PHP) *
               </label>
               <input
                 type="number"
@@ -189,13 +189,13 @@ export const AddStockModal: React.FC<AddStockModalProps> = ({
                 placeholder="42500.00"
                 value={price}
                 onChange={(e) => setPrice(e.target.value === '' ? '' : Number(e.target.value))}
-                className="w-full font-mono text-xs border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 font-bold"
+                className="w-full font-mono text-xs glass-input rounded-xl px-3 py-2 font-bold text-amber-300"
               />
             </div>
 
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
-                Supplier Cost (₱) *
+              <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                Supplier Cost (COGS) *
               </label>
               <input
                 type="number"
@@ -204,14 +204,14 @@ export const AddStockModal: React.FC<AddStockModalProps> = ({
                 placeholder="37500.00"
                 value={cost}
                 onChange={(e) => setCost(e.target.value === '' ? '' : Number(e.target.value))}
-                className="w-full font-mono text-xs border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 font-bold"
+                className="w-full font-mono text-xs glass-input rounded-xl px-3 py-2 font-bold text-slate-200"
               />
             </div>
           </div>
 
           {/* Warranty Duration */}
           <div>
-            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
               Warranty Duration *
             </label>
             <div className="flex gap-2 flex-wrap">
@@ -220,10 +220,10 @@ export const AddStockModal: React.FC<AddStockModalProps> = ({
                   type="button"
                   key={days}
                   onClick={() => setWarranty(days)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
                     warranty === days
-                      ? 'bg-teal-700 text-white border-teal-800 shadow-sm'
-                      : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+                      ? 'bg-teal-500/20 text-teal-300 border-teal-500/50 shadow-glass-xs shadow-[0_0_12px_rgba(29,130,150,0.3)]'
+                      : 'bg-slate-900/60 text-slate-400 border-white/[0.08] hover:bg-white/[0.05] hover:text-slate-200'
                   }`}
                 >
                   {days >= 365 ? `${days / 365} Year${days > 365 ? 's' : ''}` : `${days} Days`}
@@ -234,7 +234,7 @@ export const AddStockModal: React.FC<AddStockModalProps> = ({
 
           {/* Remarks */}
           <div>
-            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
               Batch Remarks / Note
             </label>
             <input
@@ -242,23 +242,23 @@ export const AddStockModal: React.FC<AddStockModalProps> = ({
               placeholder="e.g., Batch shipment A1, sealed packaging"
               value={remarks}
               onChange={(e) => setRemarks(e.target.value)}
-              className="w-full text-xs border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className="w-full text-xs glass-input rounded-xl px-3 py-2 placeholder:text-slate-500"
             />
           </div>
 
           {/* Actions */}
-          <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+          <div className="pt-3 border-t border-white/[0.08] flex items-center justify-end gap-2.5">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-slate-600 font-semibold hover:bg-slate-100 rounded-lg"
+              className="px-4 py-2 text-slate-300 font-semibold hover:bg-white/[0.06] rounded-xl transition-colors cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="px-5 py-2 bg-teal-700 hover:bg-teal-800 text-white font-bold rounded-lg shadow-sm transition-all"
+              className="px-5 py-2 bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-500 hover:to-teal-400 text-slate-950 font-bold rounded-xl shadow-lg shadow-teal-900/40 transition-all cursor-pointer disabled:opacity-50"
             >
               {submitting ? 'Saving...' : itemToEdit ? 'Update Item' : 'Save Stock Item'}
             </button>
