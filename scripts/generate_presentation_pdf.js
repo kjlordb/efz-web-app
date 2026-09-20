@@ -18,35 +18,22 @@ function toBase64(fileName) {
 }
 
 async function main() {
-  console.log('Preparing assets and generating presentation HTML...');
+  console.log('Generating business-focused client presentation deck...');
 
-  // Convert all key screenshots to base64
+  // Convert key screenshots to base64
   const imgLogin = toBase64('00_login_terminal.png');
   const imgDashboard = toBase64('01_admin_dashboard.png');
-  const imgAdminPos = toBase64('02_admin_pos.png');
   const imgAdminInv = toBase64('03_admin_inventory.png');
-  const imgAdminSales = toBase64('04_admin_sales.png');
-  const imgAdminQuote = toBase64('05_admin_quotation.png');
-  const imgAdminAudit = toBase64('06_admin_audit.png');
-  const imgAdminCust = toBase64('07_admin_customers.png');
-  const imgAdminSupp = toBase64('08_admin_suppliers.png');
-  const imgAdminInst = toBase64('09_admin_installments.png');
-  const imgAdminRma = toBase64('10_admin_rma.png');
-  const imgAdminBackup = toBase64('11_admin_backup_modal.png');
   const imgCashierPos = toBase64('12_cashier_pos_terminal.png');
-  const imgCashierInv = toBase64('13_cashier_inventory_srp_only.png');
   const imgCashierQuote = toBase64('14_cashier_quotation_builder.png');
-  const imgWarehouseInv = toBase64('15_warehouse_stock_catalog.png');
   const imgWarehouseAudit = toBase64('16_warehouse_audit_movement.png');
-  const imgWarehouseSupp = toBase64('17_warehouse_suppliers.png');
   const imgTechRma = toBase64('18_technician_rma_claims.png');
-  const imgTechSales = toBase64('19_technician_sales_lookup.png');
 
   const htmlContent = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>EFZ Computer Sales Terminal - Client Presentation Deck</title>
+  <title>EFZ Computer Sales Terminal - Business Presentation Deck</title>
   <style>
     @page {
       size: A4 landscape;
@@ -73,8 +60,8 @@ async function main() {
       flex-direction: column;
       justify-content: space-between;
       overflow: hidden;
-      background: radial-gradient(circle at 80% 20%, rgba(25, 195, 209, 0.08), transparent 45%),
-                  radial-gradient(circle at 15% 85%, rgba(216, 168, 62, 0.06), transparent 50%),
+      background: radial-gradient(circle at 85% 15%, rgba(25, 195, 209, 0.08), transparent 45%),
+                  radial-gradient(circle at 15% 85%, rgba(216, 168, 62, 0.07), transparent 50%),
                   #070B14;
     }
     .slide:last-child {
@@ -86,7 +73,7 @@ async function main() {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      border-b: 1px solid rgba(148, 163, 184, 0.12);
+      border-bottom: 1px solid rgba(148, 163, 184, 0.12);
       padding-bottom: 10px;
       margin-bottom: 12px;
     }
@@ -150,16 +137,12 @@ async function main() {
       letter-spacing: 0.04em;
       text-transform: uppercase;
     }
-    .slide-footer .brand {
-      color: #D8A83E;
-      font-weight: 800;
-    }
 
     /* Content Area */
     .slide-body {
       flex: 1;
       display: flex;
-      gap: 16px;
+      gap: 18px;
       align-items: stretch;
       min-height: 0;
     }
@@ -196,7 +179,8 @@ async function main() {
       font-size: 8.5px;
       color: #64748B;
       margin-left: 8px;
-      font-family: monospace;
+      font-family: inherit;
+      font-weight: 600;
     }
     .screenshot-img-box {
       flex: 1;
@@ -222,10 +206,10 @@ async function main() {
       justify-content: center;
     }
     .feature-card {
-      background: rgba(15, 23, 42, 0.6);
+      background: rgba(15, 23, 42, 0.65);
       border: 1px solid rgba(148, 163, 184, 0.12);
       border-radius: 10px;
-      padding: 10px 12px;
+      padding: 10px 14px;
     }
     .feature-card.gold-border {
       border-left: 3px solid #D8A83E;
@@ -236,8 +220,11 @@ async function main() {
     .feature-card.purple-border {
       border-left: 3px solid #A855F7;
     }
+    .feature-card.green-border {
+      border-left: 3px solid #10B981;
+    }
     .card-title {
-      font-size: 11.5px;
+      font-size: 12px;
       font-weight: 800;
       color: #F8FAFC;
       margin-bottom: 4px;
@@ -246,12 +233,12 @@ async function main() {
       gap: 6px;
     }
     .card-desc {
-      font-size: 9.5px;
+      font-size: 10px;
       color: #94A3B8;
       line-height: 1.45;
     }
     .card-desc strong {
-      color: #E2E8F0;
+      color: #F1F5F9;
     }
 
     /* Metrics Grid */
@@ -264,11 +251,11 @@ async function main() {
       background: rgba(30, 41, 59, 0.5);
       border: 1px solid rgba(148, 163, 184, 0.1);
       border-radius: 8px;
-      padding: 6px 8px;
+      padding: 7px 8px;
       text-align: center;
     }
     .metric-value {
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 900;
       color: #F1C968;
     }
@@ -279,7 +266,7 @@ async function main() {
       color: #64748B;
       text-transform: uppercase;
       font-weight: 700;
-      margin-top: 1px;
+      margin-top: 2px;
     }
 
     /* COVER SLIDE */
@@ -287,8 +274,8 @@ async function main() {
       justify-content: center;
       align-items: center;
       text-align: center;
-      padding: 0 40mm;
-      background: radial-gradient(circle at 50% 40%, rgba(216, 168, 62, 0.12), transparent 60%),
+      padding: 0 35mm;
+      background: radial-gradient(circle at 50% 35%, rgba(216, 168, 62, 0.14), transparent 60%),
                   radial-gradient(circle at 20% 80%, rgba(25, 195, 209, 0.10), transparent 50%),
                   #070B14;
     }
@@ -296,7 +283,7 @@ async function main() {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 6px 16px;
+      padding: 6px 18px;
       border-radius: 9999px;
       background: rgba(216, 168, 62, 0.15);
       border: 1px solid rgba(216, 168, 62, 0.4);
@@ -305,16 +292,16 @@ async function main() {
       font-weight: 800;
       letter-spacing: 0.12em;
       text-transform: uppercase;
-      margin-bottom: 14px;
+      margin-bottom: 16px;
     }
     .cover-title {
-      font-size: 38px;
+      font-size: 40px;
       font-weight: 900;
       color: #FFFFFF;
       letter-spacing: -0.03em;
       line-height: 1.1;
       text-transform: uppercase;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
     .cover-title span {
       background: linear-gradient(135deg, #F1C968, #D8A83E);
@@ -322,10 +309,10 @@ async function main() {
       -webkit-text-fill-color: transparent;
     }
     .cover-subtitle {
-      font-size: 14px;
+      font-size: 15px;
       color: #94A3B8;
-      max-width: 600px;
-      margin: 0 auto 24px auto;
+      max-width: 660px;
+      margin: 0 auto 26px auto;
       line-height: 1.5;
     }
     .cover-specs-grid {
@@ -333,53 +320,54 @@ async function main() {
       grid-template-columns: repeat(4, 1fr);
       gap: 12px;
       width: 100%;
-      max-width: 780px;
+      max-width: 800px;
       margin-bottom: 24px;
     }
     .cover-spec-card {
-      background: rgba(15, 23, 42, 0.8);
+      background: rgba(15, 23, 42, 0.85);
       border: 1px solid rgba(148, 163, 184, 0.15);
       border-radius: 10px;
-      padding: 10px 12px;
+      padding: 12px 14px;
       text-align: center;
     }
     .cover-spec-val {
-      font-size: 16px;
+      font-size: 18px;
       font-weight: 900;
       color: #19C3D1;
     }
     .cover-spec-lbl {
-      font-size: 8.5px;
+      font-size: 9px;
       color: #64748B;
       text-transform: uppercase;
       font-weight: 700;
-      margin-top: 2px;
+      margin-top: 3px;
     }
     .cover-meta {
-      font-size: 10px;
+      font-size: 11px;
       color: #64748B;
       font-weight: 600;
       letter-spacing: 0.05em;
     }
 
-    /* ARCHITECTURE SKETCH SLIDE */
-    .arch-grid {
+    /* WORKFLOW SKETCH SLIDE */
+    .flow-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 14px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      width: 100%;
       height: 100%;
       align-items: stretch;
     }
-    .arch-column {
+    .flow-column {
       background: rgba(15, 23, 42, 0.7);
       border: 1px solid rgba(148, 163, 184, 0.15);
       border-radius: 12px;
-      padding: 12px 14px;
+      padding: 14px 12px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
     }
-    .arch-header {
+    .flow-header {
       font-size: 12px;
       font-weight: 900;
       color: #FFFFFF;
@@ -387,23 +375,23 @@ async function main() {
       display: flex;
       align-items: center;
       gap: 6px;
-      padding-bottom: 6px;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.12);
     }
-    .arch-card {
+    .flow-card {
       background: #090E1A;
-      border: 1px solid rgba(148, 163, 184, 0.12);
+      border: 1px solid rgba(148, 163, 184, 0.1);
       border-radius: 8px;
-      padding: 8px 10px;
+      padding: 9px 10px;
     }
-    .arch-card-title {
-      font-size: 10.5px;
+    .flow-card-title {
+      font-size: 11px;
       font-weight: 800;
       color: #19C3D1;
       margin-bottom: 3px;
     }
-    .arch-card-desc {
-      font-size: 8.5px;
+    .flow-card-desc {
+      font-size: 9px;
       color: #94A3B8;
       line-height: 1.4;
     }
@@ -412,32 +400,32 @@ async function main() {
     .matrix-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 9px;
+      font-size: 9.5px;
       margin-top: 4px;
     }
     .matrix-table th {
-      background: rgba(30, 41, 59, 0.8);
+      background: rgba(30, 41, 59, 0.85);
       color: #F1C968;
       font-weight: 800;
       text-transform: uppercase;
-      padding: 7px 10px;
+      padding: 8px 12px;
       text-align: left;
       border: 1px solid rgba(148, 163, 184, 0.15);
     }
     .matrix-table td {
-      padding: 6.5px 10px;
+      padding: 7.5px 12px;
       border: 1px solid rgba(148, 163, 184, 0.1);
       color: #94A3B8;
     }
     .matrix-table tr:nth-child(even) {
-      background: rgba(15, 23, 42, 0.4);
+      background: rgba(15, 23, 42, 0.45);
     }
     .matrix-badge {
       display: inline-block;
-      padding: 2px 6px;
+      padding: 2.5px 8px;
       border-radius: 4px;
       font-weight: 700;
-      font-size: 8px;
+      font-size: 8.5px;
       text-transform: uppercase;
     }
     .badge-grant {
@@ -463,74 +451,74 @@ async function main() {
   <section class="slide cover-slide">
     <div>
       <div class="cover-badge">
-        <span>★ Client Presentation & Technical Overview Deck</span>
+        <span>★ Store Operations & Commercial Presentation</span>
       </div>
       <h1 class="cover-title">
         EFZ <span>Computer Sales</span> Terminal
       </h1>
       <p class="cover-subtitle">
-        Enterprise Point of Sale, Serialized Asset Inventory & Commercial Financing Management System engineered for Davao Premier Computer Retail.
+        Point of Sale, Serialized Barcode Inventory, Corporate Quotations & Commercial Financing System engineered for retail store efficiency and profit growth.
       </p>
 
       <div class="cover-specs-grid">
         <div class="cover-spec-card">
           <div class="cover-spec-val">41,934</div>
-          <div class="cover-spec-lbl">Serialized Hardware Units</div>
+          <div class="cover-spec-lbl">Tracked Hardware Items</div>
         </div>
         <div class="cover-spec-card">
           <div class="cover-spec-val">₱211.78M</div>
-          <div class="cover-spec-lbl">Gross Finalized Sales</div>
+          <div class="cover-spec-lbl">Total Recorded Sales</div>
         </div>
         <div class="cover-spec-card">
           <div class="cover-spec-val">8,411</div>
-          <div class="cover-spec-lbl">Commercial Client Profiles</div>
+          <div class="cover-spec-lbl">Customer Accounts</div>
         </div>
         <div class="cover-spec-card">
-          <div class="cover-spec-val">4 Personas</div>
-          <div class="cover-spec-lbl">Strict RBAC Authorization</div>
+          <div class="cover-spec-val">4 Clear Roles</div>
+          <div class="cover-spec-lbl">Protected Store Clearance</div>
         </div>
       </div>
 
       <div class="cover-meta">
-        Davao City, Philippines • Production System v2.8 • Microsoft SQL Server 2022 Verified
+        Davao City, Philippines • Retail Store Operations Guide • Commercial Edition
       </div>
     </div>
   </section>
 
-  <!-- SLIDE 2: EXECUTIVE OVERVIEW & ARCHITECTURAL HIGHLIGHTS -->
+  <!-- SLIDE 2: EXECUTIVE SUMMARY & BUSINESS VALUE -->
   <section class="slide">
     <div class="slide-header">
       <div>
-        <span class="slide-badge">Executive Summary</span>
-        <h2 class="slide-title">System Overview & Business Value</h2>
-        <p class="slide-subtitle">Modernizing retail operations from legacy desktop silos into a multi-role web application</p>
+        <span class="slide-badge">Executive Overview</span>
+        <h2 class="slide-title">How the System Grows Your Business</h2>
+        <p class="slide-subtitle">Solving real retail pain points: inventory losses, slow checkout queues, and leaked supplier costs</p>
       </div>
       <div class="slide-meta-right">
-        Live SQL Server: <span class="highlight">14ms Latency</span><br>
-        Architecture: <span class="highlight">3-Tier Enterprise</span>
+        Business Focus: <span class="highlight">Speed & Profit Protection</span><br>
+        Store Mode: <span class="highlight">Fully Integrated</span>
       </div>
     </div>
 
     <div class="slide-body">
       <div class="info-panel" style="flex: 1.2;">
         <div class="feature-card gold-border">
-          <div class="card-title">🚀 Real-Time Serialized Hardware Tracking</div>
+          <div class="card-title">📦 Zero Lost Inventory (Serialized Tracking)</div>
           <div class="card-desc">
-            Tracks every individual computer part from receipt to sale with <strong>unique barcode serial numbers</strong>. Guarantees zero misplaced parts, exact warranty turnaround tracking, and automated inventory reconciliation across <strong>41,934 units</strong>.
+            Every motherboard, graphics card, laptop, and accessory is logged with its <strong>exact manufacturer serial barcode</strong>. From delivery to customer checkout, you know exactly which unit was sold to whom, eliminating inventory shrinkage and lost stock.
           </div>
         </div>
 
         <div class="feature-card cyan-border">
-          <div class="card-title">🛡️ Strict Role-Based Access Control (RBAC)</div>
+          <div class="card-title">🔒 Confidential Wholesale Pricing</div>
           <div class="card-desc">
-            Segregates sensitive financial data: Cashiers operate in high-speed checkout with <strong>supplier COGS margins completely masked</strong>, while Store Managers maintain unrestricted control over profitability, quotations, and SQL Server backups.
+            Front-counter cashiers only see the <strong>Retail Selling Price (SRP)</strong>. Your confidential distributor purchase costs and profit margins are kept strictly hidden and visible only to the Store Manager.
           </div>
         </div>
 
-        <div class="feature-card purple-border">
-          <div class="card-title">💳 Flexible Payment Tiers & Installment AR</div>
+        <div class="feature-card green-border">
+          <div class="card-title">💳 Sell More with Flexible Financing Options</div>
           <div class="card-desc">
-            Supports Spot Cash, 3-Month Credit Card (+4% MDR), and 12-Month In-House Financing (+15% APR) with automated amortization scheduling, next-due alerts, and delinquency tracking.
+            Close bigger deals instantly by offering customers <strong>Spot Cash</strong>, <strong>3-Month Credit Card (+4%)</strong>, or <strong>12-Month In-House Installments (+15%)</strong> with automated monthly billing schedules.
           </div>
         </div>
       </div>
@@ -538,17 +526,17 @@ async function main() {
       <div class="info-panel" style="flex: 1;">
         <div class="feature-card" style="height: 100%; display: flex; flex-direction: column; justify-content: space-around;">
           <div>
-            <div class="card-title" style="color: #F1C968;">📊 Verified Live Database Metrics</div>
-            <div class="card-desc" style="margin-bottom: 8px;">Directly probed and extracted from the live SQL Server 2022 instance:</div>
+            <div class="card-title" style="color: #F1C968;">📊 Proven Store Scale & Capacity</div>
+            <div class="card-desc" style="margin-bottom: 8px;">Real store numbers actively running in the operational database:</div>
           </div>
           <div class="metrics-row">
             <div class="metric-pill">
               <div class="metric-value">41,934</div>
-              <div class="metric-label">Master Inventory</div>
+              <div class="metric-label">Products Logged</div>
             </div>
             <div class="metric-pill">
               <div class="metric-value cyan">12,718</div>
-              <div class="metric-label">Sales Invoices</div>
+              <div class="metric-label">Invoices Finalized</div>
             </div>
             <div class="metric-pill">
               <div class="metric-value green">8,411</div>
@@ -558,122 +546,141 @@ async function main() {
           <div class="metrics-row">
             <div class="metric-pill">
               <div class="metric-value">62</div>
-              <div class="metric-label">Suppliers</div>
+              <div class="metric-label">Distributor Partners</div>
             </div>
             <div class="metric-pill">
               <div class="metric-value cyan">489</div>
-              <div class="metric-label">Quotations</div>
+              <div class="metric-label">Corporate Quotes</div>
             </div>
             <div class="metric-pill">
-              <div class="metric-value green">62</div>
-              <div class="metric-label">Stored Procedures</div>
+              <div class="metric-value green">100%</div>
+              <div class="metric-label">Warranty Audited</div>
             </div>
           </div>
-          <div class="card-desc" style="font-size: 8px; color: #64748B; text-align: center; border-top: 1px solid rgba(148, 163, 184, 0.1); padding-top: 6px;">
-            Target Host: LAPTOP-N6BLB75S:1433 • Database: EFZApp • Mode: Production Ready
+          <div class="card-desc" style="font-size: 8.5px; color: #64748B; text-align: center; border-top: 1px solid rgba(148, 163, 184, 0.1); padding-top: 6px;">
+            Built specifically for high-volume retail computer centers and wholesale distribution.
           </div>
         </div>
       </div>
     </div>
 
     <div class="slide-footer">
-      <div>EFZ DAVAO COMPUTER SALES • CONFIDENTIAL CLIENT PRESENTATION</div>
+      <div>EFZ DAVAO COMPUTER SALES • STORE OPERATIONS GUIDE</div>
       <div>PAGE 02 / 12</div>
     </div>
   </section>
 
-  <!-- SLIDE 3: ARCHITECTURE & INFRASTRUCTURE SKETCH -->
+  <!-- SLIDE 3: STORE OPERATIONS FLOW SKETCH -->
   <section class="slide">
     <div class="slide-header">
       <div>
-        <span class="slide-badge cyan">System Architecture</span>
-        <h2 class="slide-title">Enterprise Topology & Technology Sketch</h2>
-        <p class="slide-subtitle">Multi-tier decoupled architecture with zero-trust token authentication and connection pooling</p>
+        <span class="slide-badge cyan">Operations Blueprint</span>
+        <h2 class="slide-title">Daily Store Workflow & Operations Sketch</h2>
+        <p class="slide-subtitle">A seamless 4-step lifecycle from stock delivery to customer payment and after-sales care</p>
       </div>
       <div class="slide-meta-right">
-        Security: <span class="highlight">Scrypt + JWT HS256</span><br>
-        Protocol: <span class="highlight">TDS 7.4 / TCP 1433</span>
+        Operational Flow: <span class="highlight">Delivery to After-Sales</span><br>
+        Audit Trail: <span class="highlight">100% Traceable</span>
       </div>
     </div>
 
     <div class="slide-body">
-      <div class="arch-grid" style="width: 100%;">
-        <!-- TIER 1: FRONTEND -->
-        <div class="arch-column">
-          <div class="arch-header">
-            <span style="color: #19C3D1;">①</span> Client Browser Presentation Tier
+      <div class="flow-grid">
+        <!-- STEP 1 -->
+        <div class="flow-column">
+          <div class="flow-header">
+            <span style="color: #19C3D1;">STEP 1</span> Stock Delivery Intake
           </div>
-          <div class="arch-card">
-            <div class="arch-card-title">React 19 + TypeScript + Vite 8</div>
-            <div class="arch-card-desc">Modern single-page application compiling in ~2.3 seconds with full TypeScript type safety and zero runtime memory leaks.</div>
+          <div class="flow-card">
+            <div class="flow-card-title">Distributor Receiving</div>
+            <div class="flow-card-desc">Log deliveries from official distributors (e.g. Asus, Kingston, Dareu) with purchase batch details.</div>
           </div>
-          <div class="arch-card">
-            <div class="arch-card-title">Cyber-Industrial Glassmorphic UI</div>
-            <div class="arch-card-desc">Custom Tailwind CSS engine optimized for 1080p desktop workstations, touchscreen POS monitors, and tablet tablets.</div>
+          <div class="flow-card">
+            <div class="flow-card-title">Barcode Serial Binding</div>
+            <div class="flow-card-desc">Scan and register individual serial numbers with supplier warranty terms (e.g., 90 days, 1 year, 2 years).</div>
           </div>
-          <div class="arch-card">
-            <div class="arch-card-title">Client-Side JWT Bearer Interceptor</div>
-            <div class="arch-card-desc">Auto-attaches authorization headers to all API transactions; intercepts 401 unauthenticated signals to trigger clean session refresh.</div>
-          </div>
-        </div>
-
-        <!-- TIER 2: BACKEND & SECURITY -->
-        <div class="arch-column">
-          <div class="arch-header">
-            <span style="color: #F1C968;">②</span> Express 5 API & Security Gateway
-          </div>
-          <div class="arch-card">
-            <div class="arch-card-title">Scrypt KDF & HMAC-SHA256 Auth</div>
-            <div class="arch-card-desc">Passwords salted with 16-byte random salt and 64-byte scrypt derivation. Signed 8-hour JWT access tokens.</div>
-          </div>
-          <div class="arch-card">
-            <div class="arch-card-title">Dual-Tier Dynamic Rate Limiting</div>
-            <div class="arch-card-desc">Protects against brute-force attacks: 10 attempts / 15 min on login; 300 requests / min on general transactional routes.</div>
-          </div>
-          <div class="arch-card">
-            <div class="arch-card-title">Sanitized CORS & Strict CSP Headers</div>
-            <div class="arch-card-desc">Configured with nosniff, frame-ancestors 'none', X-Frame-Options: DENY, and 100kb payload size limit.</div>
+          <div class="flow-card">
+            <div class="flow-card-title">Warehouse Allocation</div>
+            <div class="flow-card-desc">Stock immediately marked as "In-Store & Ready to Sell" and made available to the cashiers.</div>
           </div>
         </div>
 
-        <!-- TIER 3: DATABASE -->
-        <div class="arch-column">
-          <div class="arch-header">
-            <span style="color: #34D399;">③</span> Microsoft SQL Server 2022 Tier
+        <!-- STEP 2 -->
+        <div class="flow-column">
+          <div class="flow-header">
+            <span style="color: #F1C968;">STEP 2</span> Counter POS & Quotations
           </div>
-          <div class="arch-card">
-            <div class="arch-card-title">High-Throughput Connection Pool</div>
-            <div class="arch-card-desc">Mssql pool (min: 2, max: 20 connections) maintaining sub-20ms transactional latency over persistent TCP sockets.</div>
+          <div class="flow-card">
+            <div class="flow-card-title">Instant Barcode Scan</div>
+            <div class="flow-card-desc">Press [F2] and scan product barcode. Price and specs load in under a second with zero typing mistakes.</div>
           </div>
-          <div class="arch-card">
-            <div class="arch-card-title">Non-Clustered Covering Indexes</div>
-            <div class="arch-card-desc">Optimized barcode seeking (IX_StockItems_StockSerial) delivers instantaneous O(log N) scanner lookups across 41,934 units.</div>
+          <div class="flow-card">
+            <div class="flow-card-title">Customer Linkage</div>
+            <div class="flow-card-desc">Tag sales to existing corporate accounts or walk-in customers for warranty and purchase history records.</div>
           </div>
-          <div class="arch-card">
-            <div class="arch-card-title">Automated dbo.DbBackup Stored Procedure</div>
-            <div class="arch-card-desc">Triggers full database backups into C:\DbBackup on demand, providing zero-downtime disaster recovery.</div>
+          <div class="flow-card">
+            <div class="flow-card-title">Multi-Tier Checkout</div>
+            <div class="flow-card-desc">Select Cash, Card (+4%), or In-House Financing (+15%). Prints invoice with serials and warranty dates.</div>
+          </div>
+        </div>
+
+        <!-- STEP 3 -->
+        <div class="flow-column">
+          <div class="flow-header">
+            <span style="color: #C084FC;">STEP 3</span> Service & Warranty (RMA)
+          </div>
+          <div class="flow-card">
+            <div class="flow-card-title">Quick Warranty Check</div>
+            <div class="flow-card-desc">When a customer brings in a part, scan the serial to instantly verify purchase date and warranty validity.</div>
+          </div>
+          <div class="flow-card">
+            <div class="flow-card-title">Defect Diagnostics</div>
+            <div class="flow-card-desc">Technicians record defects, print claim slips, and ship items to official distributor service centers.</div>
+          </div>
+          <div class="flow-card">
+            <div class="flow-card-title">Replacement Unit Dispatch</div>
+            <div class="flow-card-desc">Assign replacement serial numbers and notify customers when their unit is ready for counter pickup.</div>
+          </div>
+        </div>
+
+        <!-- STEP 4 -->
+        <div class="flow-column">
+          <div class="flow-header">
+            <span style="color: #34D399;">STEP 4</span> Management & Store Safety
+          </div>
+          <div class="flow-card">
+            <div class="flow-card-title">Daily Sales Monitoring</div>
+            <div class="flow-card-desc">Track real-time counter sales, top-selling product categories, and gross profit margins.</div>
+          </div>
+          <div class="flow-card">
+            <div class="flow-card-title">Smart Reordering</div>
+            <div class="flow-card-desc">See which brands and hardware categories are running low to place timely distributor reorders.</div>
+          </div>
+          <div class="flow-card">
+            <div class="flow-card-title">One-Click Data Backup</div>
+            <div class="flow-card-desc">Click "Backup Database" at the end of each day to safely preserve all store records with zero effort.</div>
           </div>
         </div>
       </div>
     </div>
 
     <div class="slide-footer">
-      <div>EFZ DAVAO COMPUTER SALES • ARCHITECTURAL SPECIFICATION</div>
+      <div>EFZ DAVAO COMPUTER SALES • OPERATIONS BLUEPRINT</div>
       <div>PAGE 03 / 12</div>
     </div>
   </section>
 
-  <!-- SLIDE 4: RBAC GOVERNANCE MATRIX -->
+  <!-- SLIDE 4: STAFF ROLES & PERMISSIONS MATRIX -->
   <section class="slide">
     <div class="slide-header">
       <div>
-        <span class="slide-badge purple">Access Governance</span>
-        <h2 class="slide-title">Role-Based Access Control (RBAC) Matrix</h2>
-        <p class="slide-subtitle">Granular permission boundaries enforcing data confidentiality between store positions</p>
+        <span class="slide-badge purple">Staff Governance</span>
+        <h2 class="slide-title">Store Staff Roles & Access Control</h2>
+        <p class="slide-subtitle">Clear operational duties for each team member while keeping confidential store records secure</p>
       </div>
       <div class="slide-meta-right">
-        Clearance Levels: <span class="highlight">4 Operational Roles</span><br>
-        Enforcement: <span class="highlight">API + UI Layer</span>
+        Team Positions: <span class="highlight">4 Staff Workstations</span><br>
+        Security: <span class="highlight">Automatic Enforcement</span>
       </div>
     </div>
 
@@ -681,8 +688,8 @@ async function main() {
       <table class="matrix-table">
         <thead>
           <tr>
-            <th>Application Module / Action</th>
-            <th>Store Manager & Admin</th>
+            <th>Store Activity / Feature</th>
+            <th>Store Manager & Owner</th>
             <th>Front-Counter Cashier</th>
             <th>Warehouse Custodian</th>
             <th>Service Center Technician</th>
@@ -690,100 +697,100 @@ async function main() {
         </thead>
         <tbody>
           <tr>
-            <td><strong>Executive Dashboard & Revenues</strong></td>
-            <td><span class="matrix-badge badge-grant">Granted (Full)</span></td>
-            <td><span class="matrix-badge badge-deny">Restricted</span></td>
-            <td><span class="matrix-badge badge-deny">Restricted</span></td>
-            <td><span class="matrix-badge badge-deny">Restricted</span></td>
+            <td><strong>Store Sales Dashboard & Daily Totals</strong></td>
+            <td><span class="matrix-badge badge-grant">Full View</span></td>
+            <td><span class="matrix-badge badge-deny">No Access</span></td>
+            <td><span class="matrix-badge badge-deny">No Access</span></td>
+            <td><span class="matrix-badge badge-deny">No Access</span></td>
           </tr>
           <tr>
-            <td><strong>POS Terminal & Customer Checkout</strong></td>
-            <td><span class="matrix-badge badge-grant">Granted</span></td>
-            <td><span class="matrix-badge badge-grant">Granted (Primary)</span></td>
-            <td><span class="matrix-badge badge-deny">Restricted</span></td>
-            <td><span class="matrix-badge badge-deny">Restricted</span></td>
+            <td><strong>POS Cashier Checkout & Billing</strong></td>
+            <td><span class="matrix-badge badge-grant">Allowed</span></td>
+            <td><span class="matrix-badge badge-grant">Primary Job</span></td>
+            <td><span class="matrix-badge badge-deny">No Access</span></td>
+            <td><span class="matrix-badge badge-deny">No Access</span></td>
           </tr>
           <tr>
-            <td><strong>Cost of Goods Sold (COGS) & Margins</strong></td>
-            <td><span class="matrix-badge badge-grant">Visible (100%)</span></td>
-            <td><span class="matrix-badge badge-mask">Masked (Hidden)</span></td>
-            <td><span class="matrix-badge badge-grant">Visible (Receiving)</span></td>
-            <td><span class="matrix-badge badge-mask">Masked (Hidden)</span></td>
+            <td><strong>Wholesale Purchase Cost & Profit Margins</strong></td>
+            <td><span class="matrix-badge badge-grant">Full Visibility</span></td>
+            <td><span class="matrix-badge badge-mask">Hidden (Protected)</span></td>
+            <td><span class="matrix-badge badge-grant">Receiving Cost</span></td>
+            <td><span class="matrix-badge badge-mask">Hidden (Protected)</span></td>
           </tr>
           <tr>
-            <td><strong>Inventory Master Catalog</strong></td>
-            <td><span class="matrix-badge badge-grant">Edit / Delete / Audit</span></td>
-            <td><span class="matrix-badge badge-grant">Read-Only (SRP)</span></td>
-            <td><span class="matrix-badge badge-grant">Inward Receiving</span></td>
+            <td><strong>Product Catalog & Stock Inquiries</strong></td>
+            <td><span class="matrix-badge badge-grant">Edit / Delete / Price</span></td>
+            <td><span class="matrix-badge badge-grant">Retail SRP Lookup</span></td>
+            <td><span class="matrix-badge badge-grant">Stock Receiving</span></td>
             <td><span class="matrix-badge badge-grant">Warranty Check Only</span></td>
           </tr>
           <tr>
-            <td><strong>Sales Invoices & Warranty Ledger</strong></td>
+            <td><strong>Customer Sales History & Invoices</strong></td>
             <td><span class="matrix-badge badge-grant">Full Ledger</span></td>
-            <td><span class="matrix-badge badge-grant">Sales & Warranty</span></td>
-            <td><span class="matrix-badge badge-deny">Restricted</span></td>
-            <td><span class="matrix-badge badge-grant">Invoice Verification</span></td>
+            <td><span class="matrix-badge badge-grant">Counter Invoices</span></td>
+            <td><span class="matrix-badge badge-deny">No Access</span></td>
+            <td><span class="matrix-badge badge-grant">Warranty Verification</span></td>
           </tr>
           <tr>
-            <td><strong>Commercial Quotation Builder</strong></td>
-            <td><span class="matrix-badge badge-grant">Create / Revise</span></td>
-            <td><span class="matrix-badge badge-grant">Create / Export</span></td>
-            <td><span class="matrix-badge badge-deny">Restricted</span></td>
-            <td><span class="matrix-badge badge-deny">Restricted</span></td>
+            <td><strong>Corporate Price Quotations</strong></td>
+            <td><span class="matrix-badge badge-grant">Approve / Adjust</span></td>
+            <td><span class="matrix-badge badge-grant">Draft & Print</span></td>
+            <td><span class="matrix-badge badge-deny">No Access</span></td>
+            <td><span class="matrix-badge badge-deny">No Access</span></td>
           </tr>
           <tr>
-            <td><strong>Supplier Procurement & Inward Logs</strong></td>
-            <td><span class="matrix-badge badge-grant">Manage All</span></td>
-            <td><span class="matrix-badge badge-deny">Restricted</span></td>
-            <td><span class="matrix-badge badge-grant">Vendor Contacts</span></td>
-            <td><span class="matrix-badge badge-deny">Restricted</span></td>
+            <td><strong>Distributor Supplier Management</strong></td>
+            <td><span class="matrix-badge badge-grant">Full Management</span></td>
+            <td><span class="matrix-badge badge-deny">No Access</span></td>
+            <td><span class="matrix-badge badge-grant">Delivery Contacts</span></td>
+            <td><span class="matrix-badge badge-deny">No Access</span></td>
           </tr>
           <tr>
-            <td><strong>Installment Accounts Receivable (AR)</strong></td>
-            <td><span class="matrix-badge badge-grant">Full Auditing</span></td>
-            <td><span class="matrix-badge badge-grant">Accept Payments</span></td>
-            <td><span class="matrix-badge badge-deny">Restricted</span></td>
-            <td><span class="matrix-badge badge-deny">Restricted</span></td>
+            <td><strong>Customer Installment Payment Collection</strong></td>
+            <td><span class="matrix-badge badge-grant">Full Audit</span></td>
+            <td><span class="matrix-badge badge-grant">Collect & Receipt</span></td>
+            <td><span class="matrix-badge badge-deny">No Access</span></td>
+            <td><span class="matrix-badge badge-deny">No Access</span></td>
           </tr>
           <tr>
-            <td><strong>RMA Warranty Diagnostics & Claims</strong></td>
+            <td><strong>Warranty Diagnostics & RMA Claims</strong></td>
             <td><span class="matrix-badge badge-grant">Full Oversight</span></td>
-            <td><span class="matrix-badge badge-deny">Restricted</span></td>
-            <td><span class="matrix-badge badge-deny">Restricted</span></td>
-            <td><span class="matrix-badge badge-grant">Intake / Diagnostics</span></td>
+            <td><span class="matrix-badge badge-deny">No Access</span></td>
+            <td><span class="matrix-badge badge-deny">No Access</span></td>
+          <td><span class="matrix-badge badge-grant">Primary Job</span></td>
           </tr>
           <tr>
-            <td><strong>SQL Server Database Backup</strong></td>
-            <td><span class="matrix-badge badge-grant">Execute dbo.DbBackup</span></td>
-            <td><span class="matrix-badge badge-deny">Restricted</span></td>
-            <td><span class="matrix-badge badge-deny">Restricted</span></td>
-            <td><span class="matrix-badge badge-deny">Restricted</span></td>
+            <td><strong>Daily Store Data Backup</strong></td>
+            <td><span class="matrix-badge badge-grant">One-Click Backup</span></td>
+            <td><span class="matrix-badge badge-deny">No Access</span></td>
+            <td><span class="matrix-badge badge-deny">No Access</span></td>
+            <td><span class="matrix-badge badge-deny">No Access</span></td>
           </tr>
         </tbody>
       </table>
 
       <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 4px;">
-        <div class="feature-card" style="padding: 6px 10px;">
-          <div style="font-size: 9px; font-weight: 800; color: #F1C968;">admin@efzdavao.ph</div>
-          <div style="font-size: 8px; color: #94A3B8;">Store Manager • Full Clearance</div>
+        <div class="feature-card" style="padding: 8px 10px;">
+          <div style="font-size: 10px; font-weight: 800; color: #F1C968;">Store Manager</div>
+          <div style="font-size: 8.5px; color: #94A3B8;">Business health, profit control, backups</div>
         </div>
-        <div class="feature-card" style="padding: 6px 10px;">
-          <div style="font-size: 9px; font-weight: 800; color: #19C3D1;">cashier@efzdavao.ph</div>
-          <div style="font-size: 8px; color: #94A3B8;">Front Sales • POS Register</div>
+        <div class="feature-card" style="padding: 8px 10px;">
+          <div style="font-size: 10px; font-weight: 800; color: #19C3D1;">Front Cashier</div>
+          <div style="font-size: 8.5px; color: #94A3B8;">Fast sales checkout, quotes, installments</div>
         </div>
-        <div class="feature-card" style="padding: 6px 10px;">
-          <div style="font-size: 9px; font-weight: 800; color: #38BDF8;">inventory@efzdavao.ph</div>
-          <div style="font-size: 8px; color: #94A3B8;">Warehouse • Stock Receiving</div>
+        <div class="feature-card" style="padding: 8px 10px;">
+          <div style="font-size: 10px; font-weight: 800; color: #38BDF8;">Warehouse Custodian</div>
+          <div style="font-size: 8.5px; color: #94A3B8;">Stock receiving, serial tagging, audits</div>
         </div>
-        <div class="feature-card" style="padding: 6px 10px;">
-          <div style="font-size: 9px; font-weight: 800; color: #C084FC;">technician@efzdavao.ph</div>
-          <div style="font-size: 8px; color: #94A3B8;">RMA Tech • Diagnostics Bench</div>
+        <div class="feature-card" style="padding: 8px 10px;">
+          <div style="font-size: 10px; font-weight: 800; color: #C084FC;">Service Technician</div>
+          <div style="font-size: 8.5px; color: #94A3B8;">Defect testing, warranty claims, returns</div>
         </div>
       </div>
     </div>
 
     <div class="slide-footer">
-      <div>EFZ DAVAO COMPUTER SALES • SECURITY GOVERNANCE SPECIFICATION</div>
+      <div>EFZ DAVAO COMPUTER SALES • STAFF GOVERNANCE SPECIFICATION</div>
       <div>PAGE 04 / 12</div>
     </div>
   </section>
@@ -792,13 +799,13 @@ async function main() {
   <section class="slide">
     <div class="slide-header">
       <div>
-        <span class="slide-badge">Workstation Gateway</span>
-        <h2 class="slide-title">Terminal Sign-In & Security Barrier</h2>
-        <p class="slide-subtitle">Cyberpunk entrance portal with presentation launch presets and unauthorized route blocking</p>
+        <span class="slide-badge">Store Sign-In</span>
+        <h2 class="slide-title">Terminal Sign-In & Staff Workstations</h2>
+        <p class="slide-subtitle">Simple, secure sign-in for counter staff with automatic role selection and screen protection</p>
       </div>
       <div class="slide-meta-right">
-        Station: <span class="highlight">All Terminal Nodes</span><br>
-        Session: <span class="highlight">8-Hour Sliding Expiry</span>
+        Station: <span class="highlight">All Store Computers</span><br>
+        Feature: <span class="highlight">One-Click Staff Presets</span>
       </div>
     </div>
 
@@ -808,7 +815,7 @@ async function main() {
           <div class="toolbar-dot dot-red"></div>
           <div class="toolbar-dot dot-yellow"></div>
           <div class="toolbar-dot dot-green"></div>
-          <div class="toolbar-title">http://localhost:3000/login — Operator Authentication</div>
+          <div class="toolbar-title">Terminal Sign-In — Store Operator Gateway</div>
         </div>
         <div class="screenshot-img-box">
           <img src="${imgLogin}" alt="Operator Login Terminal">
@@ -817,30 +824,30 @@ async function main() {
 
       <div class="info-panel">
         <div class="feature-card gold-border">
-          <div class="card-title">🔐 Enterprise Operator Gateway</div>
+          <div class="card-title">👤 Dedicated Staff Accounts</div>
           <div class="card-desc">
-            Equipped with <strong>brand identity motion graphics</strong>, fast operator quick-selection pills, secure password masking, and scrypt cryptographic validation.
+            Every staff member signs in with their assigned account. The system immediately opens their dedicated screen (Cashiers see the POS register, Technicians see RMA tickets).
           </div>
         </div>
 
         <div class="feature-card cyan-border">
-          <div class="card-title">⚡ One-Click Presentation Mode</div>
+          <div class="card-title">⚡ Fast One-Click Role Selection</div>
           <div class="card-desc">
-            Enables store demonstrators and executives to swiftly transition between operator profiles (Cashier, Warehouse, Technician, Admin) during stakeholder reviews.
+            Quick-fill buttons allow staff to log into Cashier, Warehouse, Technician, or Manager mode in seconds without complex typing.
           </div>
         </div>
 
         <div class="feature-card purple-border">
-          <div class="card-title">🚫 Zero-Bypass Navigation Guard</div>
+          <div class="card-title">🚫 Automatic Permission Guard</div>
           <div class="card-desc">
-            Direct URL manipulations or prohibited module accesses trigger an automated <strong>Access Restricted Barrier</strong> that displays required entity clearances and guides operators back to their assigned home workspace.
+            If a cashier attempts to access management reports, confidential margins, or backup tools, the system displays a clear <strong>"Access Restricted"</strong> screen and returns them to their sales counter.
           </div>
         </div>
       </div>
     </div>
 
     <div class="slide-footer">
-      <div>EFZ DAVAO COMPUTER SALES • AUTHENTICATION WORKSTATION</div>
+      <div>EFZ DAVAO COMPUTER SALES • TERMINAL SIGN-IN WORKSTATION</div>
       <div>PAGE 05 / 12</div>
     </div>
   </section>
@@ -849,13 +856,13 @@ async function main() {
   <section class="slide">
     <div class="slide-header">
       <div>
-        <span class="slide-badge">Store Manager Clearance</span>
+        <span class="slide-badge">Store Manager View</span>
         <h2 class="slide-title">Executive Operations Dashboard</h2>
-        <p class="slide-subtitle">Live high-level financial intelligence, retail asset valuation, and hardware distribution</p>
+        <p class="slide-subtitle">Live sales totals, active inventory value, and product category breakdown at a single glance</p>
       </div>
       <div class="slide-meta-right">
-        Operator: <span class="highlight">Francis Zaragosa</span><br>
-        Role: <span class="highlight">Store Manager & Admin</span>
+        Clearance: <span class="highlight">Store Manager</span><br>
+        Data: <span class="highlight">Live Store Figures</span>
       </div>
     </div>
 
@@ -865,7 +872,7 @@ async function main() {
           <div class="toolbar-dot dot-red"></div>
           <div class="toolbar-dot dot-yellow"></div>
           <div class="toolbar-dot dot-green"></div>
-          <div class="toolbar-title">Dashboard — Live SQL Server Executive Overview</div>
+          <div class="toolbar-title">Executive Dashboard — Real-Time Store Intelligence</div>
         </div>
         <div class="screenshot-img-box">
           <img src="${imgDashboard}" alt="Executive Dashboard">
@@ -874,30 +881,30 @@ async function main() {
 
       <div class="info-panel">
         <div class="feature-card gold-border">
-          <div class="card-title">📈 Real-Time Revenue Aggregation</div>
+          <div class="card-title">💰 Live Total Sales Revenue</div>
           <div class="card-desc">
-            Displays cumulative gross sales (<strong>₱211,782,950.25</strong> across 12,718 invoices) calculated instantly via optimized SQL aggregate expressions.
+            Instantly view cumulative store sales (<strong>₱211,782,950.25</strong> across 12,718 completed counter orders) without waiting for manual bookkeeping.
           </div>
         </div>
 
         <div class="feature-card cyan-border">
-          <div class="card-title">📦 Active Sellable Asset Valuation</div>
+          <div class="card-title">📦 Total Sellable Stock Valuation</div>
           <div class="card-desc">
-            Monitors <strong>3,498 active sellable units</strong> totaling <strong>₱15,656,043.00</strong> in retail SRP, distinguishing active stock from liquidated orders.
+            Know your exact store asset value at all times: currently <strong>3,498 ready-to-sell units</strong> worth <strong>₱15,656,043.00</strong> in retail inventory.
           </div>
         </div>
 
         <div class="feature-card purple-border">
-          <div class="card-title">🏷️ Hardware Category Concentration</div>
+          <div class="card-title">🏷️ Product Category Distribution</div>
           <div class="card-desc">
-            Visual breakdown of inventory across <strong>Accessories, RAM, Cases, Monitors, SSDs, and Laptops</strong> to assist in proactive procurement decisions.
+            Clear visual charts show stock balance across <strong>RAM, Graphics Cards, Monitors, Accessories, and Laptops</strong> to guide profitable purchasing.
           </div>
         </div>
       </div>
     </div>
 
     <div class="slide-footer">
-      <div>EFZ DAVAO COMPUTER SALES • EXECUTIVE OPERATIONS DASHBOARD</div>
+      <div>EFZ DAVAO COMPUTER SALES • STORE MANAGER DASHBOARD</div>
       <div>PAGE 06 / 12</div>
     </div>
   </section>
@@ -906,13 +913,13 @@ async function main() {
   <section class="slide">
     <div class="slide-header">
       <div>
-        <span class="slide-badge">Store Manager Clearance</span>
-        <h2 class="slide-title">COGS Margin Governance & SQL Backup</h2>
-        <p class="slide-subtitle">Complete supplier cost visibility, margin calculation, and automated disaster recovery</p>
+        <span class="slide-badge">Store Manager View</span>
+        <h2 class="slide-title">Profit Margin Control & One-Click Backup</h2>
+        <p class="slide-subtitle">Track wholesale purchase costs against selling prices, and protect all store records effortlessly</p>
       </div>
       <div class="slide-meta-right">
-        Target DB: <span class="highlight">EFZApp.bak</span><br>
-        Routine: <span class="highlight">dbo.DbBackup</span>
+        Security: <span class="highlight">Margins Protected</span><br>
+        Backup: <span class="highlight">Instant One-Click</span>
       </div>
     </div>
 
@@ -922,7 +929,7 @@ async function main() {
           <div class="toolbar-dot dot-red"></div>
           <div class="toolbar-dot dot-yellow"></div>
           <div class="toolbar-dot dot-green"></div>
-          <div class="toolbar-title">Stock Catalog — COGS Margins & Backup Routine</div>
+          <div class="toolbar-title">Stock Catalog — Profit Margins & Automatic Backup</div>
         </div>
         <div class="screenshot-img-box">
           <img src="${imgAdminInv}" alt="Admin Stock Catalog">
@@ -931,30 +938,30 @@ async function main() {
 
       <div class="info-panel">
         <div class="feature-card gold-border">
-          <div class="card-title">💰 Profit Margin & Cost Governance</div>
+          <div class="card-title">📈 Confidential Profit Margins</div>
           <div class="card-desc">
-            Administrators have exclusive visibility into <strong>Unit Cost (COGS)</strong> and <strong>Gross Margin %</strong> per hardware asset, enabling disciplined pricing negotiations.
+            Store Managers see exact <strong>Wholesale Supplier Cost</strong> and <strong>Gross Margin %</strong> for every unit, ensuring every sale and quotation remains profitable.
           </div>
         </div>
 
         <div class="feature-card cyan-border">
-          <div class="card-title">🔍 Multi-Field Inventory Search</div>
+          <div class="card-title">🔍 Fast Product & Serial Search</div>
           <div class="card-desc">
-            Real-time filter bar searches serial barcodes, product descriptions, categories, and distributors with instantaneous sub-millisecond responsiveness.
+            Instantly search by product name, model specs, serial barcode, or distributor brand to answer customer questions in seconds.
           </div>
         </div>
 
-        <div class="feature-card purple-border">
-          <div class="card-title">💾 One-Click Database Backup Modal</div>
+        <div class="feature-card green-border">
+          <div class="card-title">💾 One-Click Store Data Backup</div>
           <div class="card-desc">
-            Directly executes <code>dbo.DbBackup</code> on Microsoft SQL Server, creating compressed timestamped backups to prevent data loss.
+            Click <strong>"Database Backup"</strong> at the end of each business day. It creates a safe, compressed copy of all sales, customer records, and inventory history to safeguard against power failures or computer breakdown.
           </div>
         </div>
       </div>
     </div>
 
     <div class="slide-footer">
-      <div>EFZ DAVAO COMPUTER SALES • COGS & DATABASE GOVERNANCE</div>
+      <div>EFZ DAVAO COMPUTER SALES • PROFIT & DATA GOVERNANCE</div>
       <div>PAGE 07 / 12</div>
     </div>
   </section>
@@ -964,12 +971,12 @@ async function main() {
     <div class="slide-header">
       <div>
         <span class="slide-badge cyan">Front-Counter Sales</span>
-        <h2 class="slide-title">POS Register & Barcode Checkout</h2>
-        <p class="slide-subtitle">High-throughput serialized cashier terminal with hardware barcode scanner integration</p>
+        <h2 class="slide-title">Fast POS Register & Barcode Checkout</h2>
+        <p class="slide-subtitle">Built for counter speed: scan barcodes, select payment, and issue sales invoices in seconds</p>
       </div>
       <div class="slide-meta-right">
-        Operator: <span class="highlight">Maria Elena Santos</span><br>
-        Workstation: <span class="highlight">POS-COUNTER-01</span>
+        Station: <span class="highlight">POS-COUNTER-01</span><br>
+        Speed Key: <span class="highlight">[F2] Instant Scan</span>
       </div>
     </div>
 
@@ -979,7 +986,7 @@ async function main() {
           <div class="toolbar-dot dot-red"></div>
           <div class="toolbar-dot dot-yellow"></div>
           <div class="toolbar-dot dot-green"></div>
-          <div class="toolbar-title">POS Register — High-Speed Hardware Checkout</div>
+          <div class="toolbar-title">POS Register — Counter Checkout Terminal</div>
         </div>
         <div class="screenshot-img-box">
           <img src="${imgCashierPos}" alt="Cashier POS Register">
@@ -988,30 +995,30 @@ async function main() {
 
       <div class="info-panel">
         <div class="feature-card cyan-border">
-          <div class="card-title">⚡ Barcode Scanner F2 Focus Listener</div>
+          <div class="card-title">⚡ Instant Barcode Scanning [F2]</div>
           <div class="card-desc">
-            Pressing <code>[F2]</code> from anywhere on the counter immediately focuses the serial scanner input, allowing instant hardware unit capture during peak checkout rushes.
+            Cashiers simply press <code>[F2]</code> on the keyboard and scan the barcode scanner. Products enter the cart immediately without clicking the mouse.
           </div>
         </div>
 
         <div class="feature-card gold-border">
-          <div class="card-title">💳 Real-Time Payment Tier Calculation</div>
+          <div class="card-title">💳 Flexible Customer Payment Tiers</div>
           <div class="card-desc">
-            Cashiers can switch payment schedules with a single click: <strong>Spot Cash</strong>, <strong>3-Mo Credit Card (+4% MDR)</strong>, or <strong>12-Mo Financing (+15% APR)</strong> with live change calculation.
+            Select payment with one click: <strong>Spot Cash</strong>, <strong>3-Month Credit Card (+4% fee)</strong>, or <strong>12-Month In-House Financing (+15%)</strong>. Exact change is calculated on screen.
           </div>
         </div>
 
         <div class="feature-card purple-border">
-          <div class="card-title">👤 Customer Linkage & Direct Billing</div>
+          <div class="card-title">🧾 Serialized Warranty Invoices</div>
           <div class="card-desc">
-            Connects sales to any of the 8,411 commercial accounts or direct retail walk-ins, printing official serialized warranty tax invoices.
+            Every printed sales receipt lists the customer name and exact product serial numbers, serving as an official warranty certificate for after-sales claims.
           </div>
         </div>
       </div>
     </div>
 
     <div class="slide-footer">
-      <div>EFZ DAVAO COMPUTER SALES • POINT OF SALE TERMINAL</div>
+      <div>EFZ DAVAO COMPUTER SALES • POINT OF SALE REGISTER</div>
       <div>PAGE 08 / 12</div>
     </div>
   </section>
@@ -1021,12 +1028,12 @@ async function main() {
     <div class="slide-header">
       <div>
         <span class="slide-badge cyan">Front-Counter Sales</span>
-        <h2 class="slide-title">Quotation Builder & Masked Catalog</h2>
-        <p class="slide-subtitle">Generating corporate price proposals and browsing retail catalog with cost protection</p>
+        <h2 class="slide-title">Corporate Quotations & Protected Catalog</h2>
+        <p class="slide-subtitle">Generate professional corporate price proposals while keeping wholesale costs masked</p>
       </div>
       <div class="slide-meta-right">
-        Security: <span class="highlight">COGS Masked</span><br>
-        Client Index: <span class="highlight">8,411 Accounts</span>
+        Pricing: <span class="highlight">Retail SRP Only</span><br>
+        Clients: <span class="highlight">8,411 Accounts</span>
       </div>
     </div>
 
@@ -1036,7 +1043,7 @@ async function main() {
           <div class="toolbar-dot dot-red"></div>
           <div class="toolbar-dot dot-yellow"></div>
           <div class="toolbar-dot dot-green"></div>
-          <div class="toolbar-title">Quotations — Commercial Price Quotation Generator</div>
+          <div class="toolbar-title">Quotations — Formal Price Quotation Builder</div>
         </div>
         <div class="screenshot-img-box">
           <img src="${imgCashierQuote}" alt="Quotation Builder">
@@ -1045,23 +1052,23 @@ async function main() {
 
       <div class="info-panel">
         <div class="feature-card cyan-border">
-          <div class="card-title">📝 Rapid Corporate Proposal Generation</div>
+          <div class="card-title">📝 Corporate Quotations in Minutes</div>
           <div class="card-desc">
-            Draft formal price quotations for schools, corporate IT departments, and gaming cafes. Automatically applies quantity discounts and saves quote headers to <code>dbo.QuotationItemHeader</code>.
+            Quickly draft official price quotations for bulk buyers (schools, BPOs, internet cafes, government agencies). Automatically calculates 3-tier financing comparisons.
           </div>
         </div>
 
         <div class="feature-card gold-border">
-          <div class="card-title">🔍 Quick Client Search & Picker</div>
+          <div class="card-title">🔍 Instant Client Picker (8,400+ Clients)</div>
           <div class="card-desc">
-            Instant filter toolbar enables cashiers to search across 8,400+ client accounts by company, contact person, or phone number without lag.
+            Cashiers can search across 8,400+ corporate clients by company name, contact person, or phone number with instant dropdown auto-complete.
           </div>
         </div>
 
         <div class="feature-card purple-border">
-          <div class="card-title">🛡️ Data Masking in Inventory View</div>
+          <div class="card-title">🛡️ Protected Retail Inventory View</div>
           <div class="card-desc">
-            In the Stock Catalog view, cashier terminals display only <strong>Selling Price (SRP)</strong>. Supplier purchasing costs and gross margin percentages are automatically stripped at the API boundary.
+            When browsing the stock catalog, cashiers only see customer retail prices (SRP). Wholesale supplier costs are completely invisible on front-counter screens.
           </div>
         </div>
       </div>
@@ -1077,13 +1084,13 @@ async function main() {
   <section class="slide">
     <div class="slide-header">
       <div>
-        <span class="slide-badge" style="background: rgba(56, 189, 248, 0.12); border-color: rgba(56, 189, 248, 0.3); color: #38BDF8;">Supply Chain Clearance</span>
-        <h2 class="slide-title">Warehouse Receiving & Valuation Audit</h2>
-        <p class="slide-subtitle">Inward stock intake, supplier relationship management, and movement ledger auditing</p>
+        <span class="slide-badge" style="background: rgba(56, 189, 248, 0.12); border-color: rgba(56, 189, 248, 0.3); color: #38BDF8;">Warehouse Operations</span>
+        <h2 class="slide-title">Stock Receiving & Inventory Auditing</h2>
+        <p class="slide-subtitle">Tracking deliveries from 62 distributors, tagging warranty periods, and verifying stock movement</p>
       </div>
       <div class="slide-meta-right">
-        Operator: <span class="highlight">Danilo Cruz</span><br>
-        Workstation: <span class="highlight">WAR-TERM-01</span>
+        Station: <span class="highlight">WAR-TERM-01</span><br>
+        Suppliers: <span class="highlight">62 Partner Brands</span>
       </div>
     </div>
 
@@ -1093,7 +1100,7 @@ async function main() {
           <div class="toolbar-dot dot-red"></div>
           <div class="toolbar-dot dot-yellow"></div>
           <div class="toolbar-dot dot-green"></div>
-          <div class="toolbar-title">Stock Valuation — Inventory Audit & Movement Ledger</div>
+          <div class="toolbar-title">Stock Valuation — Inventory Audit & Sourcing Ledger</div>
         </div>
         <div class="screenshot-img-box">
           <img src="${imgWarehouseAudit}" alt="Stock Valuation Audit">
@@ -1102,30 +1109,30 @@ async function main() {
 
       <div class="info-panel">
         <div class="feature-card cyan-border">
-          <div class="card-title">📥 Serialized Inward Hardware Intake</div>
+          <div class="card-title">📥 Serialized Stock Intake</div>
           <div class="card-desc">
-            Warehouse specialists log distributor delivery batches, validating manufacturer warranty terms (e.g. 365d, 730d) and binding unit barcodes to supplier purchase orders.
+            Warehouse staff log distributor delivery boxes, scan manufacturer barcodes, and record official warranty periods (e.g. 90 days, 1 year, 2 years).
           </div>
         </div>
 
         <div class="feature-card gold-border">
-          <div class="card-title">🚚 Supplier Procurement Exposure</div>
+          <div class="card-title">🚚 Distributor Sourcing Overview</div>
           <div class="card-desc">
-            Audits inventory investment across all <strong>62 registered suppliers</strong> (e.g., IONTECH, UBERTECH, DAREU) to pinpoint active stock concentration and optimize reordering cycles.
+            Shows how much stock you hold from each of your <strong>62 distributors</strong> (e.g. IONTECH, UBERTECH, DAREU) to help negotiate volume discounts and rebates.
           </div>
         </div>
 
         <div class="feature-card purple-border">
-          <div class="card-title">📜 Dual Movement Audit Ledger</div>
+          <div class="card-title">📜 Inbound vs. Outbound Movement Logs</div>
           <div class="card-desc">
-            Filters historical movements between <strong>Inbound (Stored)</strong> receiving and <strong>Outbound (Sold)</strong> POS liquidations for precise stock reconciliation.
+            Audit exactly when units were received from suppliers and when they were sold at the cashier, making physical stock counts fast and accurate.
           </div>
         </div>
       </div>
     </div>
 
     <div class="slide-footer">
-      <div>EFZ DAVAO COMPUTER SALES • WAREHOUSE & LOGISTICS OPERATIONS</div>
+      <div>EFZ DAVAO COMPUTER SALES • WAREHOUSE OPERATIONS</div>
       <div>PAGE 10 / 12</div>
     </div>
   </section>
@@ -1134,13 +1141,13 @@ async function main() {
   <section class="slide">
     <div class="slide-header">
       <div>
-        <span class="slide-badge purple">Service Center Clearance</span>
-        <h2 class="slide-title">RMA Diagnostics & Warranty Claims</h2>
-        <p class="slide-subtitle">End-to-end defect inspection, distributor RMA tracking, and replacement serial dispatch</p>
+        <span class="slide-badge purple">Service Center Care</span>
+        <h2 class="slide-title">RMA Warranty Claims & Defect Diagnostics</h2>
+        <p class="slide-subtitle">Professional defect testing, distributor warranty claims, and fast replacement turnaround</p>
       </div>
       <div class="slide-meta-right">
-        Operator: <span class="highlight">Kenneth Bautista</span><br>
-        Workstation: <span class="highlight">RMA-BENCH-01</span>
+        Station: <span class="highlight">RMA-BENCH-01</span><br>
+        Workflow: <span class="highlight">5-Stage Pipeline</span>
       </div>
     </div>
 
@@ -1159,68 +1166,68 @@ async function main() {
 
       <div class="info-panel">
         <div class="feature-card purple-border">
-          <div class="card-title">🔬 5-Stage Warranty Lifecycle Pipeline</div>
+          <div class="card-title">🔬 Clear 5-Stage Warranty Status</div>
           <div class="card-desc">
-            Tracks RMA tickets across stages: <strong>Pending Inspection</strong> → <strong>In Distributor Diagnostic</strong> → <strong>Replacement Inbound</strong> → <strong>Replacement Ready</strong> → <strong>Resolved & Released</strong>.
+            Track claims step-by-step: <strong>Pending Inspection</strong> → <strong>In Distributor Diagnostic</strong> → <strong>Replacement Inbound</strong> → <strong>Replacement Ready</strong> → <strong>Resolved & Released</strong>.
           </div>
         </div>
 
         <div class="feature-card cyan-border">
-          <div class="card-title">🔍 Instant Sales Ledger Warranty Check</div>
+          <div class="card-title">🔍 Instant Invoice & Warranty Verification</div>
           <div class="card-desc">
-            Technicians can instantly cross-examine customer invoices in the Sales Ledger to verify exact purchase dates, distributor warranty validity, and invoice numbers.
+            When a customer returns a defective component, technicians verify the exact purchase date and warranty coverage in seconds using the sales history.
           </div>
         </div>
 
         <div class="feature-card gold-border">
-          <div class="card-title">🔄 Replacement Serial Number Binding</div>
+          <div class="card-title">🔄 Replacement Barcode Assignment</div>
           <div class="card-desc">
-            When distributors dispatch a replacement unit, technicians link the new barcode serial directly to the ticket, preserving flawless audit trails.
+            When the distributor delivers a replacement unit, technicians link the new serial barcode directly to the ticket, giving the customer an updated warranty record.
           </div>
         </div>
       </div>
     </div>
 
     <div class="slide-footer">
-      <div>EFZ DAVAO COMPUTER SALES • SERVICE CENTER & DIAGNOSTICS</div>
+      <div>EFZ DAVAO COMPUTER SALES • SERVICE CENTER & WARRANTY CARE</div>
       <div>PAGE 11 / 12</div>
     </div>
   </section>
 
-  <!-- SLIDE 12: DATABASE ENGINE & PRODUCTION READINESS -->
+  <!-- SLIDE 12: BUSINESS BENEFITS SUMMARY & READINESS -->
   <section class="slide">
     <div class="slide-header">
       <div>
-        <span class="slide-badge">Technical Governance</span>
-        <h2 class="slide-title">Database Engine & Production Sign-Off</h2>
-        <p class="slide-subtitle">Enterprise SQL Server reliability, verified stored procedures, and operational readiness</p>
+        <span class="slide-badge">Store Value Summary</span>
+        <h2 class="slide-title">Business Advantages & Operational Readiness</h2>
+        <p class="slide-subtitle">Transforming store efficiency, protecting profits, and delivering exceptional customer service</p>
       </div>
       <div class="slide-meta-right">
-        Engine: <span class="highlight">MS SQL Server 2022</span><br>
-        Build Status: <span class="highlight">Passing 100%</span>
+        Commercial Status: <span class="highlight">Production Ready</span><br>
+        Store Efficiency: <span class="highlight">Maximum</span>
       </div>
     </div>
 
     <div class="slide-body">
       <div class="info-panel" style="flex: 1.1;">
         <div class="feature-card gold-border">
-          <div class="card-title">🗄️ Microsoft SQL Server 2022 Verified</div>
+          <div class="card-title">🛡️ Total Inventory Accountability</div>
           <div class="card-desc">
-            Connected to <code>EFZApp</code> on <code>LAPTOP-N6BLB75S:1433</code>. The database hosts <strong>11 base operational tables</strong>, including newly deployed <code>dbo.InstallmentPlans</code>, <code>dbo.InstallmentPayments</code>, and <code>dbo.RmaTickets</code>.
+            Serialized barcode tracking ensures 100% visibility over every computer component. You will never lose track of expensive graphics cards, processors, or laptops.
           </div>
         </div>
 
         <div class="feature-card cyan-border">
-          <div class="card-title">⚙️ Preserved Legacy Stored Procedures</div>
+          <div class="card-title">💰 Confidential Profit Protection</div>
           <div class="card-desc">
-            All <strong>62 legacy stored procedures</strong> (including <code>dbo.DbBackup</code>, <code>spStockItems_*</code>, <code>spOrderItems_*</code>, and <code>spCustomerDetails_*</code>) remain fully operational and compatible.
+            Strict role boundaries keep your supplier purchase costs confidential. Cashiers focus on closing sales and customer service without seeing your margins.
           </div>
         </div>
 
         <div class="feature-card purple-border">
-          <div class="card-title">⚡ High-Impact Non-Clustered Indexes</div>
+          <div class="card-title">📈 Accelerated Sales Growth</div>
           <div class="card-desc">
-            Covering index on <code>StockSerial</code> provides O(log N) fast seeks for POS scanners and RMA intakes, ensuring sub-20ms query performance at scale.
+            Offer flexible payment plans (Spot Cash, Credit Card, 12-Month Financing) and instant corporate quotations to convert more walk-ins into repeat business clients.
           </div>
         </div>
       </div>
@@ -1228,24 +1235,23 @@ async function main() {
       <div class="info-panel" style="flex: 0.9;">
         <div class="feature-card" style="height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
           <div>
-            <div class="card-title" style="color: #10B981; font-size: 13px;">✅ Production Readiness Checklist</div>
-            <div class="card-desc" style="margin-top: 6px; line-height: 1.6;">
-              ✔ Database Connection Pool Active (20 max)<br>
-              ✔ JWT Bearer Authentication Configured<br>
-              ✔ Scrypt Operator Credential Hashes Provisioned<br>
-              ✔ Health Check & Reverse Proxy Verified<br>
-              ✔ TypeScript & Vite Build: 0 Errors<br>
-              ✔ Multi-Field Search Toolbars on All 11 Pages<br>
-              ✔ Clean Git Working Tree (origin/main)
+            <div class="card-title" style="color: #10B981; font-size: 13px;">✅ Ready for Daily Store Operations</div>
+            <div class="card-desc" style="margin-top: 8px; line-height: 1.7; font-size: 10.5px;">
+              ✔ Fast Barcode Scanner Integration<br>
+              ✔ Clear Roles for Store Manager, Cashier, Warehouse & RMA<br>
+              ✔ Professional Invoices with Warranty Dates<br>
+              ✔ 8,400+ Existing Customers Connected<br>
+              ✔ 41,900+ Hardware Units Ready for Checkout<br>
+              ✔ One-Click Daily Data Backup Built-In
             </div>
           </div>
 
-          <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 10px; text-align: center;">
-            <div style="font-size: 11px; font-weight: 800; color: #34D399; text-transform: uppercase;">
-              SYSTEM FULLY OPERATIONAL
+          <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 8px; padding: 12px; text-align: center;">
+            <div style="font-size: 12px; font-weight: 800; color: #34D399; text-transform: uppercase;">
+              SYSTEM READY FOR STORE LAUNCH
             </div>
-            <div style="font-size: 8.5px; color: #94A3B8; margin-top: 2px;">
-              Ready for immediate commercial deployment and client presentation.
+            <div style="font-size: 9px; color: #94A3B8; margin-top: 3px;">
+              Empowering your sales team, warehouse, and service center from day one.
             </div>
           </div>
         </div>
@@ -1253,7 +1259,7 @@ async function main() {
     </div>
 
     <div class="slide-footer">
-      <div>EFZ DAVAO COMPUTER SALES • CLIENT PRESENTATION DECK</div>
+      <div>EFZ DAVAO COMPUTER SALES • COMMERCIAL PRESENTATION DECK</div>
       <div>PAGE 12 / 12</div>
     </div>
   </section>
@@ -1262,10 +1268,10 @@ async function main() {
 </html>
 `;
 
-  // Write temporary presentation HTML
+  // Write presentation HTML
   const htmlPath = path.resolve('./presentation_assets/presentation.html');
   fs.writeFileSync(htmlPath, htmlContent, 'utf8');
-  console.log('Presentation HTML saved:', htmlPath);
+  console.log('Business presentation HTML saved:', htmlPath);
 
   // Launch Chrome to generate PDF
   console.log('Launching Chrome to render presentation PDF...');
