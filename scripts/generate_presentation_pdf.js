@@ -26,6 +26,7 @@ async function main() {
   const imgAdminInv = toBase64('03_admin_inventory.png');
   const imgCashierPos = toBase64('12_cashier_pos_terminal.png');
   const imgCashierQuote = toBase64('14_cashier_quotation_builder.png');
+  const imgAdminInst = toBase64('09_admin_installments.png');
   const imgWarehouseAudit = toBase64('16_warehouse_audit_movement.png');
   const imgTechRma = toBase64('18_technician_rma_claims.png');
 
@@ -566,7 +567,7 @@ async function main() {
 
     <div class="slide-footer">
       <div>EFZ DAVAO COMPUTER SALES • STORE OPERATIONS GUIDE</div>
-      <div>PAGE 02 / 12</div>
+      <div>PAGE 02 / 13</div>
     </div>
   </section>
 
@@ -666,7 +667,7 @@ async function main() {
 
     <div class="slide-footer">
       <div>EFZ DAVAO COMPUTER SALES • OPERATIONS BLUEPRINT</div>
-      <div>PAGE 03 / 12</div>
+      <div>PAGE 03 / 13</div>
     </div>
   </section>
 
@@ -791,7 +792,7 @@ async function main() {
 
     <div class="slide-footer">
       <div>EFZ DAVAO COMPUTER SALES • STAFF GOVERNANCE SPECIFICATION</div>
-      <div>PAGE 04 / 12</div>
+      <div>PAGE 04 / 13</div>
     </div>
   </section>
 
@@ -848,7 +849,7 @@ async function main() {
 
     <div class="slide-footer">
       <div>EFZ DAVAO COMPUTER SALES • TERMINAL SIGN-IN WORKSTATION</div>
-      <div>PAGE 05 / 12</div>
+      <div>PAGE 05 / 13</div>
     </div>
   </section>
 
@@ -905,7 +906,7 @@ async function main() {
 
     <div class="slide-footer">
       <div>EFZ DAVAO COMPUTER SALES • STORE MANAGER DASHBOARD</div>
-      <div>PAGE 06 / 12</div>
+      <div>PAGE 06 / 13</div>
     </div>
   </section>
 
@@ -962,7 +963,7 @@ async function main() {
 
     <div class="slide-footer">
       <div>EFZ DAVAO COMPUTER SALES • PROFIT & DATA GOVERNANCE</div>
-      <div>PAGE 07 / 12</div>
+      <div>PAGE 07 / 13</div>
     </div>
   </section>
 
@@ -1019,7 +1020,7 @@ async function main() {
 
     <div class="slide-footer">
       <div>EFZ DAVAO COMPUTER SALES • POINT OF SALE REGISTER</div>
-      <div>PAGE 08 / 12</div>
+      <div>PAGE 08 / 13</div>
     </div>
   </section>
 
@@ -1076,11 +1077,68 @@ async function main() {
 
     <div class="slide-footer">
       <div>EFZ DAVAO COMPUTER SALES • COMMERCIAL CRM & QUOTATIONS</div>
-      <div>PAGE 09 / 12</div>
+      <div>PAGE 09 / 13</div>
     </div>
   </section>
 
-  <!-- SLIDE 10: WAREHOUSE & INVENTORY VALUATION -->
+  <!-- SLIDE 10: COMMERCIAL FINANCING & INSTALLMENT AR -->
+  <section class="slide">
+    <div class="slide-header">
+      <div>
+        <span class="slide-badge cyan">Commercial Financing</span>
+        <h2 class="slide-title">Installment Accounts Receivable & Amortization</h2>
+        <p class="slide-subtitle">Automated monthly amortization schedules, customer payment collections, and aging balance tracking</p>
+      </div>
+      <div class="slide-meta-right">
+        Financing Terms: <span class="highlight">3-Mo &amp; 12-Mo Plans</span><br>
+        AR Tracking: <span class="highlight">Automated Maturity</span>
+      </div>
+    </div>
+
+    <div class="slide-body">
+      <div class="screenshot-frame">
+        <div class="screenshot-toolbar">
+          <div class="toolbar-dot dot-red"></div>
+          <div class="toolbar-dot dot-yellow"></div>
+          <div class="toolbar-dot dot-green"></div>
+          <div class="toolbar-title">Installment AR — Customer Amortization &amp; Collections Ledger</div>
+        </div>
+        <div class="screenshot-img-box">
+          <img src="${imgAdminInst}" alt="Installment AR Ledger">
+        </div>
+      </div>
+
+      <div class="info-panel">
+        <div class="feature-card cyan-border">
+          <div class="card-title">📈 Boost High-Value PC Sales Conversion</div>
+          <div class="card-desc">
+            Allow walk-ins and corporate clients to purchase high-end gaming rigs, laptops, and workstations with structured <strong>3-Month (4% card fee)</strong> or <strong>12-Month In-House Financing (+15% APR)</strong>, dramatically raising average ticket size.
+          </div>
+        </div>
+
+        <div class="feature-card gold-border">
+          <div class="card-title">📅 Live Amortization &amp; Due Date Schedules</div>
+          <div class="card-desc">
+            Automated ledger tracks exact monthly dues (e.g. <strong>₱3,916.47/mo</strong>), payment progress (<strong>4/12 paid</strong>), maturity dates, and remaining balances (<strong>₱31,331.72</strong>) with zero manual calculations.
+          </div>
+        </div>
+
+        <div class="feature-card green-border">
+          <div class="card-title">💳 Front-Counter Collections &amp; Status Alerts</div>
+          <div class="card-desc">
+            Cashiers collect monthly installments directly at the counter with one-click payment logging. Visual status badges (<strong>Current, Settled, Delinquent</strong>) ensure overdue balances are immediately flagged for prompt collection.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <div>EFZ DAVAO COMPUTER SALES • COMMERCIAL FINANCING &amp; AR</div>
+      <div>PAGE 10 / 13</div>
+    </div>
+  </section>
+
+  <!-- SLIDE 11: WAREHOUSE & INVENTORY VALUATION -->
   <section class="slide">
     <div class="slide-header">
       <div>
@@ -1133,11 +1191,11 @@ async function main() {
 
     <div class="slide-footer">
       <div>EFZ DAVAO COMPUTER SALES • WAREHOUSE OPERATIONS</div>
-      <div>PAGE 10 / 12</div>
+      <div>PAGE 11 / 13</div>
     </div>
   </section>
 
-  <!-- SLIDE 11: RMA DEFECT DIAGNOSTICS & WARRANTY -->
+  <!-- SLIDE 12: RMA DEFECT DIAGNOSTICS & WARRANTY -->
   <section class="slide">
     <div class="slide-header">
       <div>
@@ -1190,11 +1248,11 @@ async function main() {
 
     <div class="slide-footer">
       <div>EFZ DAVAO COMPUTER SALES • SERVICE CENTER & WARRANTY CARE</div>
-      <div>PAGE 11 / 12</div>
+      <div>PAGE 12 / 13</div>
     </div>
   </section>
 
-  <!-- SLIDE 12: BUSINESS BENEFITS SUMMARY & READINESS -->
+  <!-- SLIDE 13: BUSINESS BENEFITS SUMMARY & READINESS -->
   <section class="slide">
     <div class="slide-header">
       <div>
@@ -1239,6 +1297,7 @@ async function main() {
             <div class="card-desc" style="margin-top: 8px; line-height: 1.7; font-size: 10.5px;">
               ✔ Fast Barcode Scanner Integration<br>
               ✔ Clear Roles for Store Manager, Cashier, Warehouse & RMA<br>
+              ✔ In-House Installment & Commercial AR Tracking<br>
               ✔ Professional Invoices with Warranty Dates<br>
               ✔ 8,400+ Existing Customers Connected<br>
               ✔ 41,900+ Hardware Units Ready for Checkout<br>
@@ -1260,7 +1319,7 @@ async function main() {
 
     <div class="slide-footer">
       <div>EFZ DAVAO COMPUTER SALES • COMMERCIAL PRESENTATION DECK</div>
-      <div>PAGE 12 / 12</div>
+      <div>PAGE 13 / 13</div>
     </div>
   </section>
 
