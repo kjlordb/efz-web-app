@@ -1,6 +1,14 @@
 import { createHmac, randomBytes, scrypt as scryptCallback, timingSafeEqual } from 'node:crypto';
 import { promisify } from 'node:util';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import dotenv from 'dotenv';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
+dotenv.config();
 
 const scrypt = promisify(scryptCallback);
 
@@ -199,6 +207,21 @@ export function readAccessToken(token: string): AuthenticatedUser | null {
     return null;
   }
 }
+
+export const extractAuth: RequestHandler = (req: Request, _res: Response, next: NextFunction) => {
+  const authorization = req.header('authorization');
+  if (authorization?.startsWith('Bearer ')) {
+    try {
+      const user = readAccessToken(authorization.slice(7));
+      if (user) {
+        req.auth = user;
+      }
+    } catch {
+      // Continue unauthenticated if token fails to decode
+    }
+  }
+  next();
+};
 
 export const requireAuth: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
   const authorization = req.header('authorization');

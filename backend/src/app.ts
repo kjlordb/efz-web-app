@@ -3,7 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { requireAuth } from './auth.js';
+import { extractAuth, requireAuth } from './auth.js';
 import { authRouter } from './routes/auth.js';
 import { healthRouter } from './routes/health.js';
 import { stockRouter } from './routes/stock.js';
@@ -46,9 +46,10 @@ app.use(cors({
 app.use(express.json({ limit: '100kb' }));
 app.use('/api', createRateLimiter({ windowMs: 60_000, maxRequests: 300 }));
 
+app.use(extractAuth);
 app.use('/api/auth', authRouter);
-app.use('/api', requireAuth);
 app.use('/api/health', healthRouter);
+app.use('/api', requireAuth);
 app.use('/api/stock', stockRouter);
 app.use('/api/customers', customerRouter);
 app.use('/api/orders', ordersRouter);
