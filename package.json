@@ -16,6 +16,7 @@
     "preview": "npm --prefix frontend run preview"
   },
   "devDependencies": {
-    "concurrently": "^10.0.5"
+    "concurrently": "^10.0.5",
+    "puppeteer-core": "^25.11.0"
   }
 }
