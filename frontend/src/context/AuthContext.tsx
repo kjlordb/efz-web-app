@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { UserRole, Permission, ROLE_DEFINITIONS, roleHasPermission, canRoleAccessTab } from '../types/rbac';
 import { ActiveTab } from '../components/layout/Sidebar';
+import { apiFetch, apiUrl, AUTH_EXPIRED_EVENT, clearAccessToken, getAccessToken, setAccessToken } from '../services/auth';
 
 export interface User {
   id: string;
@@ -11,184 +12,98 @@ export interface User {
   entityLabel: string;
   workstation: string;
   avatar: string;
-  isGuest?: boolean;
 }
 
-export const DEMO_ACCOUNTS: Record<string, { user: User; password: string }> = {
-  guest: {
-    user: {
-      id: 'usr_guest',
-      name: 'Demo Guest Cashier',
-      email: 'guest@efzdavao.ph',
-      role: 'cashier',
-      roleTitle: 'Sales Specialist & Cashier',
-      entityLabel: 'Front-Counter Sales',
-      workstation: 'POS-TERM-GUEST',
-      avatar: 'G',
-      isGuest: true
-    },
-    password: 'guest123'
-  },
-  warehouse: {
-    user: {
-      id: 'usr_warehouse',
-      name: 'Mark (Warehouse Lead)',
-      email: 'warehouse@efzdavao.ph',
-      role: 'inventory',
-      roleTitle: 'Warehouse & Procurement Specialist',
-      entityLabel: 'Supply Chain & Warehouse',
-      workstation: 'WH-TERM-04',
-      avatar: 'M',
-      isGuest: false
-    },
-    password: 'stock123'
-  },
-  tech: {
-    user: {
-      id: 'usr_tech',
-      name: 'Dave (Hardware Lead)',
-      email: 'tech@efzdavao.ph',
-      role: 'technician',
-      roleTitle: 'Senior RMA & Warranty Technician',
-      entityLabel: 'Service Center & Diagnostics',
-      workstation: 'TECH-BENCH-02',
-      avatar: 'D',
-      isGuest: false
-    },
-    password: 'tech123'
-  },
-  admin: {
-    user: {
-      id: 'usr_admin',
-      name: 'Kyle (Admin)',
-      email: 'admin@efzdavao.ph',
-      role: 'admin',
-      roleTitle: 'Store Manager & Administrator',
-      entityLabel: 'Executive Management',
-      workstation: 'WEB-TERM-01',
-      avatar: 'K',
-      isGuest: false
-    },
-    password: 'admin123'
-  }
-};
+export const OPERATOR_PROFILES = {
+  cashier: { email: 'cashier@efzdavao.ph', label: 'Cashier' },
+  inventory: { email: 'inventory@efzdavao.ph', label: 'Warehouse' },
+  technician: { email: 'technician@efzdavao.ph', label: 'RMA Tech' },
+  admin: { email: 'admin@efzdavao.ph', label: 'Admin' },
+} as const;
 
 interface AuthContextType {
   currentUser: User | null;
   isAuthenticated: boolean;
   login: (identifier: string, password: string) => Promise<boolean>;
-  loginAsGuest: () => void;
-  loginAsAdmin: () => void;
-  loginAsWarehouse: () => void;
-  loginAsTechnician: () => void;
-  switchRole: (role: UserRole) => void;
   hasPermission: (permission: Permission) => boolean;
   canAccess: (tab: ActiveTab) => boolean;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AUTH_USER_STORAGE_KEY = 'efz_authenticated_user';
 
-const AUTH_STORAGE_KEY = 'efz_auth_session';
+function readStoredUser(): User | null {
+  try {
+    const saved = localStorage.getItem(AUTH_USER_STORAGE_KEY);
+    return saved ? JSON.parse(saved) as User : null;
+  } catch {
+    return null;
+  }
+}
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState<User | null>(() => {
-    try {
-      const saved = localStorage.getItem(AUTH_STORAGE_KEY);
-      return saved ? JSON.parse(saved) : null;
-    } catch {
-      return null;
-    }
-  });
-
-  const saveUserSession = (user: User) => {
-    setCurrentUser(user);
-    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
-  };
-
-  const login = async (identifier: string, pass: string): Promise<boolean> => {
-    const cleanId = identifier.trim().toLowerCase();
-    
-    // Find match by email or account key
-    const matched = Object.values(DEMO_ACCOUNTS).find(
-      (acc) =>
-        acc.user.email.toLowerCase() === cleanId ||
-        acc.user.name.toLowerCase().includes(cleanId) ||
-        (cleanId === 'guest' && acc.user.role === 'cashier') ||
-        (cleanId === 'admin' && acc.user.role === 'admin') ||
-        (cleanId === 'warehouse' && acc.user.role === 'inventory') ||
-        (cleanId === 'tech' && acc.user.role === 'technician')
-    );
-
-    if (matched && matched.password === pass) {
-      saveUserSession(matched.user);
-      return true;
-    }
-
-    // Flexible presentation fallback
-    if (cleanId.includes('guest') && (pass === 'guest123' || pass === 'guest' || pass === '123456')) {
-      saveUserSession(DEMO_ACCOUNTS.guest.user);
-      return true;
-    }
-    if (cleanId.includes('admin') && (pass === 'admin123' || pass === 'admin' || pass === '123456')) {
-      saveUserSession(DEMO_ACCOUNTS.admin.user);
-      return true;
-    }
-    if (cleanId.includes('warehouse') && (pass === 'stock123' || pass === 'warehouse')) {
-      saveUserSession(DEMO_ACCOUNTS.warehouse.user);
-      return true;
-    }
-    if (cleanId.includes('tech') && (pass === 'tech123' || pass === 'tech')) {
-      saveUserSession(DEMO_ACCOUNTS.tech.user);
-      return true;
-    }
-
-    return false;
-  };
-
-  const loginAsGuest = () => saveUserSession(DEMO_ACCOUNTS.guest.user);
-  const loginAsAdmin = () => saveUserSession(DEMO_ACCOUNTS.admin.user);
-  const loginAsWarehouse = () => saveUserSession(DEMO_ACCOUNTS.warehouse.user);
-  const loginAsTechnician = () => saveUserSession(DEMO_ACCOUNTS.tech.user);
-
-  const switchRole = (role: UserRole) => {
-    const targetAccount = Object.values(DEMO_ACCOUNTS).find((acc) => acc.user.role === role);
-    if (targetAccount) {
-      saveUserSession(targetAccount.user);
-    }
-  };
-
-  const hasPermission = (permission: Permission): boolean => {
-    if (!currentUser) return false;
-    return roleHasPermission(currentUser.role, permission);
-  };
-
-  const canAccess = (tab: ActiveTab): boolean => {
-    if (!currentUser) return false;
-    return canRoleAccessTab(currentUser.role, tab);
-  };
+  const [currentUser, setCurrentUser] = useState<User | null>(readStoredUser);
 
   const logout = () => {
+    clearAccessToken();
+    localStorage.removeItem(AUTH_USER_STORAGE_KEY);
     setCurrentUser(null);
-    localStorage.removeItem(AUTH_STORAGE_KEY);
   };
 
+  const saveSession = (token: string, user: User) => {
+    setAccessToken(token);
+    localStorage.setItem(AUTH_USER_STORAGE_KEY, JSON.stringify(user));
+    setCurrentUser(user);
+  };
+
+  useEffect(() => {
+    const token = getAccessToken();
+    if (!token) {
+      if (currentUser) logout();
+      return;
+    }
+    apiFetch('/api/auth/me')
+      .then(async (response) => {
+        if (!response.ok) throw new Error('Session validation failed.');
+        const data = await response.json() as { user: User };
+        localStorage.setItem(AUTH_USER_STORAGE_KEY, JSON.stringify(data.user));
+        setCurrentUser(data.user);
+      })
+      .catch(logout);
+    // Validate an existing browser session once on application startup.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener(AUTH_EXPIRED_EVENT, logout);
+    return () => window.removeEventListener(AUTH_EXPIRED_EVENT, logout);
+  });
+
+  const login = async (identifier: string, password: string): Promise<boolean> => {
+    const response = await fetch(apiUrl('/api/auth/login'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ identifier, password }),
+    });
+    if (response.status === 401) return false;
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({ error: 'Unable to sign in.' })) as { error?: string };
+      throw new Error(data.error || 'Unable to sign in.');
+    }
+    const data = await response.json() as { token: string; user: User };
+    saveSession(data.token, data.user);
+    return true;
+  };
+
+  const hasPermission = (permission: Permission): boolean =>
+    currentUser ? roleHasPermission(currentUser.role, permission) : false;
+
+  const canAccess = (tab: ActiveTab): boolean =>
+    currentUser ? canRoleAccessTab(currentUser.role, tab) : false;
+
   return (
-    <AuthContext.Provider
-      value={{
-        currentUser,
-        isAuthenticated: !!currentUser,
-        login,
-        loginAsGuest,
-        loginAsAdmin,
-        loginAsWarehouse,
-        loginAsTechnician,
-        switchRole,
-        hasPermission,
-        canAccess,
-        logout
-      }}
-    >
+    <AuthContext.Provider value={{ currentUser, isAuthenticated: !!currentUser, login, hasPermission, canAccess, logout }}>
       {children}
     </AuthContext.Provider>
   );
@@ -196,8 +111,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
+  if (!context) throw new Error('useAuth must be used within an AuthProvider');
   return context;
 };

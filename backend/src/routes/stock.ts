@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import { getPool, sql } from '../db.js';
+import { requirePermission } from '../auth.js';
 
 export const stockRouter = Router();
 
 // GET /api/stock/stats - Get complete breakdown of inventory numbers
-stockRouter.get('/stats', async (_req, res) => {
+stockRouter.get('/stats', requirePermission('VIEW_INVENTORY'), async (req, res) => {
   try {
     const pool = await getPool();
     const result = await pool.request().query(`
@@ -20,14 +21,18 @@ stockRouter.get('/stats', async (_req, res) => {
         COALESCE(SUM(CASE WHEN StockStatus IN ('stored', 'updated') THEN SuppliersPrice ELSE 0 END), 0) AS activeInventoryCostValue
       FROM dbo.StockItems
     `);
-    res.json(result.recordset[0]);
+    const stats = result.recordset[0];
+    if (req.auth?.role !== 'admin' && req.auth?.role !== 'inventory') {
+      delete stats.activeInventoryCostValue;
+    }
+    res.json(stats);
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
 });
 
 // GET /api/stock - List stock items with filtering and pagination
-stockRouter.get('/', async (req, res) => {
+stockRouter.get('/', requirePermission('VIEW_INVENTORY'), async (req, res) => {
   try {
     const pool = await getPool();
     const {
@@ -103,6 +108,7 @@ stockRouter.get('/', async (req, res) => {
 
     const result = await request.query(query);
 
+    const canViewCosts = req.auth?.role === 'admin' || req.auth?.role === 'inventory';
     const items = result.recordset.map((row) => ({
       id: row.id,
       stockSerial: row.StockSerial || '',
@@ -110,7 +116,7 @@ stockRouter.get('/', async (req, res) => {
       stockDetails: row.StockDetails || '',
       stockPrice: Number(row.StockPrice) || 0,
       supplierName: row.SupplierName || '',
-      suppliersPrice: Number(row.SuppliersPrice) || 0,
+      suppliersPrice: canViewCosts ? Number(row.SuppliersPrice) || 0 : 0,
       stockStatus: row.StockStatus || 'stored',
       warranty: Number(row.Warranty) || 0,
       inDate: row.InDate ? new Date(row.InDate).toISOString() : new Date().toISOString(),
@@ -126,7 +132,7 @@ stockRouter.get('/', async (req, res) => {
 });
 
 // GET /api/stock/categories - List distinct category names
-stockRouter.get('/categories', async (_req, res) => {
+stockRouter.get('/categories', requirePermission('VIEW_INVENTORY'), async (_req, res) => {
   try {
     const pool = await getPool();
     const result = await pool.request().query(`
@@ -143,10 +149,10 @@ stockRouter.get('/categories', async (_req, res) => {
 });
 
 // GET /api/stock/serial/:serial - Instant barcode search
-stockRouter.get('/serial/:serial', async (req, res) => {
+stockRouter.get('/serial/:serial', requirePermission('VIEW_INVENTORY'), async (req, res) => {
   try {
     const pool = await getPool();
-    const { serial } = req.params;
+    const serial = String(req.params.serial);
     const result = await pool
       .request()
       .input('serial', sql.NVarChar, serial.trim())
@@ -171,7 +177,7 @@ stockRouter.get('/serial/:serial', async (req, res) => {
       stockDetails: row.StockDetails || '',
       stockPrice: Number(row.StockPrice) || 0,
       supplierName: row.SupplierName || '',
-      suppliersPrice: Number(row.SuppliersPrice) || 0,
+      suppliersPrice: req.auth?.role === 'admin' || req.auth?.role === 'inventory' ? Number(row.SuppliersPrice) || 0 : 0,
       stockStatus: row.StockStatus || 'stored',
       warranty: Number(row.Warranty) || 0,
       inDate: row.InDate ? new Date(row.InDate).toISOString() : new Date().toISOString(),
@@ -184,7 +190,7 @@ stockRouter.get('/serial/:serial', async (req, res) => {
 });
 
 // POST /api/stock - Insert new inward stock item
-stockRouter.post('/', async (req, res) => {
+stockRouter.post('/', requirePermission('MANAGE_INVENTORY'), async (req, res) => {
   try {
     const pool = await getPool();
     const {
@@ -249,10 +255,10 @@ stockRouter.post('/', async (req, res) => {
 });
 
 // PUT /api/stock/:id - Update stock item
-stockRouter.put('/:id', async (req, res) => {
+stockRouter.put('/:id', requirePermission('MANAGE_INVENTORY'), async (req, res) => {
   try {
     const pool = await getPool();
-    const id = parseInt(req.params.id, 10);
+    const id = parseInt(String(req.params.id), 10);
     const { stockPrice, stockDetails, stockStatus, warranty } = req.body;
 
     const request = pool.request().input('id', sql.Int, id);
@@ -287,10 +293,10 @@ stockRouter.put('/:id', async (req, res) => {
 });
 
 // DELETE /api/stock/:id - Soft-delete stock item
-stockRouter.delete('/:id', async (req, res) => {
+stockRouter.delete('/:id', requirePermission('MANAGE_INVENTORY'), async (req, res) => {
   try {
     const pool = await getPool();
-    const id = parseInt(req.params.id, 10);
+    const id = parseInt(String(req.params.id), 10);
     await pool
       .request()
       .input('id', sql.Int, id)
@@ -303,7 +309,7 @@ stockRouter.delete('/:id', async (req, res) => {
 });
 
 // POST /api/stock/batch-price - Bulk price revision
-stockRouter.post('/batch-price', async (req, res) => {
+stockRouter.post('/batch-price', requirePermission('MANAGE_INVENTORY'), async (req, res) => {
   try {
     const pool = await getPool();
     const { category, details, newPrice } = req.body;

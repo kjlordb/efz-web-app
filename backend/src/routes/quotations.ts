@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import { getPool, sql } from '../db.js';
+import { requirePermission } from '../auth.js';
 
 export const quotationRouter = Router();
 
 // GET /api/quotations - List quotations with item details
-quotationRouter.get('/', async (_req, res) => {
+quotationRouter.get('/', requirePermission('CREATE_QUOTATION'), async (_req, res) => {
   try {
     const pool = await getPool();
     const headersResult = await pool.request().query(`
@@ -96,7 +97,7 @@ quotationRouter.get('/', async (_req, res) => {
 });
 
 // POST /api/quotations - Create pro-forma quotation
-quotationRouter.post('/', async (req, res) => {
+quotationRouter.post('/', requirePermission('CREATE_QUOTATION'), async (req, res) => {
   const pool = await getPool();
   const transaction = new sql.Transaction(pool);
 

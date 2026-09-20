@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   ShieldCheck,
   KeyRound,
@@ -17,24 +17,16 @@ import {
   Terminal
 } from 'lucide-react';
 import { BrandLogo } from '../components/common/BrandLogo';
-import { useAuth, DEMO_ACCOUNTS } from '../context/AuthContext';
-import { getStorageStats, resetDemoDataToBaseline } from '../services/api';
+import { useAuth, OPERATOR_PROFILES } from '../context/AuthContext';
 
 export const LoginPage: React.FC = () => {
-  const { login, loginAsGuest, loginAsAdmin, loginAsWarehouse, loginAsTechnician } = useAuth();
+  const { login } = useAuth();
   
-  const [identifier, setIdentifier] = useState('guest@efzdavao.ph');
-  const [password, setPassword] = useState('guest123');
+  const [identifier, setIdentifier] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [resetSuccess, setResetSuccess] = useState(false);
-
-  const [stats, setStats] = useState(() => getStorageStats());
-
-  useEffect(() => {
-    setStats(getStorageStats());
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,7 +36,7 @@ export const LoginPage: React.FC = () => {
     try {
       const success = await login(identifier, password);
       if (!success) {
-        setError('Invalid credentials. Please verify identifier and password or select a quick-launch profile.');
+        setError('Invalid credentials. Please verify your operator account and password.');
       }
     } catch (err: any) {
       setError(err.message || 'Login failed. Please try again.');
@@ -53,21 +45,12 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  const handleSelectDemoAccount = (key: 'guest' | 'warehouse' | 'tech' | 'admin') => {
-    const acc = DEMO_ACCOUNTS[key];
-    if (acc) {
-      setIdentifier(acc.user.email);
-      setPassword(acc.password);
+  const handleSelectOperator = (key: keyof typeof OPERATOR_PROFILES) => {
+    const profile = OPERATOR_PROFILES[key];
+    if (profile) {
+      setIdentifier(profile.email);
+      setPassword('');
       setError(null);
-    }
-  };
-
-  const handleResetData = () => {
-    if (window.confirm('Reset all cached transactions, stock status, invoices, and RMA claims back to factory demonstration baseline?')) {
-      resetDemoDataToBaseline();
-      setStats(getStorageStats());
-      setResetSuccess(true);
-      setTimeout(() => setResetSuccess(false), 3000);
     }
   };
 
@@ -128,7 +111,7 @@ export const LoginPage: React.FC = () => {
                 {/* 1. Cashier / Guest Demo */}
                 <button
                   type="button"
-                  onClick={loginAsGuest}
+                  onClick={() => handleSelectOperator('cashier')}
                   className="w-full group flex items-center justify-between p-2.5 rounded-xl bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-500 hover:to-teal-600 border border-teal-400/30 text-white font-bold text-xs shadow-glass-xs hover:shadow-glow-teal transition-all duration-200"
                 >
                   <div className="flex items-center gap-2.5">
@@ -150,7 +133,7 @@ export const LoginPage: React.FC = () => {
                 {/* 2. Warehouse & Inventory Specialist */}
                 <button
                   type="button"
-                  onClick={loginAsWarehouse}
+                  onClick={() => handleSelectOperator('inventory')}
                   className="w-full group flex items-center justify-between p-2.5 rounded-xl bg-slate-900/80 hover:bg-cyan-950/60 border border-white/[0.08] hover:border-cyan-500/50 text-slate-200 hover:text-white font-semibold text-xs shadow-glass-xs transition-all duration-200"
                 >
                   <div className="flex items-center gap-2.5">
@@ -172,7 +155,7 @@ export const LoginPage: React.FC = () => {
                 {/* 3. Service Center RMA Technician */}
                 <button
                   type="button"
-                  onClick={loginAsTechnician}
+                  onClick={() => handleSelectOperator('technician')}
                   className="w-full group flex items-center justify-between p-2.5 rounded-xl bg-slate-900/80 hover:bg-purple-950/60 border border-white/[0.08] hover:border-purple-500/50 text-slate-200 hover:text-white font-semibold text-xs shadow-glass-xs transition-all duration-200"
                 >
                   <div className="flex items-center gap-2.5">
@@ -194,7 +177,7 @@ export const LoginPage: React.FC = () => {
                 {/* 4. Store Manager & Admin */}
                 <button
                   type="button"
-                  onClick={loginAsAdmin}
+                  onClick={() => handleSelectOperator('admin')}
                   className="w-full group flex items-center justify-between p-2.5 rounded-xl bg-gradient-to-r from-amber-500/20 to-amber-600/10 hover:from-amber-500/30 hover:to-amber-600/20 border border-amber-500/40 hover:border-amber-400 text-amber-200 hover:text-white font-semibold text-xs shadow-glass-xs transition-all duration-200"
                 >
                   <div className="flex items-center gap-2.5">
@@ -216,33 +199,33 @@ export const LoginPage: React.FC = () => {
                 {/* Quick-Fill Preset Badges */}
                 <div className="pt-2">
                   <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
-                    Quick-Fill Form Credentials:
+                    Quick-Fill Operator Account:
                   </div>
                   <div className="grid grid-cols-4 gap-1.5">
                     <button
                       type="button"
-                      onClick={() => handleSelectDemoAccount('guest')}
+                      onClick={() => handleSelectOperator('cashier')}
                       className="px-2 py-1.5 rounded-lg bg-slate-900/80 hover:bg-white/[0.08] text-[10px] font-medium text-teal-300 border border-white/[0.08] text-center transition-all"
                     >
                       Cashier
                     </button>
                     <button
                       type="button"
-                      onClick={() => handleSelectDemoAccount('warehouse')}
+                      onClick={() => handleSelectOperator('inventory')}
                       className="px-2 py-1.5 rounded-lg bg-slate-900/80 hover:bg-white/[0.08] text-[10px] font-medium text-cyan-300 border border-white/[0.08] text-center transition-all"
                     >
                       Warehouse
                     </button>
                     <button
                       type="button"
-                      onClick={() => handleSelectDemoAccount('tech')}
+                      onClick={() => handleSelectOperator('technician')}
                       className="px-2 py-1.5 rounded-lg bg-slate-900/80 hover:bg-white/[0.08] text-[10px] font-medium text-purple-300 border border-white/[0.08] text-center transition-all"
                     >
                       RMA Tech
                     </button>
                     <button
                       type="button"
-                      onClick={() => handleSelectDemoAccount('admin')}
+                      onClick={() => handleSelectOperator('admin')}
                       className="px-2 py-1.5 rounded-lg bg-slate-900/80 hover:bg-white/[0.08] text-[10px] font-medium text-amber-300 border border-white/[0.08] text-center transition-all"
                     >
                       Admin
@@ -254,7 +237,7 @@ export const LoginPage: React.FC = () => {
 
             {/* Session notice */}
             <div className="text-[11px] text-slate-400 bg-slate-950/60 p-3.5 rounded-xl border border-white/[0.08]">
-              <span className="text-slate-200 font-semibold">Client Presentation Note:</span> Transactions made in this session are cached dynamically in the browser. When logging out, underlying orders remain saved consistently.
+              <span className="text-slate-200 font-semibold">Security notice:</span> Roles and permissions are verified by the API for every operational action.
             </div>
           </div>
 
@@ -279,7 +262,7 @@ export const LoginPage: React.FC = () => {
               )}
 
               {/* Reset Success Banner */}
-              {resetSuccess && (
+              {false && (
                 <div className="p-3 bg-emerald-900/30 border border-emerald-500/50 rounded-xl text-xs text-emerald-300 flex items-center gap-2.5 animate-fadeIn">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
                   <span>Demonstration cache reset to factory baseline successfully.</span>
@@ -313,7 +296,7 @@ export const LoginPage: React.FC = () => {
                       <span>Security PIN / Password</span>
                     </label>
                     <span className="text-[10px] text-amber-400 font-mono">
-                      Guest: guest123
+                      Server-verified
                     </span>
                   </div>
                   <div className="relative">
@@ -358,15 +341,13 @@ export const LoginPage: React.FC = () => {
               <div className="flex items-center gap-2">
                 <Database className="w-3.5 h-3.5 text-teal-400" />
                 <span>
-                  Dynamic Cache: <strong className="text-white">{stats.ordersCount} Invoices</strong> •{' '}
-                  <strong className="text-teal-300">{stats.storedStockCount} In-Stock</strong> •{' '}
-                  <strong className="text-amber-300">{stats.rmaCount} RMA</strong>
+                  Server-backed session with permission checks on every operational request.
                 </span>
               </div>
 
               <button
                 type="button"
-                onClick={handleResetData}
+                onClick={() => undefined}
                 title="Reset cache to factory demo seed"
                 className="text-[10px] text-slate-400 hover:text-amber-400 underline flex items-center gap-1 transition-colors self-start sm:self-auto"
               >

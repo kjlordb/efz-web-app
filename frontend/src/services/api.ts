@@ -18,6 +18,7 @@ import {
   INITIAL_STOCK_ITEMS,
   INITIAL_SUPPLIERS
 } from './mockData';
+import { apiFetch } from './auth';
 
 // LocalStorage Persistence Keys
 const STORAGE_KEYS = {
@@ -29,6 +30,8 @@ const STORAGE_KEYS = {
   RMA: 'efz_rma_tickets',
   INSTALLMENTS: 'efz_installment_plans'
 };
+
+const offlineDemoEnabled = import.meta.env.DEV && import.meta.env.VITE_ENABLE_OFFLINE_DEMO === 'true';
 
 function loadFromStorage<T>(key: string, initial: T): T {
   try {
@@ -133,7 +136,7 @@ export async function getDbHealth(force = false): Promise<DbHealthStatus> {
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 2000);
-    const res = await fetch('/api/health', { signal: controller.signal });
+    const res = await apiFetch('/api/health', { signal: controller.signal });
     clearTimeout(timeoutId);
 
     if (res.ok) {
@@ -151,6 +154,10 @@ export async function getDbHealth(force = false): Promise<DbHealthStatus> {
     }
   } catch {
     // API server is offline or unreachable
+  }
+
+  if (!offlineDemoEnabled) {
+    throw new Error('The secure API is unavailable. Check VITE_API_BASE_URL and the backend service.');
   }
 
   cachedHealth = {
@@ -181,7 +188,7 @@ export const inventoryService = {
     const health = await getDbHealth();
     if (health.connected) {
       try {
-        const res = await fetch('/api/stock/stats');
+        const res = await apiFetch('/api/stock/stats');
         if (res.ok) {
           return await res.json();
         }
@@ -225,7 +232,7 @@ export const inventoryService = {
         if (options?.sort) params.set('sort', options.sort);
         params.set('limit', String(options?.limit || 5000));
 
-        const res = await fetch(`/api/stock?${params.toString()}`);
+        const res = await apiFetch(`/api/stock?${params.toString()}`);
         if (res.ok) {
           return await res.json();
         }
@@ -269,7 +276,7 @@ export const inventoryService = {
     const health = await getDbHealth();
     if (health.connected) {
       try {
-        const res = await fetch('/api/stock', {
+        const res = await apiFetch('/api/stock', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(item),
@@ -311,7 +318,7 @@ export const inventoryService = {
     const health = await getDbHealth();
     if (health.connected) {
       try {
-        const res = await fetch(`/api/stock/${id}`, {
+        const res = await apiFetch(`/api/stock/${id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(updates),
@@ -338,7 +345,7 @@ export const inventoryService = {
     const health = await getDbHealth();
     if (health.connected) {
       try {
-        const res = await fetch(`/api/stock/${id}`, { method: 'DELETE' });
+        const res = await apiFetch(`/api/stock/${id}`, { method: 'DELETE' });
         if (res.ok) {
           notifyDataUpdated();
           return;
@@ -360,7 +367,7 @@ export const inventoryService = {
     const health = await getDbHealth();
     if (health.connected) {
       try {
-        const res = await fetch(`/api/stock/${id}`, {
+        const res = await apiFetch(`/api/stock/${id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ stockStatus: 'stored' }),
@@ -386,7 +393,7 @@ export const inventoryService = {
     const health = await getDbHealth();
     if (health.connected) {
       try {
-        const res = await fetch('/api/stock/batch-price', {
+        const res = await apiFetch('/api/stock/batch-price', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ category, details, newPrice }),
@@ -427,6 +434,7 @@ export const salesService = {
     serial?: string;
     customerId?: number;
     paymentTier?: PaymentMethodType;
+    search?: string;
   }): Promise<Order[]> {
     const health = await getDbHealth();
     if (health.connected) {
@@ -437,9 +445,10 @@ export const salesService = {
         if (options?.serial) params.set('serial', options.serial);
         if (options?.customerId) params.set('customerId', String(options.customerId));
         if (options?.paymentTier) params.set('paymentTier', options.paymentTier);
+        if (options?.search) params.set('search', options.search);
         params.set('limit', '200');
 
-        const res = await fetch(`/api/orders?${params.toString()}`);
+        const res = await apiFetch(`/api/orders?${params.toString()}`);
         if (res.ok) {
           return await res.json();
         }
@@ -497,7 +506,7 @@ export const salesService = {
     const health = await getDbHealth();
     if (health.connected) {
       try {
-        const res = await fetch('/api/orders', {
+        const res = await apiFetch('/api/orders', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data),
@@ -635,7 +644,7 @@ export const customerService = {
         if (search) params.set('search', search);
         params.set('limit', '200');
 
-        const res = await fetch(`/api/customers?${params.toString()}`);
+        const res = await apiFetch(`/api/customers?${params.toString()}`);
         if (res.ok) {
           return await res.json();
         }
@@ -674,7 +683,7 @@ export const customerService = {
     const health = await getDbHealth();
     if (health.connected) {
       try {
-        const res = await fetch('/api/customers', {
+        const res = await apiFetch('/api/customers', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(customer),
@@ -711,7 +720,7 @@ export const customerService = {
     const health = await getDbHealth();
     if (health.connected) {
       try {
-        const res = await fetch(`/api/customers/${id}`, {
+        const res = await apiFetch(`/api/customers/${id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(updates),
@@ -753,7 +762,7 @@ export const supplierService = {
     if (health.connected) {
       try {
         const url = search ? `/api/suppliers?search=${encodeURIComponent(search.trim())}` : '/api/suppliers';
-        const res = await fetch(url);
+        const res = await apiFetch(url);
         if (res.ok) {
           return await res.json();
         }
@@ -788,7 +797,7 @@ export const supplierService = {
     const health = await getDbHealth();
     if (health.connected) {
       try {
-        const res = await fetch('/api/suppliers', {
+        const res = await apiFetch('/api/suppliers', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(supplier),
@@ -823,7 +832,7 @@ export const quotationService = {
     const health = await getDbHealth();
     if (health.connected) {
       try {
-        const res = await fetch('/api/quotations');
+        const res = await apiFetch('/api/quotations');
         if (res.ok) {
           const raw = await res.json();
           if (Array.isArray(raw)) {
@@ -881,7 +890,7 @@ export const quotationService = {
     const health = await getDbHealth();
     if (health.connected) {
       try {
-        const res = await fetch('/api/quotations', {
+        const res = await apiFetch('/api/quotations', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data),
@@ -953,25 +962,44 @@ export const quotationService = {
   }
 };
 
+export interface DashboardSummary {
+  totalOrders: number;
+  totalRevenue: number;
+  totalCustomers: number;
+  activeStockUnits: number;
+  activeInventoryRetailValue: number;
+  activeInventoryCostValue: number;
+  categories: Array<{ category: string; units: number }>;
+}
+
+export const dashboardService = {
+  async getSummary(): Promise<DashboardSummary> {
+    const res = await apiFetch('/api/reports/dashboard');
+    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || 'Unable to load dashboard reporting data.');
+    return await res.json();
+  }
+};
+
 // ==========================================
 // RMA & WARRANTY CLAIM SERVICES
 // ==========================================
 export const rmaService = {
   async getTickets(): Promise<RMATicket[]> {
-    await delay();
-    return [...rmaTickets];
+    const res = await apiFetch('/api/rma');
+    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || 'Unable to load RMA tickets.');
+    return await res.json();
   },
 
   async createTicket(ticket: Omit<RMATicket, 'id' | 'dateFiled'>): Promise<RMATicket> {
-    await delay();
-    const newTicket: RMATicket = {
-      ...ticket,
-      id: `RMA-${new Date().getFullYear()}-${String(rmaTickets.length + 1).padStart(3, '0')}`,
-      dateFiled: new Date().toISOString()
-    };
-    rmaTickets.unshift(newTicket);
-    saveToStorage(STORAGE_KEYS.RMA, rmaTickets);
-    return newTicket;
+    const res = await apiFetch('/api/rma', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(ticket),
+    });
+    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || 'Unable to create the RMA ticket.');
+    const created = await res.json();
+    notifyDataUpdated();
+    return created;
   },
 
   async updateTicketStatus(
@@ -980,18 +1008,15 @@ export const rmaService = {
     technicianNotes?: string,
     replacementSerial?: string
   ): Promise<RMATicket> {
-    await delay();
-    const idx = rmaTickets.findIndex((t) => t.id === id);
-    if (idx === -1) throw new Error('RMA Ticket not found');
-
-    rmaTickets[idx] = {
-      ...rmaTickets[idx],
-      status,
-      technicianNotes: technicianNotes || rmaTickets[idx].technicianNotes,
-      replacementSerial: replacementSerial || rmaTickets[idx].replacementSerial
-    };
-    saveToStorage(STORAGE_KEYS.RMA, rmaTickets);
-    return rmaTickets[idx];
+    const res = await apiFetch(`/api/rma/${encodeURIComponent(id)}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status, technicianNotes, replacementSerial }),
+    });
+    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || 'Unable to update the RMA ticket.');
+    const updated = await res.json();
+    notifyDataUpdated();
+    return updated;
   }
 };
 
@@ -1000,46 +1025,26 @@ export const rmaService = {
 // ==========================================
 export const installmentService = {
   async getPlans(): Promise<InstallmentPlan[]> {
-    await delay();
-    return [...installmentPlans];
+    const res = await apiFetch('/api/installments');
+    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || 'Unable to load installment plans.');
+    return await res.json();
   },
 
   async recordPayment(
     planId: string,
     amount: number,
     referenceNumber: string,
-    cashier: string
+    _cashier: string
   ): Promise<InstallmentPlan> {
-    await delay();
-    const idx = installmentPlans.findIndex((p) => p.id === planId);
-    if (idx === -1) throw new Error('Installment plan not found');
-
-    const plan = installmentPlans[idx];
-    const newPaidMonths = Math.min(plan.totalMonths, plan.paidMonths + 1);
-    const newRemainingBalance = Math.max(0, plan.remainingBalance - amount);
-
-    const log = {
-      id: `PAY-${Date.now().toString().slice(-4)}`,
-      date: new Date().toISOString().split('T')[0],
-      amountPaid: amount,
-      referenceNumber,
-      cashier
-    };
-
-    const nextDate = new Date();
-    nextDate.setMonth(nextDate.getMonth() + 1);
-
-    installmentPlans[idx] = {
-      ...plan,
-      paidMonths: newPaidMonths,
-      remainingBalance: newRemainingBalance,
-      nextDueDate: newRemainingBalance === 0 ? 'Fully Settled' : nextDate.toISOString().split('T')[0],
-      status: newRemainingBalance === 0 ? 'Settled' : 'Current',
-      paymentHistory: [log, ...plan.paymentHistory]
-    };
-
-    saveToStorage(STORAGE_KEYS.INSTALLMENTS, installmentPlans);
-    return installmentPlans[idx];
+    const res = await apiFetch(`/api/installments/${encodeURIComponent(planId)}/payments`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ amount, referenceNumber }),
+    });
+    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || 'Unable to record the payment.');
+    const updated = await res.json();
+    notifyDataUpdated();
+    return updated;
   }
 };
 
@@ -1048,17 +1053,8 @@ export const installmentService = {
 // ==========================================
 export const databaseService = {
   async triggerBackup(): Promise<{ success: boolean; message: string; destination?: string }> {
-    try {
-      const res = await fetch('/api/backup', { method: 'POST' });
-      if (res.ok) {
-        return await res.json();
-      }
-    } catch {}
-
-    return {
-      success: true,
-      message: 'Database backup simulated locally (C:\\data\\EFZApp\\EFZApp.bak).',
-      destination: 'C:\\data\\EFZApp\\EFZApp.bak'
-    };
+    const res = await apiFetch('/api/backup', { method: 'POST' });
+    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || 'Database backup failed.');
+    return await res.json();
   }
 };

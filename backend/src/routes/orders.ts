@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import { getPool, sql } from '../db.js';
+import { requirePermission } from '../auth.js';
 
 export const ordersRouter = Router();
 
 // GET /api/orders - List sales invoices with customer metadata and liquidated units
-ordersRouter.get('/', async (req, res) => {
+ordersRouter.get('/', requirePermission('VIEW_SALES_LEDGER'), async (req, res) => {
   try {
     const pool = await getPool();
     const {
@@ -12,6 +13,7 @@ ordersRouter.get('/', async (req, res) => {
       endDate,
       serial,
       customerId,
+      search,
       paymentTier,
       limit = '100',
       offset = '0',
@@ -58,6 +60,22 @@ ordersRouter.get('/', async (req, res) => {
     if (paymentTier && typeof paymentTier === 'string') {
       request.input('paymentTier', sql.NVarChar, `%${paymentTier}%`);
       query += ` AND o.PaymentMethod LIKE @paymentTier`;
+    }
+
+    if (search && typeof search === 'string' && search.trim()) {
+      request.input('search', sql.NVarChar, `%${search.trim()}%`);
+      query += ` AND (
+        c.FirstName LIKE @search OR c.LastName LIKE @search OR c.Company LIKE @search OR c.ContactNumber LIKE @search
+      )`;
+    }
+
+    if (serial && typeof serial === 'string' && serial.trim()) {
+      request.input('serial', sql.NVarChar, `%${serial.trim()}%`);
+      query += ` AND EXISTS (
+        SELECT 1 FROM dbo.StockItems stock
+        WHERE stock.OrderId = CONVERT(NVARCHAR(500), o.id)
+          AND stock.StockSerial LIKE @serial
+      )`;
     }
 
     const parsedLimit = Math.min(Math.max(parseInt(limit as string, 10) || 100, 1), 500);
@@ -141,14 +159,6 @@ ordersRouter.get('/', async (req, res) => {
       };
     });
 
-    if (serial && typeof serial === 'string') {
-      const q = serial.toLowerCase().trim();
-      orders = orders.filter((o) =>
-        o.listOfSerials.toLowerCase().includes(q) ||
-        o.items.some((i: any) => i.stockSerial.toLowerCase().includes(q))
-      );
-    }
-
     res.json(orders);
   } catch (err: any) {
     console.error('Error in GET /api/orders:', err);
@@ -157,7 +167,7 @@ ordersRouter.get('/', async (req, res) => {
 });
 
 // POST /api/orders - Transactional checkout & stock liquidation
-ordersRouter.post('/', async (req, res) => {
+ordersRouter.post('/', requirePermission('EXECUTE_POS'), async (req, res) => {
   const pool = await getPool();
   const transaction = new sql.Transaction(pool);
 
@@ -168,24 +178,38 @@ ordersRouter.post('/', async (req, res) => {
       customerId,
       paymentTier,
       remarks,
-      encoder = 'Sales Associate',
-      computerName = 'POS-TERMINAL-01',
       amountTendered,
-      changeDue,
       discountPercent = 0,
       items = [],
     } = req.body;
 
-    if (!customerId) {
+    if (!Number.isSafeInteger(customerId) || customerId <= 0) {
       await transaction.rollback();
       return res.status(400).json({ error: 'Customer ID is required.' });
     }
-    if (!items || items.length === 0) {
+    if (!Array.isArray(items) || items.length === 0 || items.length > 100) {
       await transaction.rollback();
       return res.status(400).json({ error: 'Transaction cart cannot be empty.' });
     }
 
-    // 1. Fetch Customer details
+    const parsedDiscount = Number(discountPercent);
+    if (!Number.isFinite(parsedDiscount) || parsedDiscount < 0 || parsedDiscount > 100) {
+      await transaction.rollback();
+      return res.status(400).json({ error: 'Discount must be between 0 and 100 percent.' });
+    }
+
+    const requestedSerials = items.map((item: unknown) => {
+      const serial = typeof (item as { stockSerial?: unknown })?.stockSerial === 'string'
+        ? (item as { stockSerial: string }).stockSerial.trim()
+        : '';
+      return serial;
+    });
+    if (requestedSerials.some((serial) => !serial) || new Set(requestedSerials.map((serial) => serial.toLowerCase())).size !== requestedSerials.length) {
+      await transaction.rollback();
+      return res.status(400).json({ error: 'Every checkout item must have one unique serial number.' });
+    }
+
+    // 1. Fetch customer and lock each sellable item before calculating the invoice.
     const custReq = new sql.Request(transaction);
     const custRes = await custReq
       .input('custId', sql.Int, customerId)
@@ -198,10 +222,38 @@ ordersRouter.post('/', async (req, res) => {
     const customer = custRes.recordset[0];
     const customerFullName = `${customer.FirstName || ''} ${customer.LastName || ''}`.trim() || 'Retail Client';
 
-    // 2. Compute Total Price
-    let baseSum = items.reduce((acc: number, it: any) => acc + (Number(it.stockPrice) || 0), 0);
-    if (discountPercent > 0) {
-      baseSum = baseSum * (1 - discountPercent / 100);
+    const stockRequest = new sql.Request(transaction);
+    const serialParameters = requestedSerials.map((serial, index) => {
+      const parameter = `serial${index}`;
+      stockRequest.input(parameter, sql.NVarChar(100), serial);
+      return `LOWER(StockSerial) = LOWER(@${parameter})`;
+    });
+    const stockResult = await stockRequest.query(`
+      SELECT id, StockSerial, StockName, StockDetails, StockPrice, SupplierName, SuppliersPrice, StockStatus, Warranty, InDate, Encoder
+      FROM dbo.StockItems WITH (UPDLOCK, HOLDLOCK)
+      WHERE ${serialParameters.join(' OR ')}
+    `);
+    if (stockResult.recordset.length !== requestedSerials.length) {
+      await transaction.rollback();
+      return res.status(409).json({ error: 'One or more scanned serials no longer exist.' });
+    }
+
+    const stockBySerial = new Map(stockResult.recordset.map((item) => [String(item.StockSerial).toLowerCase(), item]));
+    const authoritativeItems = requestedSerials.map((serial) => stockBySerial.get(serial.toLowerCase()));
+    if (authoritativeItems.some((item) => !item || !['stored', 'updated'].includes(String(item.StockStatus).toLowerCase()))) {
+      await transaction.rollback();
+      return res.status(409).json({ error: 'One or more scanned units are no longer available for sale.' });
+    }
+
+    // 2. Compute total from database prices, never client-submitted price fields.
+    let baseSum = authoritativeItems.reduce((acc, item) => acc + Number(item!.StockPrice), 0);
+    if (parsedDiscount > 0) {
+      baseSum = baseSum * (1 - parsedDiscount / 100);
+    }
+
+    if (paymentTier !== 'Cash' && paymentTier !== '3months' && paymentTier !== '12months') {
+      await transaction.rollback();
+      return res.status(400).json({ error: 'A valid payment tier is required.' });
     }
 
     let multiplier = 1.0;
@@ -214,6 +266,21 @@ ordersRouter.post('/', async (req, res) => {
       paymentMethodName = '12-Month Financing Plan (15% Financing Premium)';
     }
     const orderTotal = Math.round(baseSum * multiplier * 100) / 100;
+
+    const parsedTendered = amountTendered === undefined || amountTendered === null ? undefined : Number(amountTendered);
+    if (parsedTendered !== undefined && (!Number.isFinite(parsedTendered) || parsedTendered < 0)) {
+      await transaction.rollback();
+      return res.status(400).json({ error: 'Tendered amount must be a non-negative number.' });
+    }
+    if (paymentTier === 'Cash' && parsedTendered !== undefined && parsedTendered < orderTotal) {
+      await transaction.rollback();
+      return res.status(400).json({ error: 'Cash tendered is less than the invoice total.' });
+    }
+    const authoritativeChangeDue = paymentTier === 'Cash' && parsedTendered !== undefined
+      ? Math.round((parsedTendered - orderTotal) * 100) / 100
+      : undefined;
+    const encoder = req.auth!.name;
+    const computerName = req.auth!.workstation;
 
     // 3. Insert into dbo.OrderItems via spOrderItems_Insert
     const orderInsertReq = new sql.Request(transaction);
@@ -229,29 +296,58 @@ ordersRouter.post('/', async (req, res) => {
     const execResult = await orderInsertReq.execute('dbo.spOrderItems_Insert');
     const newOrderId = execResult.output.id;
 
-    // 4. Liquidate Serialized Items (Update StockStatus='sold', OrderId=newOrderId)
-    const serialsList = items.map((i: any) => i.stockSerial).filter(Boolean);
-    if (serialsList.length > 0) {
-      const serialsCsv = serialsList.join(',');
-      const statusReq = new sql.Request(transaction);
-      statusReq.input('StockSerial', sql.NVarChar(sql.MAX), serialsCsv);
-      statusReq.input('OrderId', sql.NVarChar(500), String(newOrderId));
-      await statusReq.execute('dbo.spStockItems_UpdateSerialStatus');
+    if (paymentTier === '3months' || paymentTier === '12months') {
+      const termMonths = paymentTier === '3months' ? 3 : 12;
+      const monthlyAmortization = Math.round((orderTotal / termMonths) * 100) / 100;
+      await new sql.Request(transaction)
+        .input('planId', sql.NVarChar(50), `INS-${newOrderId}`)
+        .input('orderId', sql.Int, newOrderId)
+        .input('customerId', sql.Int, customerId)
+        .input('customerName', sql.NVarChar(200), customerFullName)
+        .input('totalPrincipal', sql.Money, orderTotal)
+        .input('termMonths', sql.Int, termMonths)
+        .input('monthlyAmortization', sql.Money, monthlyAmortization)
+        .query(`
+          INSERT INTO dbo.InstallmentPlans
+          (PlanId, OrderId, CustomerId, CustomerName, TotalPrincipal, TermMonths, MonthlyAmortization,
+           PaidMonths, RemainingBalance, NextDueDate, Status)
+          VALUES
+          (@planId, @orderId, @customerId, @customerName, @totalPrincipal, @termMonths, @monthlyAmortization,
+           0, @totalPrincipal, DATEADD(MONTH, 1, CAST(GETDATE() AS date)), 'Current')
+        `);
+    }
 
-      // 5. Insert into dbo.TransactionHistory
-      for (const it of items) {
+    // 4. Liquidate only the rows locked and verified above.
+    const itemIds = authoritativeItems.map((item) => Number(item!.id));
+    const statusReq = new sql.Request(transaction).input('OrderId', sql.NVarChar(500), String(newOrderId));
+    const idParameters = itemIds.map((id, index) => {
+      const parameter = `itemId${index}`;
+      statusReq.input(parameter, sql.Int, id);
+      return `@${parameter}`;
+    });
+    const statusResult = await statusReq.query(`
+      UPDATE dbo.StockItems
+      SET StockStatus = 'sold', OrderId = @OrderId
+      WHERE id IN (${idParameters.join(', ')}) AND StockStatus IN ('stored', 'updated')
+    `);
+    if ((statusResult.rowsAffected[0] || 0) !== itemIds.length) {
+      throw new Error('Inventory changed during checkout. The transaction was cancelled.');
+    }
+
+    // 5. Insert transaction history from authoritative item data.
+    for (const it of authoritativeItems) {
         const historyReq = new sql.Request(transaction);
         historyReq.input('CustomerId', sql.Int, customerId);
-        historyReq.input('StockSerial', sql.NVarChar(100), it.stockSerial || '');
-        historyReq.input('StockName', sql.NVarChar(100), it.stockName || '');
-        historyReq.input('StockDetails', sql.NVarChar(1000), it.stockDetails || '');
-        historyReq.input('StockPrice', sql.Money, it.stockPrice || 0);
+        historyReq.input('StockSerial', sql.NVarChar(100), it!.StockSerial || '');
+        historyReq.input('StockName', sql.NVarChar(100), it!.StockName || '');
+        historyReq.input('StockDetails', sql.NVarChar(1000), it!.StockDetails || '');
+        historyReq.input('StockPrice', sql.Money, it!.StockPrice || 0);
         historyReq.input('Quantity', sql.Int, 1);
-        historyReq.input('SubTotal', sql.Money, it.stockPrice || 0);
+        historyReq.input('SubTotal', sql.Money, it!.StockPrice || 0);
         historyReq.input('Remarks', sql.NVarChar(1000), `Sold under Order #${newOrderId}`);
         historyReq.input('ComputerName', sql.NVarChar(100), computerName);
         historyReq.input('WindowName', sql.NVarChar(100), 'POS Checkout');
-        historyReq.input('Warranty', sql.Int, it.warranty || 30);
+        historyReq.input('Warranty', sql.Int, it!.Warranty || 30);
 
         await historyReq.query(`
           INSERT INTO dbo.TransactionHistory
@@ -259,7 +355,6 @@ ordersRouter.post('/', async (req, res) => {
           VALUES
           (@CustomerId, @StockSerial, @StockName, @StockDetails, @StockPrice, @Quantity, @SubTotal, @Remarks, @ComputerName, @WindowName, @Warranty)
         `);
-      }
     }
 
     await transaction.commit();
@@ -275,14 +370,27 @@ ordersRouter.post('/', async (req, res) => {
       paymentMethod: paymentMethodName,
       paymentTier,
       orderAmount: orderTotal,
-      amountTendered,
-      changeDue,
-      discountPercent,
+      amountTendered: parsedTendered,
+      changeDue: authoritativeChangeDue,
+      discountPercent: parsedDiscount,
       orderDate: new Date().toISOString(),
       encoder,
       computerName,
-      listOfSerials: serialsList.join(', '),
-      items,
+      listOfSerials: requestedSerials.join(', '),
+      items: authoritativeItems.map((item) => ({
+        id: item!.id,
+        stockSerial: item!.StockSerial || '',
+        stockName: item!.StockName || '',
+        stockDetails: item!.StockDetails || '',
+        stockPrice: Number(item!.StockPrice) || 0,
+        supplierName: item!.SupplierName || '',
+        suppliersPrice: Number(item!.SuppliersPrice) || 0,
+        stockStatus: 'sold',
+        warranty: Number(item!.Warranty) || 0,
+        inDate: item!.InDate ? new Date(item!.InDate).toISOString() : new Date().toISOString(),
+        encoder: item!.Encoder || '',
+        orderId: newOrderId,
+      })),
     };
 
     console.log(`[SQLServer] Finalized Sales Invoice #${newOrderId} for ${customerFullName} (Total: ₱${orderTotal.toLocaleString()})`);

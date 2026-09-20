@@ -3,19 +3,26 @@ import { checkConnection } from '../db.js';
 
 export const healthRouter = Router();
 
-healthRouter.get('/', async (_req, res) => {
+healthRouter.get('/', async (req, res) => {
   try {
     const status = await checkConnection();
     if (status.connected) {
+      const canViewDatabaseMetadata = req.auth?.role === 'admin';
       res.json({
         status: 'online',
-        ...status,
+        connected: true,
+        ...(canViewDatabaseMetadata ? {
+          server: status.server,
+          database: status.database,
+          latencyMs: status.latencyMs,
+          counts: status.counts,
+        } : {}),
         timestamp: new Date().toISOString(),
       });
     } else {
       res.status(503).json({
         status: 'offline',
-        ...status,
+        connected: false,
         timestamp: new Date().toISOString(),
       });
     }

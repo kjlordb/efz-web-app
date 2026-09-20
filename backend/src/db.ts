@@ -10,14 +10,14 @@ dotenv.config({ path: path.resolve(__dirname, '../.env') });
 dotenv.config();
 
 export const sqlConfig: sql.config = {
-  server: process.env.DB_SERVER || 'LAPTOP-N6BLB75S',
-  database: process.env.DB_DATABASE || 'EFZApp',
-  user: process.env.DB_USER || 'sa',
-  password: process.env.DB_PASSWORD || '12345',
+  server: process.env.DB_SERVER || '',
+  database: process.env.DB_DATABASE || '',
+  user: process.env.DB_USER || '',
+  password: process.env.DB_PASSWORD || '',
   port: parseInt(process.env.DB_PORT || '1433', 10),
   options: {
-    encrypt: process.env.DB_ENCRYPT === 'true',
-    trustServerCertificate: true,
+    encrypt: process.env.DB_ENCRYPT !== 'false',
+    trustServerCertificate: process.env.DB_TRUST_SERVER_CERTIFICATE === 'true',
     enableArithAbort: true,
   },
   pool: {
@@ -32,6 +32,14 @@ export const sqlConfig: sql.config = {
 let pool: sql.ConnectionPool | null = null;
 let isConnecting = false;
 
+function validateDatabaseConfiguration(): void {
+  const missing = ['DB_SERVER', 'DB_DATABASE', 'DB_USER', 'DB_PASSWORD']
+    .filter((name) => !process.env[name]);
+  if (missing.length > 0) {
+    throw new Error(`Database configuration is missing: ${missing.join(', ')}`);
+  }
+}
+
 export async function getPool(): Promise<sql.ConnectionPool> {
   if (pool && pool.connected) {
     return pool;
@@ -44,6 +52,7 @@ export async function getPool(): Promise<sql.ConnectionPool> {
   }
 
   try {
+    validateDatabaseConfiguration();
     isConnecting = true;
     console.log(`[SQLServer] Connecting to ${sqlConfig.database} on ${sqlConfig.server}:${sqlConfig.port}...`);
     pool = await new sql.ConnectionPool(sqlConfig).connect();

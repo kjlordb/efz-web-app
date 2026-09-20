@@ -1,13 +1,14 @@
 import { Router } from 'express';
 import { getPool } from '../db.js';
+import { requirePermission } from '../auth.js';
 
 export const backupRouter = Router();
 
 // POST /api/backup - Execute official SQL Server DbBackup stored procedure
-backupRouter.post('/', async (req, res) => {
+backupRouter.post('/', requirePermission('EXECUTE_BACKUP'), async (_req, res) => {
   try {
     const pool = await getPool();
-    const backupDir = req.body?.backupDirectory || 'C:\\DbBackup';
+    const backupDir = process.env.DB_BACKUP_DIRECTORY || 'C:\\DbBackup';
     console.log(`[SQLServer] Triggering dbo.DbBackup routine into ${backupDir}...`);
     
     const result = await pool.request()

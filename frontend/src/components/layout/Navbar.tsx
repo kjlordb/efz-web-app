@@ -17,7 +17,7 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onOpenBackupModal, onToggleMobileNav }) => {
-  const { currentUser, logout, switchRole } = useAuth();
+  const { currentUser, logout } = useAuth();
   const [time, setTime] = useState<string>('');
   const [dbHealth, setDbHealth] = useState<DbHealthStatus | null>(null);
   const currentRole = currentUser?.role || 'cashier';
@@ -94,19 +94,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBackupModal, onToggleMobil
 
       {/* Right Controls */}
       <div className="flex items-center gap-2 sm:gap-3">
-        {/* Role Switcher */}
+        {/* Role Badge */}
         <div className="flex items-center">
-          <select
-            value={currentRole}
-            onChange={(e) => switchRole(e.target.value as any)}
-            className="bg-[#0B1120] text-[#F4F7FB] text-[11px] sm:text-xs py-1 px-2 sm:px-2.5 rounded-lg border border-[rgba(148,163,184,0.14)] outline-none cursor-pointer hover:border-[#19C3D1]/40 transition-colors max-w-[110px] sm:max-w-none"
-            title="Switch operating role"
-          >
-            <option value="cashier" className="bg-[#0B1120] text-[#F4F7FB]">Cashier</option>
-            <option value="inventory" className="bg-[#0B1120] text-[#F4F7FB]">Warehouse</option>
-            <option value="technician" className="bg-[#0B1120] text-[#F4F7FB]">Technician</option>
-            <option value="admin" className="bg-[#0B1120] text-[#F4F7FB]">Admin</option>
-          </select>
+          <span className="bg-[#0B1120] text-[#19C3D1] font-semibold text-[11px] sm:text-xs py-1 px-2.5 rounded-lg border border-[rgba(25,195,209,0.2)] select-none">
+            {currentUser?.roleTitle || currentRole.toUpperCase()}
+          </span>
         </div>
 
         {/* Live Clock */}

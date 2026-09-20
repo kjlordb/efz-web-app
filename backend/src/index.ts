@@ -1,47 +1,7 @@
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
 import { checkConnection } from './db.js';
-import { healthRouter } from './routes/health.js';
-import { stockRouter } from './routes/stock.js';
-import { customerRouter } from './routes/customers.js';
-import { ordersRouter } from './routes/orders.js';
-import { supplierRouter } from './routes/suppliers.js';
-import { quotationRouter } from './routes/quotations.js';
-import { backupRouter } from './routes/backup.js';
+import { app } from './app.js';
 
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
-dotenv.config();
-
-const app = express();
 const PORT = parseInt(process.env.PORT || '5000', 10);
-
-app.use(cors());
-app.use(express.json());
-
-// Request logging middleware
-app.use((req, _res, next) => {
-  const start = Date.now();
-  next();
-  const duration = Date.now() - start;
-  if (req.path.startsWith('/api')) {
-    console.log(`[API] ${req.method} ${req.path} - ${duration}ms`);
-  }
-});
-
-// API Routes
-app.use('/api/health', healthRouter);
-app.use('/api/stock', stockRouter);
-app.use('/api/customers', customerRouter);
-app.use('/api/orders', ordersRouter);
-app.use('/api/suppliers', supplierRouter);
-app.use('/api/quotations', quotationRouter);
-app.use('/api/backup', backupRouter);
 
 // Start server
 app.listen(PORT, async () => {

@@ -49,7 +49,7 @@ export const SalesRecordPage: React.FC<SalesRecordPageProps> = ({ onInitiateRMA 
 
   useEffect(() => {
     loadSales();
-  }, [startDate, endDate]);
+  }, [startDate, endDate, searchCustomer]);
 
   useEffect(() => {
     const handleUpdate = () => {
@@ -65,7 +65,8 @@ export const SalesRecordPage: React.FC<SalesRecordPageProps> = ({ onInitiateRMA 
       const data = await salesService.getOrders({
         startDate: startDate || undefined,
         endDate: endDate || undefined,
-        serial: scanSerial || undefined
+        serial: scanSerial || undefined,
+        search: searchCustomer || undefined
       });
       setOrders(data);
 

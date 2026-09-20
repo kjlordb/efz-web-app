@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import { getPool, sql } from '../db.js';
+import { requirePermission } from '../auth.js';
 
 export const supplierRouter = Router();
 
 // GET /api/suppliers - List suppliers with active stock units
-supplierRouter.get('/', async (req, res) => {
+supplierRouter.get('/', requirePermission('VIEW_INVENTORY'), async (req, res) => {
   try {
     const pool = await getPool();
     const { search } = req.query;
@@ -56,7 +57,7 @@ supplierRouter.get('/', async (req, res) => {
 });
 
 // POST /api/suppliers - Register new supplier
-supplierRouter.post('/', async (req, res) => {
+supplierRouter.post('/', requirePermission('MANAGE_SUPPLIERS'), async (req, res) => {
   try {
     const pool = await getPool();
     const { supplierName, supplierAddress, supplierEmail, supplierContact } = req.body;

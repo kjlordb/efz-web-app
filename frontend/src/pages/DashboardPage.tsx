@@ -17,8 +17,8 @@ import {
   RotateCcw,
   Sparkles
 } from 'lucide-react';
-import { inventoryService, salesService, customerService, rmaService, installmentService, DATA_UPDATED_EVENT } from '../services/api';
-import { Order, StockItem, Customer, RMATicket, InstallmentPlan } from '../types';
+import { dashboardService, salesService, rmaService, installmentService, DATA_UPDATED_EVENT, DashboardSummary } from '../services/api';
+import { Order, RMATicket, InstallmentPlan } from '../types';
 import { ActiveTab } from '../components/layout/Sidebar';
 import { BrandLogo } from '../components/common/BrandLogo';
 
@@ -28,25 +28,22 @@ interface DashboardPageProps {
 }
 
 export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
-  const [stock, setStock] = useState<StockItem[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
-  const [customers, setCustomers] = useState<Customer[]>([]);
   const [rmaTickets, setRmaTickets] = useState<RMATicket[]>([]);
   const [installments, setInstallments] = useState<InstallmentPlan[]>([]);
+  const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [loading, setLoading] = useState(true);
 
   const load = async () => {
     try {
-      const [s, o, c, r, i] = await Promise.all([
-        inventoryService.getStockItems({ includeDeleted: false }),
+      const [dashboardSummary, o, r, i] = await Promise.all([
+        dashboardService.getSummary(),
         salesService.getOrders(),
-        customerService.getCustomers(),
         rmaService.getTickets(),
         installmentService.getPlans()
       ]);
-      setStock(s);
+      setSummary(dashboardSummary);
       setOrders(o);
-      setCustomers(c);
       setRmaTickets(r);
       setInstallments(i);
     } finally {
@@ -63,28 +60,17 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
     return () => window.removeEventListener(DATA_UPDATED_EVENT, handleUpdate);
   }, []);
 
-  const totalRevenue = orders.reduce((acc, o) => acc + o.orderAmount, 0);
-  const inStockCount = stock.filter((i) => i.stockStatus === 'stored').length;
-  const totalStockValue = stock
-    .filter((i) => i.stockStatus === 'stored')
-    .reduce((acc, i) => acc + i.stockPrice, 0);
-  const totalStockCost = stock
-    .filter((i) => i.stockStatus === 'stored')
-    .reduce((acc, i) => acc + i.suppliersPrice, 0);
+  const totalRevenue = summary?.totalRevenue || 0;
+  const totalOrders = summary?.totalOrders || 0;
+  const inStockCount = summary?.activeStockUnits || 0;
+  const totalStockValue = summary?.activeInventoryRetailValue || 0;
 
   // Total Outstanding Installment AR
   const totalOutstandingAR = installments.reduce((acc, i) => acc + i.remainingBalance, 0);
   const activeRMAClaims = rmaTickets.filter((r) => r.status !== 'Resolved & Released').length;
 
   // Group by category
-  const categoryCounts = stock
-    .filter((i) => i.stockStatus === 'stored')
-    .reduce((acc, item) => {
-      acc[item.stockName] = (acc[item.stockName] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-
-  const sortedCategories = Object.entries(categoryCounts).sort((a, b) => b[1] - a[1]);
+  const sortedCategories = summary?.categories || [];
 
   return (
     <div className="space-y-6">
@@ -151,7 +137,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
               ₱{totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}
             </div>
             <div className="flex items-center gap-1.5 text-xs text-slate-400 mt-1">
-              <span>{orders.length} tax invoices finalized</span>
+              <span>{totalOrders} tax invoices finalized</span>
             </div>
           </div>
         </div>
@@ -304,13 +290,13 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
           </div>
 
           <div className="space-y-3 flex-1 overflow-y-auto pr-1">
-            {sortedCategories.map(([category, count]) => {
-              const percentage = Math.round((count / (inStockCount || 1)) * 100);
+            {sortedCategories.map(({ category, units }) => {
+              const percentage = Math.round((units / (inStockCount || 1)) * 100);
               return (
                 <div key={category} className="space-y-1">
                   <div className="flex items-center justify-between text-xs">
                     <span className="font-medium text-slate-300">{category}</span>
-                    <span className="font-bold text-slate-100 font-mono">{count} units ({percentage}%)</span>
+                    <span className="font-bold text-slate-100 font-mono">{units} units ({percentage}%)</span>
                   </div>
                   <div className="w-full bg-slate-950/60 h-2 rounded-full overflow-hidden border border-white/[0.06] p-0.5">
                     <div

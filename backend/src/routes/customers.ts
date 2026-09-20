@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import { getPool, sql } from '../db.js';
+import { requirePermission } from '../auth.js';
 
 export const customerRouter = Router();
 
 // GET /api/customers - Query customers with order metrics
-customerRouter.get('/', async (req, res) => {
+customerRouter.get('/', requirePermission('MANAGE_CUSTOMERS'), async (req, res) => {
   try {
     const pool = await getPool();
     const { search, limit = '100', offset = '0' } = req.query;
@@ -81,7 +82,7 @@ customerRouter.get('/', async (req, res) => {
 });
 
 // POST /api/customers - Register new customer
-customerRouter.post('/', async (req, res) => {
+customerRouter.post('/', requirePermission('MANAGE_CUSTOMERS'), async (req, res) => {
   try {
     const pool = await getPool();
     const {
@@ -131,10 +132,10 @@ customerRouter.post('/', async (req, res) => {
 });
 
 // PUT /api/customers/:id - Update customer record
-customerRouter.put('/:id', async (req, res) => {
+customerRouter.put('/:id', requirePermission('MANAGE_CUSTOMERS'), async (req, res) => {
   try {
     const pool = await getPool();
-    const id = parseInt(req.params.id, 10);
+    const id = parseInt(String(req.params.id), 10);
     const { firstName, lastName, company, address, email, contactNumber, remarks } = req.body;
 
     await pool

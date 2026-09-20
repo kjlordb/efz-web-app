@@ -10,7 +10,7 @@ interface AccessRestrictedProps {
 }
 
 export const AccessRestricted: React.FC<AccessRestrictedProps> = ({ attemptedTab, onNavigateHome }) => {
-  const { currentUser, switchRole } = useAuth();
+  const { currentUser, logout } = useAuth();
   const currentRole = currentUser?.role || 'cashier';
   const roleMeta = ROLE_DEFINITIONS[currentRole];
 
@@ -69,15 +69,13 @@ export const AccessRestricted: React.FC<AccessRestrictedProps> = ({ attemptedTab
             <span>Return to {roleMeta.entityLabel}</span>
           </button>
 
-          {/* Quick Switch for Client Presentation */}
-          {authorizedRoles.length > 0 && (
-            <button
-              onClick={() => switchRole(authorizedRoles[0])}
-              className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 font-semibold text-xs border border-white/[0.1] hover:border-teal-400/40 transition-all cursor-pointer"
-            >
-              Switch to {ROLE_DEFINITIONS[authorizedRoles[0]].role} View
-            </button>
-          )}
+          <button
+            onClick={logout}
+            className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 font-semibold text-xs border border-white/[0.1] hover:border-teal-400/40 transition-all cursor-pointer flex items-center justify-center gap-2"
+          >
+            <UserCheck className="w-3.5 h-3.5 text-teal-400" />
+            <span>Switch Operator Account</span>
+          </button>
         </div>
       </div>
     </div>

@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "tsx src/index.ts",
     "start": "tsx src/index.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "auth:hash": "tsx src/create_password_hash.ts",
+    "db:migrate:operational": "tsx src/migrations/create_operational_tables.ts"
   },
   "dependencies": {
     "cors": "^2.8.6",
